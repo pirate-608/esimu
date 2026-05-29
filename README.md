@@ -6,28 +6,45 @@
 
 ## 安装
 
-从 [GitHub Releases](https://github.com/YOUR_USER/esimu/releases) 下载对应平台的压缩包，解压后将可执行文件放入 PATH 即可。
+### 一键安装（推荐）
 
-**Windows**
+**Windows (PowerShell):**
 
-下载 `esimu-windows-x64.zip`，解压后将 `esimu.exe` 放入任意 PATH 目录（或直接在解压目录中使用）。
-
-**macOS**
-
-```bash
-# 下载并解压
-tar -xzf esimu-darwin-arm64.tar.gz
-chmod +x esimu-darwin-arm64
-sudo mv esimu-darwin-arm64 /usr/local/bin/esimu
+```powershell
+irm https://raw.githubusercontent.com/pirate-608/esimu/main/scripts/install.ps1 | iex
 ```
 
-**Linux**
+或手动指定仓库：
+
+```powershell
+.\install.ps1 -Repo pirate-608/esimu
+```
+
+**Linux / macOS:**
 
 ```bash
-tar -xzf esimu-linux-x64.tar.gz
-chmod +x esimu-linux-x64
-sudo mv esimu-linux-x64 /usr/local/bin/esimu
+curl -fsSL https://raw.githubusercontent.com/pirate-608/esimu/main/scripts/install.sh | bash
 ```
+
+或手动指定仓库：
+
+```bash
+REPO=pirate-608/esimu bash install.sh
+```
+
+脚本会自动下载最新版本，解压并安装到 `~/.local/bin`。
+
+### 手动安装
+
+从 [GitHub Releases](https://github.com/pirate-608/esimu/releases) 下载对应平台的压缩包：
+
+| 平台 | 文件 |
+| :--- | :--- |
+| Windows x64 | `esimu-windows-x64.zip` |
+| macOS arm64 | `esimu-darwin-arm64.tar.gz` |
+| Linux x64 | `esimu-linux-x64.tar.gz` |
+
+解压后将可执行文件放入 PATH 目录（如 `~/.local/bin`），Linux/macOS 需 `chmod +x`。
 
 > 也可以从源码运行：`git clone` 后使用 `bun run src/cli.ts -- <command>` 进行开发调试。
 
