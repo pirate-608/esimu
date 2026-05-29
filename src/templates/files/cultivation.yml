@@ -1,0 +1,227 @@
+title: 修仙之路
+description: 你是一个初入修真界的凡人，踏上修仙之路，追求长生与大道。
+
+stats:
+  hp:
+    name: 生命
+    min: 0
+    max: 500
+    default: 100
+  qi:
+    name: 灵力
+    min: 0
+    max: 500
+    default: 50
+  realm:
+    name: 境界
+    min: 0
+    max: 100
+    default: 0
+  talent:
+    name: 天赋
+    min: 0
+    max: 20
+    default: 5
+  willpower:
+    name: 意志
+    min: 0
+    max: 20
+    default: 5
+
+character_creation:
+  total_points: 12
+  assignable:
+    - talent
+    - willpower
+
+events:
+  - id: start
+    title: 踏上仙途
+    description: 你站在青云山脚下，前方是传说中的修仙宗门——青云宗。山门巍峨，灵气环绕。
+    choices:
+      - text: 叩拜山门，请求入门
+        next_event: entrance_test
+      - text: 寻访附近散修
+        next_event: wanderer
+  - id: entrance_test
+    title: 入门试炼
+    description: 青云宗长老设下入门试炼——穿越灵气迷阵。
+    choices:
+      - text: 以天赋感应灵气
+        condition:
+          talent: 8
+        effects:
+          realm: 10
+        next_event: accepted
+      - text: 以意志强行突破
+        condition:
+          willpower: 5
+        effects:
+          hp: -30
+          realm: 5
+        next_event: accepted_hurt
+      - text: 放弃试炼
+        next_event: wanderer
+  - id: accepted
+    title: 入门成功
+    description: 你的天赋让长老们眼前一亮。你被授予内门弟子身份，获得一部基础功法。
+    effects:
+      qi: 30
+    choices:
+      - text: 闭关修炼功法
+        effects:
+          qi: 50
+          realm: 15
+        next_event: inner_disciple
+      - text: 探索宗门秘境
+        next_event: secret_realm
+  - id: accepted_hurt
+    title: 勉强通过
+    description: 虽然受伤，但你的意志打动了长老。你被收为外门弟子。
+    choices:
+      - text: 养伤修炼
+        effects:
+          hp: 40
+          qi: 20
+        next_event: outer_disciple
+      - text: 强撑身体去听道
+        effects:
+          hp: -20
+          realm: 8
+        next_event: outer_disciple
+  - id: wanderer
+    title: 散修之路
+    description: 你遇到了一位游历四方的散修老者，他看你有缘，愿意指点你一二。
+    choices:
+      - text: 接受指点
+        effects:
+          qi: 30
+          talent: 2
+        next_event: hermit_training
+      - text: 婉拒，独自修行
+        next_event: solo_path
+  - id: inner_disciple
+    title: 内门修炼
+    description: 你在内门勤奋修炼，修为突飞猛进。宗门大比即将开始。
+    choices:
+      - text: 参加宗门大比
+        condition:
+          realm: 30
+        next_event: tournament
+      - text: 继续闭关
+        effects:
+          realm: 20
+          qi: 100
+        next_event: ending_ascension
+  - id: outer_disciple
+    title: 外门磨砺
+    description: 外门生活艰苦，但你也逐渐成长。你听闻后山有一处灵眼。
+    choices:
+      - text: 冒险前往灵眼
+        effects:
+          qi: 80
+          hp: -40
+        next_event: spirit_eye
+      - text: 踏实修炼
+        effects:
+          realm: 15
+        next_event: ending_humble
+  - id: secret_realm
+    title: 宗门秘境
+    description: 秘境中危险与机遇并存，你发现了一株千年灵芝和守护妖兽。
+    choices:
+      - text: 挑战妖兽
+        condition:
+          qi: 80
+        effects:
+          qi: -60
+          hp: -50
+          realm: 25
+        next_event: inner_disciple
+      - text: 悄悄取走灵芝
+        condition:
+          talent: 10
+        effects:
+          qi: 100
+        next_event: inner_disciple
+      - text: 安全退回
+        next_event: inner_disciple
+  - id: hermit_training
+    title: 隐者修炼
+    description: 在老者的指导下，你的修为稳扎稳打。老者临别前留下一部秘籍。
+    choices:
+      - text: 研读秘籍
+        effects:
+          qi: 60
+          realm: 20
+        next_event: ending_hermit
+      - text: 下山历练
+        next_event: solo_path
+  - id: solo_path
+    title: 独自修行
+    description: 你独自在山中修行，虽慢但根基扎实。一日天降异象。
+    choices:
+      - text: 前往异象处
+        effects:
+          qi: 50
+        next_event: ending_wanderer
+      - text: 继续修炼
+        effects:
+          realm: 20
+        next_event: ending_humble
+  - id: spirit_eye
+    title: 灵眼奇遇
+    description: 灵眼中浓郁的能量涌入你体内，改造着你的根骨。
+    choices:
+      - text: 全力吸收
+        effects:
+          qi: 100
+          realm: 30
+        next_event: ending_humble
+      - text: 适可而止
+        effects:
+          qi: 50
+          realm: 15
+        next_event: ending_humble
+  - id: tournament
+    title: 宗门大比
+    description: 你在宗门大比中一路过关斩将，最终站在决赛场上。
+    choices:
+      - text: 全力一击
+        condition:
+          qi: 150
+        effects:
+          realm: 30
+        next_event: ending_champion
+      - text: 以巧取胜
+        condition:
+          talent: 12
+        effects:
+          realm: 20
+        next_event: ending_champion
+
+endings:
+  - condition:
+      realm: 60
+      qi: 200
+    title: 飞升大道
+    description: 你的修为突破桎梏，天降祥云，白日飞升！三界震惊，万仙来朝。
+  - condition:
+      talent: 12
+      realm: 40
+    title: 宗门天骄
+    description: 你以惊世天赋击败无数对手，成为宗门第一人。青云宗在你的带领下走向辉煌。
+  - condition:
+      willpower: 10
+      realm: 30
+    title: 隐世真修
+    description: 你选择了一条与众不同的道路，隐于山林，与天地同修。虽无名声，但道行深厚。
+  - condition:
+      hp: 100
+      realm: 20
+    title: 散修大师
+    description: 你以散修之身游历天下，积累无数奇遇，终成一代传奇散修。
+  - default: true
+    title: 凡人之路
+    description: 修真的道路漫长而艰辛。你虽然没有走得很远，但在修行中找到了属于自己的平静。
+

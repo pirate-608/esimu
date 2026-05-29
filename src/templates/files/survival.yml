@@ -1,0 +1,217 @@
+title: 末日求生
+description: 核战后的废土世界，辐射、变异生物、资源匮乏。你能在这片废土上活下来吗？
+
+stats:
+  hp:
+    name: 生命
+    min: 0
+    max: 100
+    default: 100
+  hunger:
+    name: 饱腹度
+    min: 0
+    max: 100
+    default: 80
+  radiation:
+    name: 辐射值
+    min: 0
+    max: 100
+    default: 10
+  strength:
+    name: 力量
+    min: 0
+    max: 20
+    default: 5
+  scavenging:
+    name: 搜寻
+    min: 0
+    max: 20
+    default: 5
+
+character_creation:
+  total_points: 10
+  assignable:
+    - strength
+    - scavenging
+
+events:
+  - id: start
+    title: 避难所出口
+    description: 地下避难所的食物已经耗尽，你不得不打开厚重的铁门，走向地面世界。阳光刺痛你的眼睛，废土的气息扑面而来。
+    choices:
+      - text: 前往远处的城市废墟
+        next_event: city_ruins
+      - text: 查看避难所附近的废弃加油站
+        next_event: gas_station
+      - text: 沿着公路前行
+        next_event: highway
+  - id: city_ruins
+    title: 城市废墟
+    description: 曾经繁华的城市现在只剩下断壁残垣。你听到废墟深处有窸窣声……
+    choices:
+      - text: 小心搜寻物资
+        condition:
+          scavenging: 5
+        effects:
+          hunger: 20
+        next_event: raider_encounter
+      - text: 远离声音来源
+        next_event: highway
+  - id: gas_station
+    title: 废弃加油站
+    description: 加油站的便利店还残留着一些未开封的罐头。但这里似乎也有其他人来过。
+    choices:
+      - text: 搜集食物
+        effects:
+          hunger: 30
+          radiation: 10
+        next_event: traveler_meet
+      - text: 查看地下油库
+        condition:
+          strength: 8
+        effects:
+          radiation: 25
+        next_event: fuel_cache
+      - text: 标记位置后离开
+        next_event: highway
+  - id: highway
+    title: 荒废公路
+    description: 公路两旁是被风沙侵蚀的汽车残骸。远处有一个路标指向「庇护所营地」。
+    choices:
+      - text: 前往庇护所营地
+        next_event: shelter_camp
+      - text: 搜查路边车辆
+        effects:
+          hunger: 15
+          scavenging: 2
+        next_event: mutated_creature
+      - text: 原路返回
+        next_event: start
+  - id: raider_encounter
+    title: 遭遇掠夺者
+    description: 一群掠夺者从废墟中冲出来，他们手持生锈的武器，目光贪婪。
+    choices:
+      - text: 正面迎战
+        condition:
+          strength: 10
+        effects:
+          hp: -40
+          hunger: 10
+        next_event: victory_loot
+      - text: 交出物资求和
+        effects:
+          hunger: -30
+        next_event: highway
+      - text: 逃跑
+        effects:
+          hp: -10
+        next_event: highway
+  - id: victory_loot
+    title: 劫后丰收
+    description: 你击败了掠夺者，从他们的营地搜刮到了大量物资和一张地图。
+    choices:
+      - text: 按地图前往军事基地
+        next_event: military_base
+      - text: 回到避难所休整
+        next_event: start
+  - id: traveler_meet
+    title: 旅人相遇
+    description: 你遇到了一个独行的旅人，他似乎对这片废土了如指掌。
+    choices:
+      - text: 和他交换情报
+        effects:
+          scavenging: 3
+        next_event: shelter_camp
+      - text: 结伴同行
+        effects:
+          hunger: -10
+        next_event: shelter_camp
+  - id: fuel_cache
+    title: 油库发现
+    description: 地下油库中竟然还有大量未使用的燃料！但辐射值也很高。
+    choices:
+      - text: 尽可能取走燃料
+        effects:
+          radiation: 30
+        next_event: ending_fuel_boss
+      - text: 放弃高风险战利品
+        next_event: gas_station
+  - id: shelter_camp
+    title: 庇护所营地
+    description: 这是一个由幸存者建立的营地，有围墙、哨塔和交易市场。营地领袖正在招募寻找净水装置的志愿者。
+    choices:
+      - text: 接受任务
+        next_event: water_plant
+      - text: 在营地交易休息
+        effects:
+          hunger: 20
+          hp: 20
+        next_event: ending_camp_life
+  - id: mutated_creature
+    title: 变异生物
+    description: 一只巨大的变异老鼠从车辆残骸中冲出，獠牙滴着绿色的毒液！
+    choices:
+      - text: 战斗！
+        condition:
+          strength: 8
+        effects:
+          hp: -30
+          hunger: 15
+        next_event: highway
+      - text: 迅速逃跑
+        effects:
+          hp: -5
+        next_event: highway
+  - id: military_base
+    title: 军事基地
+    description: 废弃的军事基地大门半掩，里面似乎有发电机在运转的声音。
+    choices:
+      - text: 进入指挥中心
+        next_event: ending_military
+      - text: 搜查军械库
+        condition:
+          scavenging: 10
+        effects:
+          strength: 5
+        next_event: ending_armed
+  - id: water_plant
+    title: 净水工厂
+    description: 工厂被变异的藤蔓植物覆盖，但核心的净水装置似乎还能运转。你看到了一只巨大的变异植物守卫。
+    choices:
+      - text: 凭借力量摧毁守卫
+        condition:
+          strength: 12
+        next_event: ending_water
+      - text: 寻找绕过守卫的路径
+        condition:
+          scavenging: 8
+        next_event: ending_water
+
+endings:
+  - condition:
+      radiation: 70
+    title: 辐射变异
+    description: 过度的辐射暴露使你的身体开始变异。你逐渐失去人性，变成废土上又一个变异生物……
+  - condition:
+      hunger: 60
+      hp: 60
+      scavenging: 10
+    title: 废土生存大师
+    description: 你凭借过人的搜寻能力和生存意志，在废土上建立了自己的营地。你是这片废土上最后的希望。
+  - condition:
+      strength: 12
+      hp: 70
+    title: 废土霸主
+    description: 强大的力量让你在废土上无人能敌。掠夺者闻风丧胆，幸存者视你为救世主。
+  - condition:
+      scavenging: 6
+    title: 净水英雄
+    description: 你成功启动了净水装置！营地有了清洁的水源，幸存者们为你立了一座雕像。
+  - condition:
+      strength: 6
+    title: 军事力量
+    description: 你发现了军事基地中保存完好的武器库和通讯设备。你向外界发出信号，希望尚存。
+  - default: true
+    title: 废土流浪者
+    description: 你在废土上默默流浪，虽然没做出什么壮举，但也顽强地活着。明天又是新的一天。
+

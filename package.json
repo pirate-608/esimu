@@ -1,0 +1,26 @@
+{
+  "name": "esimu",
+  "version": "0.1.0",
+  "module": "src/cli.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun run src/cli.ts",
+    "build": "bun build src/cli.ts --compile --outfile dist-bin/esimu",
+    "typecheck": "bun run tsc --noEmit"
+  },
+  "dependencies": {
+    "chokidar": "^5.0.0",
+    "commander": "^14.0.3",
+    "js-yaml": "^4.1.1",
+    "marked": "^18.0.4"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/js-yaml": "^4.0.9"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
+}

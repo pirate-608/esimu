@@ -1,0 +1,107 @@
+title: 我的文字模拟器
+description: 一个简单的文字模拟器游戏
+
+stats:
+  hp:
+    name: 生命值
+    min: 0
+    max: 100
+    default: 100
+  mana:
+    name: 法力值
+    min: 0
+    max: 100
+    default: 50
+  strength:
+    name: 力量
+    min: 0
+    max: 20
+    default: 5
+  intelligence:
+    name: 智力
+    min: 0
+    max: 20
+    default: 5
+
+character_creation:
+  total_points: 15
+  assignable:
+    - strength
+    - intelligence
+
+events:
+  - id: start
+    title: 冒险开始
+    description: 你站在一个分岔路口，前方有两条路。左边通向幽暗的森林，右边通向巍峨的山脉。
+    choices:
+      - text: 进入森林
+        next_event: forest
+      - text: 攀登山脉
+        condition:
+          strength: 5
+        next_event: mountain
+  - id: forest
+    title: 幽暗森林
+    description: 森林中光线昏暗，你听到远处有野兽的咆哮声。
+    choices:
+      - text: 小心前进
+        next_event: forest_deep
+      - text: 原路返回
+        next_event: start
+  - id: forest_deep
+    title: 森林深处
+    description: 你发现了一座古老的遗迹，散发着神秘的光芒。
+    choices:
+      - text: 触碰光芒
+        effects:
+          mana: 20
+          hp: -10
+        next_event: ending_magic
+      - text: 离开遗迹
+        next_event: forest
+  - id: mountain
+    title: 巍峨山脉
+    description: 山路崎岖，寒风凛冽。你在半山腰发现了一个山洞。
+    choices:
+      - text: 进入山洞
+        next_event: cave
+      - text: 继续攀登
+        condition:
+          hp: 50
+        next_event: mountain_top
+  - id: cave
+    title: 隐秘山洞
+    description: 洞中温暖干燥，角落里有一些古老的书籍。
+    choices:
+      - text: 阅读书籍
+        effects:
+          intelligence: 3
+          mana: -10
+        next_event: ending_knowledge
+      - text: 离开山洞
+        next_event: mountain
+  - id: mountain_top
+    title: 山顶之巅
+    description: 你成功登顶！眼前是壮丽的景色，你感到无比自豪。
+    choices:
+      - text: 欣赏风景
+        next_event: ending_glory
+
+endings:
+  - condition:
+      mana: 60
+    title: 魔法觉醒
+    description: 你体内的魔力被唤醒，成为了一位强大的法师。
+  - condition:
+      intelligence: 10
+    title: 知识之路
+    description: 你掌握了远古的知识，成为了最睿智的学者。
+  - condition:
+      hp: 80
+      strength: 8
+    title: 荣耀之巅
+    description: 你用勇气和力量征服了高山，成为了传奇冒险家。
+  - default: true
+    title: 平凡之路
+    description: 你的冒险结束了，虽然没有什么惊天动地的成就，但旅途本身就是最好的收获。
+

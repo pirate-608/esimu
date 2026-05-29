@@ -1,0 +1,203 @@
+title: 龙与地牢
+description: 一个经典的奇幻冒险世界。地牢深处埋藏着古老的宝藏与可怕的怪物。
+
+stats:
+  hp:
+    name: 生命值
+    min: 0
+    max: 100
+    default: 100
+  mana:
+    name: 魔力
+    min: 0
+    max: 100
+    default: 40
+  strength:
+    name: 力量
+    min: 0
+    max: 20
+    default: 5
+  dexterity:
+    name: 敏捷
+    min: 0
+    max: 20
+    default: 5
+  wisdom:
+    name: 智慧
+    min: 0
+    max: 20
+    default: 5
+  gold:
+    name: 金币
+    min: 0
+    max: 9999
+    default: 0
+
+character_creation:
+  total_points: 12
+  assignable:
+    - strength
+    - dexterity
+    - wisdom
+
+events:
+  - id: start
+    title: 冒险者公会
+    description: 你走进冒险者公会，布告栏上贴满了委托。一位老者正在招募探索远古地牢的队伍。
+    choices:
+      - text: 接受地牢探索委托
+        next_event: dungeon_entrance
+      - text: 先去酒馆收集情报
+        next_event: tavern
+      - text: 接一个简单的护送任务
+        effects:
+          gold: 50
+          hp: -10
+        next_event: tavern
+  - id: tavern
+    title: 喧闹的酒馆
+    description: 吟游诗人在弹唱英雄传奇。吧台边有个独眼佣兵在低声谈论远古地牢的秘密。
+    choices:
+      - text: 请佣兵喝一杯，打听情报
+        effects:
+          gold: -20
+          wisdom: 2
+        next_event: dungeon_entrance
+      - text: 直接前往地牢
+        next_event: dungeon_entrance
+  - id: dungeon_entrance
+    title: 地牢入口
+    description: 远古地牢的入口被藤蔓覆盖，石门上刻着古老的符文。空气中有股霉味和魔法的气息。
+    choices:
+      - text: 解读符文
+        condition:
+          wisdom: 8
+        effects:
+          mana: 30
+        next_event: rune_passage
+      - text: 推开石门进入
+        condition:
+          strength: 8
+        next_event: main_hall
+      - text: 寻找密道
+        condition:
+          dexterity: 8
+        next_event: secret_passage
+      - text: 原路返回
+        next_event: start
+  - id: rune_passage
+    title: 符文走廊
+    description: 你解读了符文，一扇隐藏的门缓缓打开。走廊尽头是一间充满魔法能量的密室。
+    choices:
+      - text: 触碰魔法水晶
+        effects:
+          mana: 50
+          hp: -10
+        next_event: main_hall
+      - text: 小心绕过去
+        next_event: main_hall
+  - id: main_hall
+    title: 地牢主厅
+    description: 巨大的石柱撑起穹顶，中央有一个石棺，周围散落着金币和魔法卷轴。一只石像鬼从阴影中苏醒！
+    choices:
+      - text: 用魔法对抗石像鬼
+        condition:
+          mana: 50
+        effects:
+          mana: -40
+          hp: -20
+          gold: 100
+        next_event: treasure_room
+      - text: 用力量击碎石像鬼
+        condition:
+          strength: 10
+        effects:
+          hp: -30
+          gold: 80
+        next_event: treasure_room
+      - text: 敏捷地抢夺宝物后逃跑
+        condition:
+          dexterity: 10
+        effects:
+          gold: 60
+        next_event: lower_levels
+      - text: 战略性撤退
+        next_event: dungeon_entrance
+  - id: secret_passage
+    title: 秘密通道
+    description: 狭窄的密道中充满了陷阱，但前方的光芒表明这里有珍贵的宝物。
+    choices:
+      - text: 拆除陷阱
+        condition:
+          dexterity: 10
+        effects:
+          gold: 200
+          dexterity: 2
+        next_event: lower_levels
+      - text: 冒险冲过去
+        effects:
+          hp: -25
+          gold: 100
+        next_event: lower_levels
+      - text: 返回地牢入口
+        next_event: dungeon_entrance
+  - id: treasure_room
+    title: 藏宝室
+    description: 石像鬼守护的宝物超出了你的想象！金币堆成小山，魔法武器挂满墙壁。
+    choices:
+      - text: 取走魔法武器
+        effects:
+          strength: 5
+          mana: 30
+          gold: 500
+        next_event: ending_hero
+      - text: 只取金币
+        effects:
+          gold: 1000
+        next_event: ending_rich
+  - id: lower_levels
+    title: 地牢下层
+    description: 蜿蜒的阶梯通向地牢更深处。远方传来低沉的龙吟声……这是一条活着的龙！
+    choices:
+      - text: 挑战巨龙
+        condition:
+          strength: 15
+          hp: 60
+        effects:
+          hp: -50
+          gold: 2000
+        next_event: ending_dragonslayer
+      - text: 用智慧与龙谈判
+        condition:
+          wisdom: 12
+          mana: 60
+        effects:
+          gold: 1500
+          wisdom: 5
+        next_event: ending_dragon_friend
+      - text: 悄悄撤退
+        next_event: ending_rich
+
+endings:
+  - condition:
+      gold: 1000
+      strength: 12
+    title: 屠龙勇士
+    description: 你斩杀了远古巨龙！你的名字被吟游诗人传唱，王国为你立起了雕像。
+  - condition:
+      wisdom: 15
+      gold: 500
+    title: 龙之盟友
+    description: 你的智慧打动了巨龙。你们达成协议，巨龙守护王国，你成为最伟大的贤者。
+  - condition:
+      gold: 500
+    title: 富甲一方
+    description: 你带着满满的金币回到地面，买下了城镇的城堡，过着奢华的生活。
+  - condition:
+      mana: 80
+      wisdom: 10
+    title: 大法师
+    description: 地牢的魔法能量彻底释放了你的潜能。你成为了王国首席大法师。
+  - default: true
+    title: 冒险继续
+    description: 地牢的探索到此为止，但冒险者的生活永无止境。收拾行囊，准备下一次冒险吧！
