@@ -69,6 +69,8 @@ Minimal commander setup — registers three subcommands imported from `src/comma
 ### Templates (`src/templates/`)
 `index.ts` exports a `TEMPLATES` map (key → YAML string) and `TEMPLATE_NAMES` map (key → Chinese display name). Four presets: default, cultivation (修仙), survival (末日), fantasy (龙与地牢). Each is a complete `game.yml` with stats, character creation, events, and endings.
 
+Template content is inlined as template literal strings in `index.ts` (needed for `bun build --compile`). The editable source-of-truth YAML/MD files live in `src/templates/files/`. After editing them, run `bun run sync-templates` to regenerate `index.ts` with the updated content.
+
 ## Key conventions
 
 - **All CLI commands operate on CWD**, not a subdirectory. User workspace files (game.yml, events/, dist/) live in the directory the user runs the command from.

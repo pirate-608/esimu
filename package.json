@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "bun run src/cli.ts",
     "build": "bun build src/cli.ts --compile --outfile dist-bin/esimu",
-    "typecheck": "bun run tsc --noEmit"
+    "typecheck": "bun run tsc --noEmit",
+    "sync-templates": "bun run scripts/sync-templates.ts"
   },
   "dependencies": {
     "chokidar": "^5.0.0",
