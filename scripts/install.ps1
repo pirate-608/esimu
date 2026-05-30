@@ -27,13 +27,12 @@ if (-not $Repo) {
 }
 
 if (-not $Repo) {
-  Write-Host "Cannot detect repository. Specify it explicitly:" -ForegroundColor Red
-  Write-Host "  .\install.ps1 -Repo owner/name" -ForegroundColor Yellow
-  Write-Host "  or`$env:ESIMU_REPO = 'owner/name'; irm ... | iex" -ForegroundColor Yellow
-  exit 1
+  # Hardcoded default — the repo this script lives in
+  $Repo = "pirate-608/esimu"
+  Write-Host "Repository: $Repo (default)" -ForegroundColor Cyan
+} else {
+  Write-Host "Repository: $Repo" -ForegroundColor Cyan
 }
-
-Write-Host "Repository: $Repo" -ForegroundColor Cyan
 
 # ── Determine download URL ──────────────────────────────────────────
 if ($Version -eq "latest") {

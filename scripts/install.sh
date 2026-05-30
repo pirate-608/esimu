@@ -18,12 +18,16 @@ if [ -z "$REPO" ]; then
   REPO=$(git -C "$(pwd)" remote get-url origin 2>/dev/null || true)
   if [[ "$REPO" =~ github\.com[:/](.+)/(.+?)(\.git)?$ ]]; then
     REPO="${BASH_REMATCH[1]}/${BASH_REMATCH[2]}"
-  else
-    echo "Cannot detect repository. Specify it explicitly:"
-    echo "  REPO=owner/name ./install.sh"
-    echo "  or  curl ... | REPO=owner/name bash"
-    exit 1
   fi
+fi
+
+if [ -z "$REPO" ]; then
+  # Hardcoded default — the repo this script lives in
+  REPO="pirate-608/esimu"
+  echo "Repository: $REPO (default)"
+else
+  echo "Repository: $REPO"
+fi
 fi
 
 # ── Detect platform ─────────────────────────────────────────────────
