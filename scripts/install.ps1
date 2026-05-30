@@ -1,25 +1,39 @@
 # esimu Windows installer
 # Downloads latest release from GitHub and installs to ~/.local/bin
+#
+# Usage:
+#   .\install.ps1 -Repo owner/name              (run as file)
+#   $env:ESIMU_REPO = "owner/name"; irm ... | iex (piped from web)
+#   irm ... | iex                                 (auto-detect from CWD git remote)
 
 param(
   [string]$Repo = "",
   [string]$Version = "latest"
 )
 
+# Suppress progress bars that break Invoke-WebRequest in some shells
+$ProgressPreference = "SilentlyContinue"
 $ErrorActionPreference = "Stop"
 
 # ── Resolve repository ──────────────────────────────────────────────
+if (-not $Repo) { $Repo = $env:ESIMU_REPO }
+
 if (-not $Repo) {
-  # Try to detect from git remote
-  $remote = git -C (Split-Path $PSScriptRoot -Parent) remote get-url origin 2>$null
+  # Try CWD git remote (works both piped and as-file)
+  $remote = git -C (Get-Location) remote get-url origin 2>$null
   if ($remote -match "github\.com[:/](.+?)/(.+?)(\.git)?$") {
     $Repo = "$($Matches[1])/$($Matches[2])"
-  } else {
-    Write-Host "Usage: .\install.ps1 -Repo <owner/name>" -ForegroundColor Red
-    Write-Host "  e.g. .\install.ps1 -Repo yourname/esimu" -ForegroundColor Red
-    exit 1
   }
 }
+
+if (-not $Repo) {
+  Write-Host "Cannot detect repository. Specify it explicitly:" -ForegroundColor Red
+  Write-Host "  .\install.ps1 -Repo owner/name" -ForegroundColor Yellow
+  Write-Host "  or`$env:ESIMU_REPO = 'owner/name'; irm ... | iex" -ForegroundColor Yellow
+  exit 1
+}
+
+Write-Host "Repository: $Repo" -ForegroundColor Cyan
 
 # ── Determine download URL ──────────────────────────────────────────
 if ($Version -eq "latest") {

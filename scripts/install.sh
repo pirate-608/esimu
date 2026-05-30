@@ -1,21 +1,27 @@
 #!/usr/bin/env bash
 # esimu installer (Linux / macOS)
 # Downloads latest release from GitHub and installs to ~/.local/bin
+#
+# Usage:
+#   REPO=owner/name ./install.sh              (run as file)
+#   curl ... | REPO=owner/name bash           (piped from web)
+#   curl ... | bash                            (auto-detect from CWD git remote)
 set -euo pipefail
 
-REPO="${REPO:-}"
+REPO="${REPO:-${ESIMU_REPO:-}}"
 VERSION="${VERSION:-latest}"
 BIN_DIR="${HOME}/.local/bin"
 
 # ── Resolve repository ──────────────────────────────────────────────
 if [ -z "$REPO" ]; then
-  # Try to detect from git remote
-  REPO=$(git -C "$(dirname "$0")/.." remote get-url origin 2>/dev/null || true)
+  # Try to detect from git remote (works both piped from web and as-file)
+  REPO=$(git -C "$(pwd)" remote get-url origin 2>/dev/null || true)
   if [[ "$REPO" =~ github\.com[:/](.+)/(.+?)(\.git)?$ ]]; then
     REPO="${BASH_REMATCH[1]}/${BASH_REMATCH[2]}"
   else
-    echo "Usage: REPO=owner/name ./install.sh"
-    echo "  e.g. REPO=yourname/esimu ./install.sh"
+    echo "Cannot detect repository. Specify it explicitly:"
+    echo "  REPO=owner/name ./install.sh"
+    echo "  or  curl ... | REPO=owner/name bash"
     exit 1
   fi
 fi
