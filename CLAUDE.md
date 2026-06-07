@@ -12,6 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Development (use bun, not node/npm)
 bun run src/cli.ts -- <command>    # Run CLI during development
 bun run typecheck                   # TypeScript type checking (noEmit)
+bun run sync-templates              # Regenerate index.ts from YAML/MD files
 
 # CLI commands (operate in CWD)
 esimu init                          # Scaffold game project (game.yml + events/ + .gitignore)
@@ -42,6 +43,15 @@ bun build src/cli.ts --compile --target=bun-windows-x64  --outfile dist/esimu.ex
 
 ### CLI entry (`src/cli.ts`)
 Minimal commander setup — registers three subcommands imported from `src/commands/`. The entry runs as a Bun script (`#!/usr/bin/env bun`), so use `bun` for all development.
+
+### Scripts
+
+- **`scripts/install.ps1`** / **`scripts/install.sh`** — One-liner installers for Windows (PowerShell) and Linux/macOS (bash). Download latest release from GitHub, extract, and install to `~/.local/bin`.
+- **`scripts/sync-templates.ts`** — Reads `src/templates/files/*.yml` and `example-event.md`, regenerates `src/templates/index.ts` with inline template string literals. Run after editing template files (`bun run sync-templates`).
+
+### GitHub Actions
+
+- **`.github/workflows/release.yml`** — Triggers on `v*` tag push. Cross-compiles binaries for Linux x64, macOS arm64, and Windows x64 via `bun build --compile --target=...`, creates GitHub Release with `.tar.gz`/`.zip` archives.
 
 ### Commands (`src/commands/`)
 
@@ -78,5 +88,5 @@ Template content is inlined as template literal strings in `index.ts` (needed fo
 - **Build is destructive** — `dist/` is always cleared and fully regenerated; no incremental builds.
 - **Custom CSS** — `game.yml` supports an optional `css` field pointing to a custom stylesheet. If set, it replaces the auto-generated CSS entirely. The default CSS uses CSS custom properties (`--bg`, `--surface`, `--accent`, etc.) for easy theming.
 - **Errors in Chinese** — user-facing error messages and console output use Chinese.
-- **The HTML/CSS/JS generators** live in `src/generator.ts`. `build.ts` and `serve.ts` both import from it. `generateHTML(config, liveReload?)` accepts an optional boolean to inject the SSE live-reload script for `--live` mode.
+- **The HTML/CSS/JS generators** live in `src/generator.ts`. `build.ts` and `serve.ts` both import from it. `generateHTML(config, liveReload?)` accepts an optional boolean to inject the SSE live-reload script. `generateCSS()` produces a minimal dark theme using CSS custom properties (`--bg`, `--accent`, etc.) that users can override. `resolveCSS(config, baseDir)` reads a custom CSS file if `css` is set in game.yml, otherwise falls back to `generateCSS()`.
 - **`bun` runtime** — use `bun` for running, building, and typechecking. The `@types/bun` package provides Bun's API types.
