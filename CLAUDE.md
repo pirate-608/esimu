@@ -27,6 +27,8 @@ esimu serve                         # In-memory dev server with live reload (no 
 esimu serve --port <number>         # Custom port
 esimu serve --config <path>         # Use non-default config file
 esimu serve --no-open               # Don't auto-open browser
+esimu graph                         # Export event graph as Mermaid flowchart
+esimu graph --output <file>         # Write Mermaid to file
 
 # Production build (single binary, current platform)
 bun build src/cli.ts --compile --outfile dist-bin/esimu

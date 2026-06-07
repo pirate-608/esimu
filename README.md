@@ -117,6 +117,22 @@ esimu serve --port 8080
 
 修改 `game.yml` 或 `events/` 中的文件后，服务器会自动重建并刷新浏览器。
 
+### `esimu graph`
+
+导出事件流程图为 Mermaid 图表，方便可视化游戏逻辑。
+
+| 选项 | 说明 |
+| :--- | :--- |
+| `--config <path>, -c <path>` | 指定配置文件路径（默认 `game.yml`） |
+| `--output <file>, -o <file>` | 输出到文件（默认打印到终端） |
+
+```bash
+esimu graph                    # 打印 Mermaid 图表到终端
+esimu graph --output game.mmd  # 保存到文件
+```
+
+输出的 Mermaid 代码可直接粘贴到 [mermaid.live](https://mermaid.live) 或 GitHub Markdown 中渲染。
+
 ## 项目结构
 
 执行 `esimu init` 后生成：

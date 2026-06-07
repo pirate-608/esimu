@@ -43,4 +43,5 @@ temp/
 # test
 __test_tpl2/
 __test_init/
-__tesr_css/
+__test_css/
+__test_bin/
