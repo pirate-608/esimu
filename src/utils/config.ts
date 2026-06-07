@@ -193,6 +193,17 @@ export function validateConfig(
     );
   }
 
+  // ── Warn about events where ALL choices are conditional ──────────
+  for (const ev of config.events as unknown[] as Array<Record<string, unknown>>) {
+    const choices = ev.choices as Array<Record<string, unknown>>;
+    if (choices.every((ch) => ch.condition !== undefined && ch.condition !== null)) {
+      console.warn(
+        `⚠ 警告: 事件 "${String(ev.id)}" (${String(ev.title)}) 的所有选项都有条件，` +
+        "当条件都不满足时玩家将卡死。建议添加一个无条件的兜底选项。"
+      );
+    }
+  }
+
   if (!Array.isArray(config.endings) || (config.endings as unknown[]).length === 0) {
     throw new Error(
       'Config validation: "endings" must be a non-empty array.'

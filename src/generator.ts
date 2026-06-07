@@ -302,20 +302,29 @@ function renderEvent(eventId) {
   const container = document.getElementById("choices-container");
   container.innerHTML = "";
 
-  for (const choice of event.choices) {
+  // Filter choices by condition
+  const available = event.choices.filter((c) => {
+    if (!c.condition) return true;
+    return checkCondition(c.condition);
+  });
+
+  // No available choices → soft game-over
+  if (available.length === 0) {
+    document.getElementById("ending-title").textContent = "前路已尽";
+    document.getElementById("ending-description").textContent = "你走到了命运的尽头，再无前路可走……";
+    showScreen("screen-ending");
+    return;
+  }
+
+  for (const choice of available) {
     const btn = document.createElement("button");
     btn.className = "btn btn-choice";
     btn.textContent = choice.text;
 
-    if (!checkCondition(choice.condition)) {
-      btn.disabled = true;
-      btn.textContent += " (条件不满足)";
-    } else {
-      btn.addEventListener("click", () => {
-        applyEffects(choice.effects);
-        handleNextEvent(choice.next_event);
-      });
-    }
+    btn.addEventListener("click", () => {
+      applyEffects(choice.effects);
+      handleNextEvent(choice.next_event);
+    });
 
     container.appendChild(btn);
   }
