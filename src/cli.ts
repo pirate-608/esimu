@@ -5,6 +5,7 @@ import { initCommand } from "./commands/init";
 import { buildCommand } from "./commands/build";
 import { serveCommand } from "./commands/serve";
 import { graphCommand } from "./commands/graph";
+import { skillCommand } from "./commands/skill";
 
 const program = new Command();
 
@@ -17,5 +18,6 @@ program.addCommand(initCommand);
 program.addCommand(buildCommand);
 program.addCommand(serveCommand);
 program.addCommand(graphCommand);
+program.addCommand(skillCommand);
 
 program.parse();
