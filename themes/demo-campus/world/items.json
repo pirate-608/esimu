@@ -1,0 +1,39 @@
+{
+  "version": "1.0.0",
+  "economy": {
+    "initial_gold": 120,
+    "exam_income": {
+      "base": 80,
+      "gpa_multiplier": 30,
+      "failed_penalty": 25
+    }
+  },
+  "items": [
+    {
+      "id": "planner",
+      "name": "通用计划本",
+      "category": "study",
+      "tags": ["学习", "效率"],
+      "price": 80,
+      "sell_price": 40,
+      "description": "一本可以迁移到任何校园主题的计划本。",
+      "effects": {
+        "efficiency": 8,
+        "stress": -2
+      }
+    },
+    {
+      "id": "campus_badge",
+      "name": "校园徽章",
+      "category": "social",
+      "tags": ["社交"],
+      "price": 60,
+      "description": "小小徽章，让陌生人更愿意与你搭话。",
+      "effects": {
+        "charm": 4,
+        "reputation": 3
+      }
+    }
+  ]
+}
+

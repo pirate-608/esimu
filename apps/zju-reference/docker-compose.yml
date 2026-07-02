@@ -1,0 +1,120 @@
+# Production-oriented Compose stack.
+#
+# The backend is reachable by Nginx over the Docker network; local host-port
+# publishing lives in docker-compose.override.yml.
+name: simlab_zju_reference
+
+services:
+  backend:
+    image: ${DOCKER_USERNAME:-pirate608}/simlab-backend:latest
+    container_name: simlab_backend
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-postgresql+asyncpg://simlab:simlab_dev_password@db/simlab}
+      - REDIS_URL=redis://redis:6379/0
+      - LLM_API_KEY=${LLM_API_KEY:-}
+      - LLM_BASE_URL=${LLM_BASE_URL:-}
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - LLM=${LLM:-}
+      - MINIMAX_API_KEY=${MINIMAX_API_KEY:-}
+      - MINIMAX_BASE_URL=${MINIMAX_BASE_URL:-https://api.minimaxi.com/v1}
+      - MINIMAX_MODEL=${MINIMAX_MODEL:-M2-her}
+      - SECRET_KEY=${SECRET_KEY:-simlab_dev_secret_change_me}
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+      - ADMIN_SESSION_SECRET=${ADMIN_SESSION_SECRET:-simlab_admin_session_secret_change_me}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      seed_embeddings:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: always
+    volumes:
+      - ./zjus-backend/world:/app/world
+
+  db:
+    image: pgvector/pgvector:pg15
+    container_name: simlab_db
+    restart: always
+    environment:
+      POSTGRES_USER: simlab
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-simlab_dev_password}
+      POSTGRES_DB: simlab
+    volumes:
+      - simlab_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:25432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U simlab -d simlab" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: simlab_redis
+    restart: always
+    ports:
+      - "127.0.0.1:16379:6379"
+
+  migrate:
+    image: ${DOCKER_USERNAME:-pirate608}/simlab-backend:latest
+    container_name: simlab_migrate
+    command: alembic upgrade head
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-postgresql+asyncpg://simlab:simlab_dev_password@db/simlab}
+      - SECRET_KEY=${SECRET_KEY:-simlab_dev_secret_change_me}
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+      - ADMIN_SESSION_SECRET=${ADMIN_SESSION_SECRET:-simlab_admin_session_secret_change_me}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  seed_embeddings:
+    image: ${DOCKER_USERNAME:-pirate608}/simlab-backend:latest
+    container_name: simlab_seed_embeddings
+    command: python scripts/import_character_embeddings.py
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-postgresql+asyncpg://simlab:simlab_dev_password@db/simlab}
+      - PYTHONPATH=/app
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    volumes:
+      - ./zjus-backend/world:/app/world
+    restart: "no"
+
+  nginx:
+    image: ${DOCKER_USERNAME:-pirate608}/simlab-frontend:latest
+    container_name: simlab_nginx
+    ports:
+      - "18080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      # World data is mounted for public developer reference under /world/.
+      - ./zjus-backend/world:/usr/share/nginx/world
+    depends_on:
+      backend:
+        condition: service_started
+    restart: always
+
+volumes:
+  simlab_postgres_data:

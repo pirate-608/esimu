@@ -1,0 +1,29 @@
+{
+  "theme_id": "zju",
+  "display_name": "ZJUers Simulator",
+  "locale": "zh-CN",
+  "terms": {
+    "institution": "折姜大学",
+    "institution_short": "折大",
+    "campus": "求是园",
+    "feed": "求是园动态",
+    "forum": "CC98",
+    "messenger": "钉钉",
+    "server": "折大服务器",
+    "player": "同学",
+    "player_nickname": "折大人",
+    "semester": "学期",
+    "course": "课程",
+    "item": "道具",
+    "rules": "折大校规",
+    "notice": "折姜大学招生减章"
+  },
+  "storage": {
+    "prefix": "simlab_zju"
+  },
+  "assets": {
+    "hero": "assets/hero.webp",
+    "logo": "assets/logo.webp"
+  },
+  "notes": "Reference theme only. Copy world data deliberately from the main game when Phase 1 starts."
+}

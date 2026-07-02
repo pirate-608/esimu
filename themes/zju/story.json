@@ -1,0 +1,67 @@
+{
+  "prologue": {
+    "diary_title": "启真湖畔",
+    "dedication_lines": [
+      "谨以此游戏献给每一位灿若星辰的浙大人。",
+      "这是一个关于你，我，和他们的故事。"
+    ],
+    "diary_pages": [
+      [
+        "我延毕第三年的清晨，在心悸中打开窗户，紫金港的阳光灿烂。",
+        "导师上午打来电话，“今天去实验室把上次的数据再验证一遍”",
+        "这份杂活我已经干了两年了，心里有些烦躁，但还是答应了。",
+        "钉钉里传来消息，导师发了新论文，要举办庆功宴。",
+        "公众号里学校发布了新推文，标题是“又一篇文章被Nature录用！”",
+        "傍晚，我从实验室出来，散步到了启真湖边。",
+        "湖边有人在喊“毕业快乐”，笑声被晚风吹散...",
+        "他们的笑容被记录在照片上，配文“明天会更好”。",
+        "而我，我却看不到明天..."
+      ],
+      [
+        "天黑了，启真湖边的人渐渐散去...",
+        "今晚的月亮格外明亮，映照在启真湖面，皎洁动人。",
+        "我俯身凝视着湖面，看到了自己的脸。",
+        "我不禁想，在湖里是否有另一个世界？",
+        "或许在那里，明天会更好？",
+        "我纵身一跃，漆黑的湖水将我吞没..."
+      ],
+      [
+        "醒过来时，阳光亮得让我睁不开眼。",
+        "十八岁的我背着包，走到了那扇门前。",
+        "“求是园欢迎您！”",
+        "我重生了，这一次，我要改变自己的人生。"
+      ]
+    ],
+    "scenes": [
+      { "from_line": 0, "image": "zjg_night.jpeg", "tone": "night" },
+      { "from_line": 2, "image": "zjg_autumn.jpg", "tone": "morning" },
+      { "from_line": 7, "image": "qizhen_lake.jpg", "tone": "lake" },
+      { "from_line": 9, "image": "sunset.webp", "tone": "sunset" },
+      { "from_line": 11, "image": "qizhen_lake.jpg", "tone": "lake" },
+      { "from_line": 17, "image": "qiushimen.webp", "tone": "threshold" }
+    ]
+  },
+  "endings": {
+    "failure_date": "退学通知后的夜晚",
+    "failure_title_lines": [
+      "很多年后，我才明白，",
+      "我也许只属于灿烂星辰背后的那片黑夜。"
+    ],
+    "failure_default_reason": "你在求是园中迷失了自我",
+    "failure_note": "这页日记被雨水泡得发皱。可如果还能再来一次，我想把那个没有说出口的“明天会更好”，亲手写完。",
+    "graduation_kicker": "Graduation Ceremony",
+    "graduation_title": "毕业典礼",
+    "graduation_line_low_gpa": "虽然仍旧平凡，但这一次我问心无愧",
+    "graduation_line_high_gpa": "这一世，我活出了更好的自己",
+    "graduation_summary_label": "校史公曰",
+    "graduation_fallback_summary": "此子聪颖过人，勤勉有加。求是园中四载，风华正茂，未来可期。前程似锦，望珍重！",
+    "graduation_background_images": [
+      "qiushimen.webp",
+      "zjg_night.jpeg",
+      "zjg_autumn.jpg",
+      "qizhen_lake.jpg",
+      "sunset.webp"
+    ]
+  }
+}
+

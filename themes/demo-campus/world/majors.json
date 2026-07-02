@@ -1,0 +1,11 @@
+[
+  {
+    "id": "GEN",
+    "name": "通识探索",
+    "desc": "用于验证框架的最小专业。",
+    "category": "demo",
+    "difficulty": 1.0,
+    "iq_bonus": 0
+  }
+]
+

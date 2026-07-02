@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "esimu-core"
+version = "0.1.0"
+description = "Reusable backend core for the esimu simulator framework lab."
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2",
+]
+
+[tool.setuptools.packages.find]
+include = ["esimu_core*"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+

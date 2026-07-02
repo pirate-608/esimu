@@ -1,0 +1,19 @@
+[
+  {
+    "id": "roommate_demo",
+    "name": "林夏",
+    "role": "roommate",
+    "description": "热心的室友，常提醒你别错过课程。",
+    "personality": "温和、务实",
+    "relationship": "室友"
+  },
+  {
+    "id": "teacher_demo",
+    "name": "陈老师",
+    "role": "teacher",
+    "description": "通识课程教师，关注你的学习节奏。",
+    "personality": "耐心、直接",
+    "relationship": "任课教师"
+  }
+]
+

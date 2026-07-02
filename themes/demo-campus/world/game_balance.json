@@ -1,0 +1,77 @@
+{
+  "tick": {
+    "interval_seconds": 3,
+    "semester_duration_seconds": 240
+  },
+  "course": {
+    "base_mastery_gain": 0.8,
+    "efficiency_divisor": 100,
+    "stress_penalty_divisor": 200,
+    "energy_penalty_threshold": 20,
+    "energy_penalty_factor": 0.5
+  },
+  "exam": {
+    "fail_threshold": 60,
+    "fail_sanity_penalty": -12,
+    "pass_all_bonus": 10,
+    "modifiers": {
+      "sanity": {
+        "low_slope": 0.3,
+        "high_slope": 0.12,
+        "excellent_bonus": 6
+      },
+      "stress": {
+        "optimal_bonus": 6,
+        "suboptimal_penalty": -5,
+        "extreme_penalty": -10
+      }
+    }
+  },
+  "relax_actions": {
+    "gym": {
+      "cooldown": 20,
+      "min_energy_required": 30,
+      "energy_cost": -20,
+      "energy_gain": 25,
+      "sanity_gain": 5,
+      "stress_change": -5,
+      "charm_gain_probability": 0.2,
+      "charm_gain": 1
+    },
+    "game": {
+      "cooldown": 18,
+      "energy_cost": -5,
+      "sanity_gain": 12
+    },
+    "walk": {
+      "cooldown": 16,
+      "stress_change": -8
+    },
+    "cc98": {
+      "cooldown": 20,
+      "effects": [
+        { "weight": 0.5, "sanity": 6, "stress": -4 },
+        { "weight": 0.3, "sanity": -5, "stress": 4 },
+        { "weight": 0.2, "sanity": -8, "stress": 8 }
+      ]
+    }
+  },
+  "events": {
+    "random_event": {
+      "check_interval_ticks": 12,
+      "trigger_probability": 0.2
+    },
+    "dingtalk": {
+      "check_interval_ticks": 10,
+      "trigger_probability": 0.2,
+      "max_contacts": 8,
+      "reuse_closed_contact_probability": 0.7
+    }
+  },
+  "game_over": {
+    "sanity_threshold": 0,
+    "stress_threshold": 200,
+    "energy_threshold": 0
+  }
+}
+

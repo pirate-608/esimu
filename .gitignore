@@ -1,0 +1,30 @@
+# Environment
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+pytest-temp/
+
+# Node
+node_modules/
+dist/
+.vite/
+.vitepress/cache/
+
+# Local runtime data
+data/
+logs/
+*.log
+
+# Editor and OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+

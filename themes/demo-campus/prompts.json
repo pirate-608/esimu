@@ -1,0 +1,16 @@
+{
+  "campus_context": "星桥学院校园",
+  "forum_name": "星桥论坛",
+  "messenger_name": "校内信",
+  "forum_batch_instruction": "模拟星桥学院的校内论坛，生成 5 条帖子。",
+  "random_event_instruction": "生成 3 个星桥学院校园随机事件，风格迥异。",
+  "messenger_batch_instruction": "模拟星桥学院校内信消息，生成 5 条（通知/约饭/求助/催作业），发送人身份各异。",
+  "private_chat_instruction": "你正在模拟星桥学院校园校内信私聊。",
+  "player_identity_template": "你是一位星桥学院{major}专业的学生，名叫{username}，目前处于{semester}，{charm_label}值约为{charm}。",
+  "messenger_scene_template": "场景：星桥学院校园，{semester}，校内信对话。当前情境：{scene}。",
+  "messenger_open_template": "（{username}打开了校内信，看到一条新消息）",
+  "graduation_instruction": "你是一位温和的校园叙事作者。请根据以上玩家的结业数据，为其撰写一段100字左右的毕业总结，内容需涵盖其专业、能力、GPA、性格、成就等主要信息，语气真诚、克制、略带幽默。",
+  "forum_empty_fallback": "星桥论坛现在没有新的帖子。",
+  "forum_unavailable_fallback": "星桥论坛暂时维护中..."
+}
+

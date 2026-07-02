@@ -1,0 +1,241 @@
+<template>
+  <div
+    id="hud-bars"
+    class="hud-container d-flex justify-content-between align-items-center p-3 mb-3"
+  >
+    <div class="d-flex gap-4 flex-grow-1 me-4">
+      <div class="stat-item flex-grow-1">
+        <div class="d-flex justify-content-between small mb-1 fw-bold stat-row">
+          <span class="stat-label">{{ statLabel('energy') }}</span>
+          <span>{{ formatStatValue(stats, 'energy', { showMax: true }) }}</span>
+        </div>
+        <div
+          class="progress"
+        >
+          <div
+            class="progress-bar stat-bar-energy"
+            :style="{ width: `${statPercent(stats, 'energy')}%` }"
+          />
+        </div>
+      </div>
+
+      <div class="stat-item flex-grow-1">
+        <div class="d-flex justify-content-between small mb-1 fw-bold stat-row">
+          <span class="stat-label">{{ statLabel('sanity') }}</span>
+          <span>{{ formatStatValue(stats, 'sanity', { showMax: true }) }}</span>
+        </div>
+        <div
+          class="progress"
+        >
+          <div
+            class="progress-bar"
+            :class="sanityColorClass"
+            :style="{ width: `${statPercent(stats, 'sanity')}%` }"
+          />
+        </div>
+      </div>
+
+      <div class="stat-item flex-grow-1">
+        <div class="d-flex justify-content-between small mb-1 fw-bold stat-row">
+          <span class="stat-label">{{ statLabel('stress') }}</span>
+          <span>{{ formatStatValue(stats, 'stress', { showMax: true }) }}</span>
+        </div>
+        <div
+          class="progress"
+        >
+          <div
+            class="progress-bar"
+            :class="stressColorClass"
+            :style="{ width: `${statPercent(stats, 'stress')}%` }"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex gap-4 border-start ps-4 hud-metrics">
+      <div class="text-center hud-metric-block">
+        <div class="small text-muted fw-bold metric-label">
+          {{ statLabel('iq') }} / {{ statLabel('eq') }} / {{ statLabel('charm') }}
+        </div>
+        <div class="fw-bold fs-5 metric-value">
+          {{ formatStatValue(stats, 'iq') }}
+          <span class="text-muted fs-6">/</span>
+          {{ formatStatValue(stats, 'eq') }}
+          <span class="text-muted fs-6">/</span>
+          {{ formatStatValue(stats, 'charm') }}
+        </div>
+      </div>
+      
+      <div class="text-center hud-metric-block">
+        <div class="small text-muted fw-bold metric-label">
+          GPA
+        </div>
+        <div
+          class="fw-bold fs-5 metric-value"
+          :class="gpaColorClass"
+        >
+          <!-- 🌟 核心防御：保证 gpa 绝对是数字，再执行 toFixed -->
+          {{ safeNumber(stats.gpa, 0).toFixed(2) }}
+        </div>
+      </div>
+
+      <div class="text-center hud-metric-block">
+        <div class="small text-muted fw-bold metric-label">
+          {{ statLabel('gold') }}
+        </div>
+        <div class="fw-bold fs-5 metric-value metric-gold">
+          {{ formatStatValue(stats, 'gold') }}
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+/**
+ * Top HUD for primary stats, cumulative GPA, and item-adjusted values.
+ */
+import { computed } from 'vue'
+import { useGameStore } from '../stores/gameStore.ts'
+import {
+  formatStatValue,
+  safeNumber,
+  statLabel,
+  statPercent,
+} from '@/utils/statDisplay'
+
+const store = useGameStore()
+const stats = computed(() => store.currentStats)
+
+const sanityColorClass = computed(() => {
+  const sanityPercent = statPercent(stats.value, 'sanity')
+  if (sanityPercent > 70) return 'stat-bar-good'
+  if (sanityPercent > 30) return 'stat-bar-normal'
+  return 'stat-bar-alert'
+})
+
+const gpaColorClass = computed(() => {
+  const gpa = safeNumber(stats.value.gpa, 0)
+  if (gpa >= 4.0) return 'metric-excellent'
+  if (gpa >= 3.0) return 'metric-good'
+  if (gpa >= 2.0) return 'metric-warn'
+  return 'metric-alert'
+})
+
+const stressColorClass = computed(() => {
+  const stressPercent = statPercent(stats.value, 'stress')
+  if (stressPercent > 70) return 'stat-bar-alert'
+  if (stressPercent > 40) return 'stat-bar-energy'
+  return 'stat-bar-good'
+})
+</script>
+
+<style scoped>
+.hud-container {
+  z-index: 100;
+  border: 1px solid var(--console-border);
+  border-radius: 8px;
+  background: var(--console-surface-gradient);
+  box-shadow: var(--console-card-shadow);
+}
+.stat-item {
+  min-width: 150px;
+}
+
+.stat-row {
+  color: var(--console-text);
+}
+
+.stat-label,
+.metric-label {
+  color: var(--console-muted) !important;
+  letter-spacing: 0.04em;
+}
+
+.progress {
+  height: 10px;
+}
+
+.progress-bar {
+  border-radius: 999px;
+}
+
+.stat-bar-energy {
+  background: var(--console-energy-gradient) !important;
+}
+
+.stat-bar-good {
+  background: var(--console-good-gradient) !important;
+}
+
+.stat-bar-normal {
+  background: var(--console-normal-gradient) !important;
+}
+
+.stat-bar-alert {
+  background: var(--console-alert-gradient) !important;
+}
+
+.hud-metrics {
+  border-color: var(--console-border) !important;
+}
+
+.hud-metric-block {
+  min-width: 82px;
+}
+
+.metric-value {
+  color: var(--console-strong);
+}
+
+.metric-excellent {
+  color: var(--console-primary-dark);
+}
+
+.metric-good {
+  color: #2f7767;
+}
+
+.metric-warn {
+  color: var(--console-gold-border);
+}
+
+.metric-alert {
+  color: var(--console-danger);
+}
+
+.metric-gold {
+  color: var(--console-gold-border);
+}
+
+@media (max-width: 430px) {
+  .hud-container {
+    padding: 10px !important;
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 10px;
+    margin-bottom: 10px !important;
+  }
+
+  .hud-container > .d-flex:first-child {
+    width: 100%;
+    margin-right: 0 !important;
+    gap: 8px !important;
+    flex-direction: column;
+  }
+
+  .hud-container > .d-flex:last-child {
+    width: 100%;
+    border-left: 0 !important;
+    padding-left: 0 !important;
+    border-top: 1px solid var(--console-border);
+    padding-top: 8px;
+    justify-content: space-between;
+    gap: 0.5rem !important;
+  }
+
+  .stat-item {
+    min-width: 0;
+  }
+}
+</style>

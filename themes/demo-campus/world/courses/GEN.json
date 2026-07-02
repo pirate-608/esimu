@@ -1,0 +1,24 @@
+[
+  {
+    "id": "intro",
+    "name": "校园生活导论",
+    "credits": 3,
+    "difficulty": 1.0,
+    "semester": 1
+  },
+  {
+    "id": "methods",
+    "name": "问题解决方法",
+    "credits": 4,
+    "difficulty": 1.2,
+    "semester": 1
+  },
+  {
+    "id": "writing",
+    "name": "表达与写作",
+    "credits": 2,
+    "difficulty": 0.9,
+    "semester": 1
+  }
+]
+

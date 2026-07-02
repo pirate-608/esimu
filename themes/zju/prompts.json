@@ -1,0 +1,15 @@
+{
+  "campus_context": "浙江大学校园",
+  "forum_name": "CC98",
+  "messenger_name": "钉钉",
+  "forum_batch_instruction": "模拟浙江大学CC98论坛，生成 5 条帖子。",
+  "random_event_instruction": "生成 3 个浙大校园随机事件，风格迥异。",
+  "messenger_batch_instruction": "模拟浙江大学钉钉消息，生成 5 条（通知/约饭/求助/催作业），发送人身份各异。",
+  "private_chat_instruction": "你正在模拟浙江大学校园钉钉私聊。",
+  "player_identity_template": "你是一位浙江大学{major}专业的学生，名叫{username}，目前处于{semester}，{charm_label}值约为{charm}。",
+  "messenger_scene_template": "场景：浙江大学校园，{semester}，钉钉消息对话。当前情境：{scene}。",
+  "messenger_open_template": "（{username}打开了钉钉，看到一条新消息）",
+  "graduation_instruction": "你是一位古风文案大师。请根据以上玩家的折姜大学结业数据，为其撰写一段100字左右的文言文结业总结，内容需涵盖其专业、能力、GPA、性格、成就等主要信息，风格典雅、用词考究，严肃中不失诙谐风趣，结尾可有调侃或祝福。",
+  "forum_empty_fallback": "CC98 现在只有烂坑和吐槽...",
+  "forum_unavailable_fallback": "CC98 服务器维护中..."
+}
