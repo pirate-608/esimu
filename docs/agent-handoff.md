@@ -73,6 +73,7 @@ Core from `simulator-core/backend/`:
 
 ```powershell
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_demo_theme_smoke.py
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m ruff check esimu_core scripts tests
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
 $env:SIMULATOR_THEME='demo-campus'; D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
@@ -88,6 +89,7 @@ D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m ruff check app tests\un
 Reference frontend from `apps/zju-reference/zjus-frontend/`:
 
 ```powershell
+npx vitest run src\utils\theme.spec.ts
 npx vue-tsc --noEmit
 npx vitest run
 npx vite build

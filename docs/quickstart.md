@@ -55,13 +55,17 @@ Run these from `simulator-core/backend/`:
 ```powershell
 cd D:\projects\simulator-framework-lab\simulator-core\backend
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_demo_theme_smoke.py
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m ruff check esimu_core scripts tests
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
 $env:SIMULATOR_THEME='demo-campus'; D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
 ```
 
 The first validation uses the default `zju` theme. The second confirms that the
-minimal `demo-campus` theme still catches portability issues.
+minimal `demo-campus` theme still catches portability issues. The
+`test_demo_theme_smoke.py` smoke starts a fresh Python process with
+`SIMULATOR_THEME=demo-campus` so singleton loaders cannot accidentally reuse the
+default ZJU theme.
 
 ## 5. Regenerate Theme Metadata When Needed
 
@@ -97,6 +101,7 @@ Run these from `apps/zju-reference/zjus-frontend/`:
 ```powershell
 cd D:\projects\simulator-framework-lab\apps\zju-reference\zjus-frontend
 npx vue-tsc --noEmit
+npx vitest run src\utils\theme.spec.ts
 npx vitest run
 npx vite build
 ```

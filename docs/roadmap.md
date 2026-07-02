@@ -82,6 +82,12 @@ Progress:
 - `validate_world_data.py` can validate this theme with
   `SIMULATOR_THEME=demo-campus` without overwriting the ZJU reference frontend
   generated metadata.
+- `test_demo_theme_smoke.py` starts a fresh Python process with
+  `SIMULATOR_THEME=demo-campus` and verifies theme, story, prompts, world data,
+  items, and runtime `init/tick` payload assembly do not fall back to ZJU data.
+- The reference frontend has a focused theme-helper test proving visible labels
+  and storage keys come from generated theme metadata rather than hardcoded ZJU
+  copy.
 
 ## Phase 5: Framework Decision
 
