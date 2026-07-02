@@ -9,6 +9,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Mapping
 
+from esimu_core.runtime.state import RuntimeSnapshot
+
 
 def safe_int(value: object, default: int = 0) -> int:
     """Convert loose persisted values to int with a fallback."""
@@ -42,6 +44,15 @@ class RuntimeSnapshotInput:
     iq_default: int = 100
     stress_default: int = 0
     efficiency_default: int = 100
+
+
+@dataclass(frozen=True)
+class RuntimePayloadDefaults:
+    """Default stat values required by derived display calculations."""
+
+    iq: int = 100
+    stress: int = 0
+    efficiency: int = 100
 
 
 def effective_efficiency(
@@ -87,6 +98,26 @@ def build_tick_payload(payload_input: RuntimeSnapshotInput) -> dict[str, Any]:
     }
 
 
+def build_tick_payload_from_snapshot(
+    snapshot: RuntimeSnapshot,
+    defaults: RuntimePayloadDefaults | None = None,
+) -> dict[str, Any]:
+    """Build the existing `tick` payload shape from a runtime snapshot."""
+    resolved_defaults = defaults or RuntimePayloadDefaults()
+    return build_tick_payload(
+        RuntimeSnapshotInput(
+            stats=snapshot.stats.values,
+            courses=snapshot.courses.mastery,
+            course_states=snapshot.courses.states,
+            semester_duration=snapshot.semester_duration,
+            relax_cooldowns=snapshot.relax_cooldowns,
+            iq_default=resolved_defaults.iq,
+            stress_default=resolved_defaults.stress,
+            efficiency_default=resolved_defaults.efficiency,
+        )
+    )
+
+
 def build_init_payload(
     payload_input: RuntimeSnapshotInput,
     *,
@@ -103,4 +134,46 @@ def build_init_payload(
         "relax_cooldowns": tick_payload["relax_cooldowns"],
         "dingtalk_state": dict(dingtalk_state),
         "items_state": dict(items_state),
+    }
+
+
+def build_init_payload_from_snapshot(
+    snapshot: RuntimeSnapshot,
+    defaults: RuntimePayloadDefaults | None = None,
+) -> dict[str, Any]:
+    """Build the existing `init` payload shape from a runtime snapshot."""
+    tick_payload = build_tick_payload_from_snapshot(snapshot, defaults)
+    return {
+        "data": tick_payload["stats"],
+        "courses": tick_payload["courses"],
+        "course_states": tick_payload["course_states"],
+        "semester_time_left": tick_payload["semester_time_left"],
+        "relax_cooldowns": tick_payload["relax_cooldowns"],
+        "dingtalk_state": dict(snapshot.dingtalk_state),
+        "items_state": dict(snapshot.items_state),
+    }
+
+
+def build_new_semester_payload(
+    snapshot: RuntimeSnapshot,
+    *,
+    semester_name: str,
+    holiday_event: Any = None,
+    energy_recovery: Mapping[str, Any] | None = None,
+    defaults: RuntimePayloadDefaults | None = None,
+) -> dict[str, Any]:
+    """Build the existing `new_semester` payload shape."""
+    tick_payload = build_tick_payload_from_snapshot(snapshot, defaults)
+    stats = tick_payload["stats"]
+    return {
+        "data": {
+            "semester_name": semester_name,
+            "holiday_event": holiday_event,
+            "stats": stats,
+            "courses": tick_payload["courses"],
+            "course_states": tick_payload["course_states"],
+            "course_info_json": stats.get("course_info_json", "[]"),
+            "semester_time_left": tick_payload["semester_time_left"],
+            "energy_recovery": dict(energy_recovery or {}),
+        }
     }

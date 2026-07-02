@@ -1,5 +1,8 @@
 # Roadmap
 
+For setup and handoff, start with `quickstart.md` and `agent-handoff.md`. For
+new simulator projects, use `new-project-bootstrap.md`.
+
 ## Phase 0: Lab Bootstrap
 
 - Create this isolated workspace.
@@ -60,6 +63,9 @@ Progress:
 - Runtime orchestration has started moving into `esimu_core.runtime`: tick
   timing, adapter-facing action decisions, `tick/init` payload assembly, and
   target-level background task tracking.
+- Runtime state boundaries are now explicit: the reference adapter converts
+  Redis/Pydantic data into `RuntimeSnapshot`, and core helpers compute
+  cooldowns plus `tick`, `init`, and `new_semester` payloads from plain data.
 
 ## Phase 4: Demo Campus
 
@@ -85,4 +91,11 @@ Decide whether the lab should become:
 - a template repository,
 - a library plus starter app,
 - or remain a research branch with cherry-picked improvements.
+
+Supporting handoff work now lives in:
+
+- `quickstart.md`: local setup and validation path.
+- `new-project-bootstrap.md`: new theme/app startup checklist.
+- `agent-handoff.md`: current extraction state for future agents.
+- `theme-pack-contract.md`: active theme pack contract.
 

@@ -3,6 +3,9 @@
 This contract is provisional. It exists to make copied ZJU code move toward a
 clear theme boundary instead of becoming another one-off game.
 
+Use `new-project-bootstrap.md` for the step-by-step process of creating a theme
+pack from this contract.
+
 ## Required Files
 
 ```text
@@ -110,3 +113,10 @@ These are intentionally not required in the bootstrap:
 - `default_models`
 - `route_titles`
 - `legal_links`
+
+## Related Documents
+
+- `quickstart.md`: validation and metadata-generation commands.
+- `new-project-bootstrap.md`: practical new-theme checklist.
+- `agent-handoff.md`: agent rules for keeping theme data out of core logic.
+- `architecture.md`: how theme packs relate to `esimu-core` and adapters.

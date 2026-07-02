@@ -1,64 +1,119 @@
 # Simulator Framework Lab
 
-This workspace is an experimental extraction lab for a reusable narrative
-simulator framework inspired by ZJUers Simulator.
+`esimu` is an experimental lab for extracting a reusable narrative-simulator
+framework from ZJUers Simulator without disturbing the live ZJU game.
 
-## Relationship To ZJUers Simulator
+This repository is not a finished framework yet. It is a controlled workspace
+for proving that the ZJU game can become:
 
-ZJUers Simulator remains the main product and the highest priority. This lab is
-allowed to copy ideas and selected code, but it must not become a dependency of
-the main ZJU game until an extracted piece is mature, tested, and intentionally
-cherry-picked back.
+```text
+esimu-core + a reference adapter + a selected theme pack
+```
 
-## Goal
+## Current Status
 
-Build a reusable lightweight strategy narrative simulator with replaceable
-theme packs:
+- `apps/zju-reference/` is the first runnable reference app, copied and
+  isolated from the main ZJUers Simulator workspace.
+- `simulator-core/backend/` contains the installable Python package
+  `esimu-core`, imported as `esimu_core.*`.
+- `themes/zju/` is the first full reference theme.
+- `themes/demo-campus/` is a tiny validation theme used to catch hidden ZJU
+  assumptions.
+- `docs/` contains the architecture notes, roadmap, theme contract, quickstart,
+  and project-bootstrap guide.
 
-- A core simulation loop for time, state, saves, events, messages, items, and
-  achievements.
-- Theme packs for campus or non-campus worlds.
-- A frontend skin layer that can rename concepts and swap visuals without
-  rewriting gameplay logic.
+ZJUers Simulator remains the main product. Mature improvements from this lab
+must be reviewed and intentionally cherry-picked back; the main game must never
+depend on this lab by accident.
 
-## Non-Goals For The Lab Bootstrap
+## 10 Minute Quickstart
 
-- Do not migrate the live ZJUers Simulator project in place.
-- Do not share production databases, Redis volumes, Docker names, ports, or
-  browser storage keys with the ZJU project.
-- Do not deploy lab images to the ZJU production registry.
-- Do not chase a fully generic engine before the first `core + zju theme pack`
-  experiment runs.
+Start here when opening the lab for the first time:
 
-## Initial Layout
+```powershell
+cd D:\projects\simulator-framework-lab
+git status --short
+```
+
+Then read:
+
+1. `AGENTS.md` for workspace rules and agent handoff notes.
+2. `docs/quickstart.md` for setup and validation commands.
+3. `docs/architecture.md` for the current core/theme/adapter boundary.
+4. `docs/new-project-bootstrap.md` when starting a new simulator theme or app.
+
+The active theme is selected at build/startup time:
+
+```powershell
+$env:SIMULATOR_THEME='zju'
+$env:SIMULATOR_THEME='demo-campus'
+```
+
+Runtime multi-theme switching is intentionally out of scope for the current
+lab phase.
+
+## Common Commands
+
+Core checks from `simulator-core/backend/`:
+
+```powershell
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m ruff check esimu_core scripts tests
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
+$env:SIMULATOR_THEME='demo-campus'; D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
+```
+
+Reference backend checks from `apps/zju-reference/zjus-backend/`:
+
+```powershell
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\unit
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m ruff check app tests\unit
+```
+
+Reference frontend checks from `apps/zju-reference/zjus-frontend/`:
+
+```powershell
+npx vue-tsc --noEmit
+npx vitest run
+npx vite build
+```
+
+See `docs/quickstart.md` for install notes, editable-package fallback, and
+theme metadata generation commands.
+
+## Repository Layout
 
 ```text
 apps/
-  zju-reference/ # Full copied app used as the first runnable reference.
+  zju-reference/      # Runnable copied app and first adapter.
 simulator-core/
-  backend/       # esimu-core Python package and backend contracts.
-  frontend/      # Future extracted Vue components, stores, and theme loader.
+  backend/            # esimu-core Python package, scripts, and tests.
+  frontend/           # Future extracted Vue/runtime frontend pieces.
 themes/
-  zju/           # First reference theme, copied deliberately from ZJU later.
-  demo-campus/   # Tiny validation theme for portability tests.
+  zju/                # Full ZJU reference theme.
+  demo-campus/        # Minimal portability validation theme.
 docs/
+  quickstart.md
+  new-project-bootstrap.md
+  agent-handoff.md
   architecture.md
   roadmap.md
   theme-pack-contract.md
+templates/
+  agent/AGENTS.md     # Copyable starter handoff template.
 ```
 
-## First Milestone
+## Starting A New Simulator
 
-Prove that a single theme can be selected at build/startup time and that the
-copied ZJU reference behavior can be represented as:
+Use `docs/new-project-bootstrap.md` as the main checklist. The short version is:
 
-```text
-esimu-core + apps/zju-reference + themes/zju
-```
-
-Only after that should the lab attempt a second theme.
-
-See `docs/zju-reference-baseline.md` for the first full-copy baseline.
+1. Copy `themes/demo-campus/` to a new `themes/<theme_id>/`.
+2. Edit `theme.json`, `story.json`, `prompts.json`, and `world/`.
+3. Run world-data validation for the new theme.
+4. Reuse `apps/zju-reference/` as the first adapter only if you need a runnable
+   app immediately.
+5. Keep ZJU-specific protocol IDs such as `cc98` and `dingtalk` as compatibility
+   IDs until the roadmap explicitly migrates them.
 
 ## Naming
 
@@ -66,6 +121,4 @@ See `docs/zju-reference-baseline.md` for the first full-copy baseline.
 - Core package name: `esimu-core`
 - Python import namespace: `esimu_core`
 
-The lab previously used temporary names during extraction. New code and docs
-should use `esimu` naming, except when historical notes explicitly describe the
-old migration path.
+Do not introduce old temporary framework-core names except in historical notes.

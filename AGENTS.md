@@ -8,16 +8,38 @@ Do not modify `D:\projects\ZJUers_simulator` while working in this lab unless th
 user explicitly asks for a cross-repository change. ZJUers Simulator is the main
 game. This workspace is an experiment.
 
+## Startup Checklist
+
+Run these checks before changing files:
+
+```powershell
+cd D:\projects\simulator-framework-lab
+git status --short
+```
+
+Confirm all three facts:
+
+- You are in `D:\projects\simulator-framework-lab`, not the ZJU main game.
+- Any dirty worktree entries are understood and preserved.
+- The task belongs to the lab. If it belongs to the ZJU main game, stop and ask
+  for explicit cross-repository permission.
+
+The lab may have in-progress extraction work. Do not assume the worktree is
+clean; read the current diff before editing files that are already modified.
+
 ## Workspace Boundary
 
 - Lab root: `D:\projects\simulator-framework-lab`
 - Main game root: `D:\projects\ZJUers_simulator`
+- Reference app: `apps/zju-reference/`
+- Core package: `simulator-core/backend/`
+- Theme packs: `themes/`
 
 Code may be copied from the main game only as a deliberate step. When copying,
 record the source path and commit or note the copied version.
 
-The first copied reference app lives at `apps/zju-reference/`. Treat it as a
-runnable baseline for extraction experiments, not as the final framework layout.
+Treat `apps/zju-reference/` as a runnable adapter and extraction baseline, not
+as the final framework layout.
 
 ## Isolation Rules
 
@@ -33,6 +55,28 @@ runnable baseline for extraction experiments, not as the final framework layout.
 - If a fix belongs in the main game, implement it in the main game separately
   after review instead of silently patching the lab copy only.
 
+## Naming Rules
+
+- Framework shorthand: `esimu`
+- Core package name: `esimu-core`
+- Python import namespace: `esimu_core`
+
+Do not introduce old temporary framework-core names except in historical
+migration notes.
+
+## Task Routing
+
+- Theme content, nouns, story, prompts, world JSON, and assets belong in
+  `themes/<theme_id>/`.
+- Reusable backend rules and loaders belong in `simulator-core/backend/esimu_core/`.
+- Redis, FastAPI, WebSocket, SQLAlchemy, OpenAI, and save-service integration
+  stay in `apps/zju-reference/`.
+- Project-level learning, roadmap, and startup instructions belong in `docs/`.
+- Reusable handoff templates belong in `templates/`.
+
+When in doubt, push reusable pure rules downward into `esimu_core`, and keep I/O
+and compatibility glue in the reference app.
+
 ## Architecture Direction
 
 Prefer a build-time selected theme first:
@@ -45,30 +89,67 @@ SIMULATOR_THEME=demo-campus
 Runtime multi-theme switching is a later experiment. It should not be introduced
 before the single-theme extraction is stable.
 
-## Naming Rules
-
-- Framework shorthand: `esimu`
-- Core package name: `esimu-core`
-- Python import namespace: `esimu_core`
-
-Do not introduce old temporary framework-core names except in historical
-migration notes.
-
 Theme packs own `theme.json`, `story.json`, `prompts.json`, `world/`, and
 `assets/`. `prompts.json` changes model-visible campus/forum/messenger context;
 legacy internal IDs such as `cc98` and `dingtalk` remain compatibility IDs until
 a deliberate protocol migration happens.
 
-`esimu_core.runtime` is the boundary for reusable runtime orchestration. Core
-helpers may calculate tick timing, action decisions, payload dictionaries, and
-background-task bookkeeping. They must not import Redis, FastAPI, SQLAlchemy,
-OpenAI, or reference-app services; adapters perform all I/O and emit returned
+`esimu_core.domain` owns pure gameplay rules such as semester settlement, GPA,
+effect handling, and action gates. It must not import Redis, FastAPI,
+SQLAlchemy, OpenAI, or reference-app services.
+
+`esimu_core.runtime` owns reusable runtime orchestration. Core helpers may
+calculate tick timing, action decisions, payload dictionaries, runtime DTOs,
+cooldown values, and background-task bookkeeping. `RuntimeSnapshot` is the
+plain-data DTO between storage/schema adapters and core payload helpers.
+Runtime modules must not import Redis, FastAPI, SQLAlchemy, OpenAI, or
+reference-app services; adapters perform all I/O and emit returned
 decisions/payloads.
+
+## Current Entry Documents
+
+- `README.md`: human-facing project overview and first links.
+- `docs/quickstart.md`: local setup and validation path.
+- `docs/new-project-bootstrap.md`: start a new simulator or theme from esimu.
+- `docs/agent-handoff.md`: current extraction state and agent operating notes.
+- `docs/architecture.md`: core/theme/adapter architecture.
+- `docs/roadmap.md`: phase progress and next extraction direction.
+- `docs/theme-pack-contract.md`: current theme file contract.
+
+## Recommended Checks
+
+Core checks from `simulator-core/backend/`:
+
+```powershell
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m ruff check esimu_core scripts tests
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
+$env:SIMULATOR_THEME='demo-campus'; D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
+```
+
+Reference backend checks from `apps/zju-reference/zjus-backend/`:
+
+```powershell
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\unit
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m ruff check app tests\unit
+```
+
+Reference frontend checks from `apps/zju-reference/zjus-frontend/`:
+
+```powershell
+npx vue-tsc --noEmit
+npx vitest run
+npx vite build
+```
+
+For documentation-only changes, `git diff --check` plus link/path review is
+usually enough.
 
 ## Review Priorities
 
 1. Does the change keep the ZJU main project untouched?
 2. Does the lab remain isolated from ZJU ports, volumes, storage keys, and
    deployment names?
-3. Does the theme pack boundary become clearer?
-4. Does copied code still run with tests, or is it only documentation/scaffold?
+3. Does reusable code avoid app-specific I/O dependencies?
+4. Does the theme pack boundary become clearer?
+5. Does copied code still run with tests, or is it only documentation/scaffold?

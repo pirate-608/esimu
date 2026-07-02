@@ -68,12 +68,15 @@ from esimu_core.domain.semester import (  # noqa: E402
 )
 from esimu_core.runtime.actions import decide_runtime_action  # noqa: E402
 from esimu_core.runtime.clock import tick_timing  # noqa: E402
+from esimu_core.runtime.cooldowns import build_cooldown_map  # noqa: E402
 from esimu_core.runtime.snapshot import (  # noqa: E402
-    RuntimeSnapshotInput,
-    build_init_payload,
-    build_tick_payload,
+    RuntimePayloadDefaults,
+    build_init_payload_from_snapshot,
+    build_new_semester_payload,
+    build_tick_payload_from_snapshot,
     semester_time_left,
 )
+from esimu_core.runtime.state import RuntimeSnapshot  # noqa: E402
 from esimu_core.runtime.tasks import TargetTaskRegistry  # noqa: E402
 
 logger = logging.getLogger(__name__)
@@ -340,6 +343,14 @@ class GameEngine:
     async def _get_items_state_payload(self) -> dict[str, Any]:
         """Build the item-state payload expected by the frontend."""
         return items.state_payload(await self.repo.get_items_state())
+
+    def _runtime_payload_defaults(self) -> RuntimePayloadDefaults:
+        """Return theme stat defaults needed for runtime payload helpers."""
+        return RuntimePayloadDefaults(
+            iq=self._stat_default("iq"),
+            stress=self._stat_default("stress"),
+            efficiency=self._stat_default("efficiency"),
+        )
 
     async def _effective_stats(self, stats: dict[str, Any]) -> dict[str, Any]:
         """Return stats with passive item bonuses applied for reads only."""
@@ -2284,27 +2295,22 @@ class GameEngine:
         # Re-read Redis after the service writes the new semester state.
         new_snapshot = await self.repo.get_snapshot()
         new_stats = await self._effective_stats(new_snapshot.stats.model_dump())
-        semester_idx = int(new_stats.get("semester_idx") or current_semester_idx or 1)
-        base_duration = balance.get_semester_duration(semester_idx)
-        elapsed = int(new_stats.get("elapsed_game_time", 0) or 0)
-        semester_time_left = self._get_semester_time_left(elapsed, base_duration)
+        runtime_snapshot = await self._runtime_snapshot_from_repo(
+            snapshot=new_snapshot,
+            effective_stats=new_stats,
+        )
 
         await self.emit(
             "new_semester",
-            {
-                "data": {
-                    "semester_name": new_stats.get(
-                        "semester", f"第 {current_semester_idx} 学期"
-                    ),
-                    "holiday_event": transition.get("holiday_event"),
-                    "stats": new_stats,
-                    "courses": new_snapshot.courses,
-                    "course_states": new_snapshot.course_states,
-                    "course_info_json": new_stats.get("course_info_json", "[]"),
-                    "semester_time_left": semester_time_left,
-                    "energy_recovery": transition.get("energy_recovery"),
-                }
-            },
+            build_new_semester_payload(
+                runtime_snapshot,
+                semester_name=str(
+                    new_stats.get("semester") or f"第 {current_semester_idx} 学期"
+                ),
+                holiday_event=transition.get("holiday_event"),
+                energy_recovery=transition.get("energy_recovery"),
+                defaults=self._runtime_payload_defaults(),
+            ),
         )
         await self._push_update("新学期开始了，加油！")
         self.start()
@@ -2332,6 +2338,49 @@ class GameEngine:
         except Exception as e:
             logger.warning(f"LLM probe failed: {e}")
 
+    async def _runtime_snapshot_from_repo(
+        self,
+        *,
+        snapshot: Any | None = None,
+        effective_stats: dict[str, Any] | None = None,
+        relax_cooldowns: dict[str, int] | None = None,
+        include_dingtalk: bool = False,
+        include_items: bool = False,
+    ) -> RuntimeSnapshot:
+        """Read adapter state and translate it into a pure runtime snapshot."""
+        if snapshot is None:
+            snapshot = await self.repo.get_snapshot()
+        stats = (
+            dict(effective_stats)
+            if effective_stats is not None
+            else await self._effective_stats(snapshot.stats.model_dump())
+        )
+        if relax_cooldowns is None:
+            relax_cooldowns = await self._get_relax_cooldowns()
+
+        try:
+            semester_idx = int(stats.get("semester_idx", 1) or 1)
+        except (TypeError, ValueError):
+            semester_idx = 1
+
+        dingtalk_state: dict[str, Any] = {}
+        if include_dingtalk:
+            dingtalk_state = (await self.repo.get_dingtalk_state()).model_dump()
+
+        items_state: dict[str, Any] = {}
+        if include_items:
+            items_state = await self._get_items_state_payload()
+
+        return RuntimeSnapshot.from_mappings(
+            stats=stats,
+            courses=snapshot.courses,
+            course_states=snapshot.course_states,
+            relax_cooldowns=relax_cooldowns,
+            semester_duration=balance.get_semester_duration(semester_idx),
+            dingtalk_state=dingtalk_state,
+            items_state=items_state,
+        )
+
     async def _push_update(
         self,
         msg: str | None = None,
@@ -2342,31 +2391,14 @@ class GameEngine:
     ):
         """Push the canonical frontend state payload."""
         try:
-            if snapshot is None:
-                snapshot = await self.repo.get_snapshot()
-            new_stats = (
-                dict(effective_stats)
-                if effective_stats is not None
-                else await self._effective_stats(snapshot.stats.model_dump())
+            runtime_snapshot = await self._runtime_snapshot_from_repo(
+                snapshot=snapshot,
+                effective_stats=effective_stats,
+                relax_cooldowns=relax_cooldowns,
             )
-            course_mastery = snapshot.courses
-            course_states = snapshot.course_states
-            if relax_cooldowns is None:
-                relax_cooldowns = await self._get_relax_cooldowns()
-
-            semester_idx = int(new_stats.get("semester_idx", 1))
-            base_duration = balance.get_semester_duration(semester_idx)
-            payload = build_tick_payload(
-                RuntimeSnapshotInput(
-                    stats=new_stats,
-                    courses=course_mastery,
-                    course_states=course_states,
-                    semester_duration=base_duration,
-                    relax_cooldowns=relax_cooldowns,
-                    iq_default=self._stat_default("iq"),
-                    stress_default=self._stat_default("stress"),
-                    efficiency_default=self._stat_default("efficiency"),
-                )
+            payload = build_tick_payload_from_snapshot(
+                runtime_snapshot,
+                self._runtime_payload_defaults(),
             )
 
             await self.emit(
@@ -2452,26 +2484,15 @@ class GameEngine:
     async def _emit_current_init(self):
         snapshot = await self.repo.get_snapshot()
         stats = await self._effective_stats(snapshot.stats.model_dump())
-        try:
-            semester_idx = int(stats.get("semester_idx", 1) or 1)
-        except (TypeError, ValueError):
-            semester_idx = 1
-        base_duration = balance.get_semester_duration(semester_idx)
-        dingtalk_state = await self.repo.get_dingtalk_state()
-        items_state = await self._get_items_state_payload()
-        payload = build_init_payload(
-            RuntimeSnapshotInput(
-                stats=stats,
-                courses=snapshot.courses,
-                course_states=snapshot.course_states,
-                semester_duration=base_duration,
-                relax_cooldowns=await self._get_relax_cooldowns(),
-                iq_default=self._stat_default("iq"),
-                stress_default=self._stat_default("stress"),
-                efficiency_default=self._stat_default("efficiency"),
-            ),
-            dingtalk_state=dingtalk_state.model_dump(),
-            items_state=items_state,
+        runtime_snapshot = await self._runtime_snapshot_from_repo(
+            snapshot=snapshot,
+            effective_stats=stats,
+            include_dingtalk=True,
+            include_items=True,
+        )
+        payload = build_init_payload_from_snapshot(
+            runtime_snapshot,
+            self._runtime_payload_defaults(),
         )
 
         await self.emit(
@@ -2513,13 +2534,12 @@ class GameEngine:
 
     async def _check_cooldown(self, action_type: str) -> int:
         last_use = await self.repo.get_cooldown_timestamp(action_type)
-        if not last_use:
-            return 0
-
-        elapsed = time.time() - float(last_use)
-        cd_time = balance.get_cooldown(action_type)
-        remaining = max(0, cd_time - elapsed)
-        return math.ceil(remaining)
+        return build_cooldown_map(
+            [action_type],
+            {action_type: last_use},
+            {action_type: balance.get_cooldown(action_type)},
+            time.time(),
+        )[action_type]
 
     async def _get_relax_cooldowns(self) -> dict[str, int]:
         actions = list(balance.relax_actions.keys())
@@ -2531,16 +2551,11 @@ class GameEngine:
             for action in actions:
                 cooldowns[action] = await self._check_cooldown(action)
             return cooldowns
-        cooldowns: dict[str, int] = {}
-        now = time.time()
-        for action in actions:
-            last_use = timestamps.get(action)
-            if not last_use:
-                cooldowns[action] = 0
-                continue
-            elapsed = now - float(last_use)
-            cd_time = balance.get_cooldown(action)
-            cooldowns[action] = math.ceil(max(0, cd_time - elapsed))
-        return cooldowns
+        return build_cooldown_map(
+            actions,
+            timestamps,
+            {action: balance.get_cooldown(action) for action in actions},
+            time.time(),
+        )
 
 

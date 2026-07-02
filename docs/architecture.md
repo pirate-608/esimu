@@ -3,6 +3,10 @@
 The lab starts from the current ZJUers Simulator shape but separates the system
 into three explicit layers.
 
+Start with `quickstart.md` if you are setting up the lab, and use
+`new-project-bootstrap.md` when creating a new simulator or theme from this
+architecture.
+
 ## 1. esimu-core
 
 Core owns behavior that should survive theme changes:
@@ -135,12 +139,18 @@ Current modules:
 - `actions.py`: wraps pure action gates in adapter-facing decisions.
 - `snapshot.py`: builds existing `tick` and `init` payload dictionaries from
   already-read state, including remaining semester time and derived efficiency.
+- `state.py`: defines plain runtime state DTOs that adapters can build from
+  their storage or schema models before calling core helpers.
+- `cooldowns.py`: calculates remaining cooldown seconds from timestamps and
+  action cooldown configuration.
 - `tasks.py`: tracks background tasks and de-duplicates long-running work by
   target key.
 
 Runtime helpers still avoid Redis, FastAPI, SQLAlchemy, OpenAI, and WebSocket
 objects. The reference app reads/writes external systems, then passes plain
-values into `esimu_core.runtime` and emits the returned payloads.
+values into `esimu_core.runtime` and emits the returned payloads. In the ZJU
+reference adapter, `_runtime_snapshot_from_repo()` is the current seam between
+Redis/Pydantic snapshots and `RuntimeSnapshot`.
 
 ## Compatibility IDs
 
@@ -149,4 +159,12 @@ because they flow through WebSocket payloads, Redis keys, save data, and legacy
 tests. User-facing labels should come from theme terms (`messenger`, `forum`).
 Renaming those IDs is a later compatibility migration, not part of the current
 adapter-extraction phase.
+
+## Related Documents
+
+- `quickstart.md`: setup and validation commands.
+- `theme-pack-contract.md`: current theme file contract.
+- `new-project-bootstrap.md`: checklist for a new simulator/theme.
+- `agent-handoff.md`: current agent operating notes.
+- `roadmap.md`: extraction phases and current progress.
 
