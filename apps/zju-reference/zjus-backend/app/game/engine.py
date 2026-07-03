@@ -40,11 +40,13 @@ from app.schemas.dingtalk import (
     DingTalkMessage,
     DingTalkReplyOption,
     DingTalkRoundState,
-    build_contact_id,
-    is_replyable_role,
     new_message_id,
-    normalize_dingtalk_role,
     now_ts,
+)
+from esimu_core.content import (
+    coerce_reply_options,
+    normalize_message_payload,
+    sanitize_effects,
 )
 from app.services.game_service import GameService
 from app.services.save_service import SaveService
@@ -65,6 +67,10 @@ from esimu_core.domain.semester import (  # noqa: E402
     safe_int,
     settle_course_exam,
     settle_semester_exam,
+)
+from esimu_core.lifecycle import (
+    achievement_detail as core_achievement_detail,
+    achievement_details as core_achievement_details,
 )
 from esimu_core.runtime.actions import decide_runtime_action  # noqa: E402
 from esimu_core.runtime.clock import tick_timing  # noqa: E402
@@ -442,76 +448,23 @@ class GameEngine:
         self, raw_options: Any, role: str
     ) -> list[DingTalkReplyOption]:
         """Normalize LLM reply options and provide role-specific fallbacks."""
-        if not is_replyable_role(role):
-            return []
-        options: list[DingTalkReplyOption] = []
-        if isinstance(raw_options, list):
-            for idx, item in enumerate(raw_options[:3]):
-                if isinstance(item, DingTalkReplyOption):
-                    options.append(item)
-                    continue
-                if isinstance(item, str):
-                    text = item.strip()
-                elif isinstance(item, dict):
-                    text = str(item.get("text") or item.get("content") or "").strip()
-                else:
-                    text = ""
-                if text:
-                    option_id = (
-                        str(item.get("option_id"))
-                        if isinstance(item, dict) and item.get("option_id")
-                        else f"opt_{idx + 1}"
-                    )
-                    options.append(
-                        DingTalkReplyOption(option_id=option_id, text=text[:80])
-                    )
-        if options:
-            return options
-        fallback = {
-            "roommate": ["哈哈收到", "我马上看看", "你先别急"],
-            "classmate": ["可以，我看一下", "等我整理一下资料", "我也有点懵"],
-            "friend": ["晚上再说？", "可以啊", "你这也太会了"],
-            "teaching_assistant": ["谢谢助教提醒", "我有个问题想问", "我会尽快完成"],
-            "teacher": ["谢谢老师", "我会提前准备", "我还有一个问题"],
-            "crush": ["还好，你呢？", "我也在想这个", "要不要一起去？"],
-        }.get(role, ["好的收到", "我想想怎么回", "可以再说详细点吗"])
         return [
-            DingTalkReplyOption(option_id=f"opt_{idx + 1}", text=text)
-            for idx, text in enumerate(fallback[:3])
+            DingTalkReplyOption(**option.as_dict())
+            for option in coerce_reply_options(raw_options, role)
         ]
 
     def _normalize_dingtalk_payload(
         self, msg_data: dict[str, Any]
     ) -> tuple[dict[str, Any], str, list[DingTalkReplyOption]]:
         """Normalize raw LLM/library DingTalk data into contact and message parts."""
-        contact_raw = msg_data.get("contact")
-        contact = contact_raw if isinstance(contact_raw, dict) else {}
-        sender = str(contact.get("sender") or msg_data.get("sender") or "未知")
-        role = normalize_dingtalk_role(
-            str(contact.get("role") or msg_data.get("role") or "unknown")
-        )
-        contact_id = str(
-            contact.get("contact_id") or build_contact_id(sender, role)
-        )
-        is_urgent = bool(contact.get("is_urgent", msg_data.get("is_urgent", False)))
-        content = ""
-        message_raw = msg_data.get("message")
-        if isinstance(message_raw, dict):
-            content = str(message_raw.get("content") or "").strip()
-        if not content:
-            content = str(msg_data.get("content") or "").strip()
-        options = self._coerce_dingtalk_options(msg_data.get("reply_options"), role)
-        if not is_replyable_role(role):
-            options = []
+        payload = normalize_message_payload(msg_data, contact_prefix="dt")
+        options = [
+            DingTalkReplyOption(**option.as_dict())
+            for option in payload.reply_options
+        ]
         return (
-            {
-                "contact_id": contact_id,
-                "sender": sender,
-                "role": role,
-                "is_replyable": is_replyable_role(role),
-                "is_urgent": is_urgent,
-            },
-            content,
+            payload.contact.as_dict(),
+            payload.content,
             options,
         )
 
@@ -762,22 +715,8 @@ class GameEngine:
     def _sanitize_dingtalk_effects(
         self, settlement: Any
     ) -> tuple[str, dict[str, int]]:
-        if not isinstance(settlement, dict):
-            return "这轮对话没有产生明显影响。", {}
-        desc = str(settlement.get("desc") or "这轮对话产生了一些影响。").strip()
-        effects_raw = settlement.get("effects")
-        effects_raw = effects_raw if isinstance(effects_raw, dict) else {}
-        effects: dict[str, int] = {}
-        for key, value in effects_raw.items():
-            max_delta = self._allowed_effect_fields().get(str(key))
-            if max_delta is None:
-                continue
-            try:
-                delta = int(value)
-            except (TypeError, ValueError):
-                continue
-            effects[str(key)] = max(-max_delta, min(max_delta, delta))
-        return desc, effects
+        result = sanitize_effects(settlement, self._allowed_effect_fields())
+        return result.desc, result.effects
 
     async def _apply_dingtalk_settlement(
         self, contact: DingTalkContact, settlement: Any
@@ -2135,28 +2074,10 @@ class GameEngine:
             self._dingtalk_inflight = False
 
     def _achievement_payload(self, code: str, item: Any) -> dict[str, Any]:
-        data = item if isinstance(item, dict) else {}
-        clean_code = str(code or "").strip()
-        return {
-            "code": clean_code,
-            "name": str(data.get("name") or clean_code),
-            "desc": str(data.get("desc") or data.get("description") or ""),
-            "icon": str(data.get("icon") or "🏅"),
-        }
+        return core_achievement_detail(code, item).as_dict()
 
     def _achievement_details(self, codes: list[Any]) -> list[dict[str, Any]]:
-        config = self._load_achievement_config()
-        details: list[dict[str, Any]] = []
-        for raw_code in codes:
-            clean_code = str(raw_code or "").strip()
-            item = config.get(raw_code) or config.get(clean_code)
-            if item is None:
-                for candidate_code, candidate in config.items():
-                    if str(candidate_code).strip() == clean_code:
-                        item = candidate
-                        break
-            details.append(self._achievement_payload(clean_code, item or {}))
-        return details
+        return core_achievement_details(codes, self._load_achievement_config())
 
     async def _check_achievements(
         self,

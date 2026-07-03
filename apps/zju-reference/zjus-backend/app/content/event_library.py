@@ -12,6 +12,7 @@ import logging
 import random
 from typing import Any, Dict, List, Optional, Set
 
+from esimu_core.content import select_local_event, select_local_forum_post
 from esimu_core.world.catalog import WorldCatalog
 from esimu_core.world.stat_definitions import stat_definitions
 
@@ -69,33 +70,19 @@ def pick_random_event(
     if not library:
         return None
 
-    sanity = _stat_default("sanity") if sanity is None else sanity
-    stress = _stat_default("stress") if stress is None else stress
-    seen = seen_ids or set()
-    candidates = []
-    for evt in library:
-        if evt.get("id") in seen:
-            continue
-        sr = evt.get("sanity_range", _stat_range("sanity"))
-        tr = evt.get("stress_range", _stat_range("stress"))
-        if sr[0] <= sanity <= sr[1] and tr[0] <= stress <= tr[1]:
-            candidates.append(evt)
-
-    if not candidates:
-        # Relax state matching before giving up, but still avoid seen events.
-        candidates = [e for e in library if e.get("id") not in seen]
-
-    if not candidates:
-        return None
-
-    chosen = random.choice(candidates)
     # Return the clean LLM-compatible shape and expose `id` for deduplication.
-    return {
-        "id": chosen.get("id"),
-        "title": chosen["title"],
-        "desc": chosen["desc"],
-        "options": chosen["options"],
-    }
+    event = select_local_event(
+        library,
+        sanity=sanity,
+        stress=stress,
+        seen_ids=seen_ids,
+        sanity_default=_stat_default("sanity"),
+        stress_default=_stat_default("stress"),
+        sanity_range=_stat_range("sanity"),
+        stress_range=_stat_range("stress"),
+        choose=random.choice,
+    )
+    return event.as_dict() if event else None
 
 
 # ============================================================
@@ -141,29 +128,12 @@ def pick_cc98_post(
     if not library:
         return None
 
-    # Filter by effect before applying the optional trigger preference.
-    candidates = [p for p in library if p.get("effect") == effect]
-    if not candidates:
-        candidates = library
-
-    trigger_norm = (trigger or "").strip().lower()
-    if trigger_norm:
-        trigger_hits = []
-        for post in candidates:
-            topic = str(post.get("topic", "")).lower()
-            content = str(post.get("content", "")).lower()
-            # Match the literal trigger first, then retry after removing spaces.
-            if (
-                trigger_norm in topic
-                or trigger_norm in content
-                or trigger_norm.replace(" ", "") in topic.replace(" ", "")
-                or trigger_norm.replace(" ", "") in content.replace(" ", "")
-            ):
-                trigger_hits.append(post)
-
-        if trigger_hits:
-            candidates = trigger_hits
-
-    chosen = random.choice(candidates)
-    return chosen.get("content", "CC98 帖子加载失败...")
+    post = select_local_forum_post(
+        library,
+        effect=effect,
+        trigger=trigger,
+        fallback="CC98 帖子加载失败...",
+        choose=random.choice,
+    )
+    return post.content if post else None
 

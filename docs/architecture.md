@@ -134,6 +134,36 @@ calls cover final-exam score calculation, GPA aggregation, new-semester energy
 recovery, pause/action gating, relax overflow transfer, active theme loaders,
 story data, and prompt fragments.
 
+## Lifecycle Contracts
+
+Reusable setup and transition payload shaping lives under:
+
+```text
+simulator-core/backend/esimu_core/lifecycle/
+```
+
+Current helpers build fresh-character state fragments, new-semester reset
+fragments, and achievement detail payloads.
+They return plain dictionaries/dataclasses and deliberately avoid reference-app
+schemas or storage clients. The reference backend still owns username safety,
+Redis writes, PostgreSQL persistence, WebSocket emission, and LLM calls.
+
+## Content And Message Contracts
+
+Theme-neutral content payload shaping lives under:
+
+```text
+simulator-core/backend/esimu_core/content/
+```
+
+Current helpers define framework-facing concepts (`feed`, `forum`,
+`messenger`) while mapping reference compatibility IDs (`cc98`, `dingtalk`) at
+adapter boundaries. They normalize local random events, forum posts, messenger
+contacts, reply options, and stat/gold settlement effects. Local-library
+selection for events and forum posts now lives in core; the reference adapter
+still owns JSON caching, LLM fallbacks, Redis content pools, WebSocket emission,
+and persisted DingTalk-compatible state schemas.
+
 ## Runtime Orchestration
 
 The next extracted layer lives under:

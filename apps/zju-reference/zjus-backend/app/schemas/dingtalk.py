@@ -5,40 +5,21 @@ The schemas keep contact IDs, message IDs, reply options, unread counts, and
 round state stable across Redis, PostgreSQL saves, and WebSocket payloads.
 """
 
-import hashlib
 import time
 import uuid
 from typing import Any, Literal
 
+from esimu_core.content import (
+    MESSAGE_ROLE_ALIASES,
+    REPLYABLE_MESSAGE_ROLES,
+    build_message_contact_id,
+    is_replyable_message_role,
+    normalize_message_role,
+)
 from pydantic import BaseModel, Field
 
-REPLYABLE_DINGTALK_ROLES = {
-    "roommate",
-    "classmate",
-    "friend",
-    "teaching_assistant",
-    "teacher",
-    "crush",
-}
-
-DINGTALK_ROLE_ALIASES = {
-    "student": "classmate",
-    "students": "classmate",
-    "同学": "classmate",
-    "同班同学": "classmate",
-    "室友": "roommate",
-    "舍友": "roommate",
-    "roomie": "roommate",
-    "ta": "teaching_assistant",
-    "assistant": "teaching_assistant",
-    "助教": "teaching_assistant",
-    "老师": "teacher",
-    "教师": "teacher",
-    "朋友": "friend",
-    "好友": "friend",
-    "crush": "crush",
-    "暗恋对象": "crush",
-}
+REPLYABLE_DINGTALK_ROLES = REPLYABLE_MESSAGE_ROLES
+DINGTALK_ROLE_ALIASES = MESSAGE_ROLE_ALIASES
 
 DINGTALK_MAX_MESSAGES_PER_CONTACT = 50
 DINGTALK_DEFAULT_MAX_CONTACTS = 12
@@ -46,20 +27,17 @@ DINGTALK_DEFAULT_MAX_CONTACTS = 12
 
 def normalize_dingtalk_role(role: str) -> str:
     """Normalize human-facing role aliases into canonical DingTalk role IDs."""
-    normalized = str(role or "unknown").strip().lower()
-    return DINGTALK_ROLE_ALIASES.get(normalized, normalized)
+    return normalize_message_role(role)
 
 
 def build_contact_id(sender: str, role: str) -> str:
     """Build a deterministic contact ID from a sender name and role."""
-    raw = f"{normalize_dingtalk_role(role)}:{sender.strip()}"
-    digest = hashlib.sha1(raw.encode("utf-8")).hexdigest()[:12]
-    return f"dt_{digest}"
+    return build_message_contact_id(sender, role, prefix="dt")
 
 
 def is_replyable_role(role: str) -> bool:
     """Return whether a normalized role supports player replies."""
-    return normalize_dingtalk_role(role) in REPLYABLE_DINGTALK_ROLES
+    return is_replyable_message_role(role)
 
 
 def new_message_id() -> str:

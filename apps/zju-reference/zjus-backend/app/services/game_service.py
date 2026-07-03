@@ -5,11 +5,14 @@ Copyright (c) 2026 pirate-608. Licensed under the MIT License.
 semesters while coordinating Redis state and PostgreSQL persistence.
 """
 
-import json
 import logging
 from typing import Any, Dict, Optional
 
 from esimu_core.domain.semester import recover_toward_baseline  # noqa: E402
+from esimu_core.lifecycle import (
+    build_initial_character_state,
+    build_semester_reset_state,
+)
 from esimu_core.world.items import items
 from esimu_core.world.stat_definitions import stat_definitions
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -106,61 +109,26 @@ class GameService:
         )
 
         safe_username = safe_username_for_prompt(username)
-        stat_defaults = stat_definitions.default_stats()
         initial_stats = PlayerStats.build_initial(username=safe_username).model_dump()
-        allocated_fields = {
-            stat_id: value for stat_id, value in overrides.items()
-        }
-        allocated_fields.update(
-            {
-                f"initial_{stat_id}": value
-                for stat_id, value in overrides.items()
-            }
+        lifecycle_state = build_initial_character_state(
+            username=safe_username,
+            major_info=major_info,
+            course_plan=assignment["course_plan"],
+            initial_courses=assignment["initial_courses"],
+            stat_defaults=stat_definitions.default_stats(),
+            allocated_stats=overrides,
+            initial_gold=items.initial_gold,
         )
-        if "iq" in overrides:
-            allocated_fields["iq"] = overrides["iq"] + major_info.get("iq_buff", 0)
-
-        update_fields = {
-            "elapsed_game_time": 0,
-            "major": major_info["name"],
-            "major_abbr": major_info["abbr"],
-            "initial_major_abbr": major_info["abbr"],
-            "stress": major_info.get("stress_base", 0),
-            "energy": stat_defaults["energy"],
-            "sanity": stat_defaults["sanity"],
-            "gpa": "0.0",
-            "highest_gpa": "0.0",
-            "gpa_points_total": "0.0",
-            "gpa_credits_total": "0.0",
-            "reputation": stat_defaults["reputation"],
-            "gold": items.initial_gold,
-            "semester": "大一秋冬",
-            "semester_idx": 1,
-            "course_plan_json": json.dumps(
-                assignment["course_plan"], ensure_ascii=False
-            ),
-            "course_info_json": json.dumps(
-                assignment["initial_courses"], ensure_ascii=False
-            ),
-        }
-        update_fields.update(allocated_fields)
-        initial_stats.update(update_fields)
-
-        courses_mastery = {str(c["id"]): 0 for c in assignment["initial_courses"]}
-        course_states = {str(c["id"]): 1 for c in assignment["initial_courses"]}
+        initial_stats.update(lifecycle_state.stats_update)
 
         await self.repo.set_game_data(
             stats=initial_stats,
-            courses=courses_mastery,
-            states=course_states,
+            courses=lifecycle_state.courses_mastery,
+            states=lifecycle_state.course_states,
             achievements=[],
         )
 
-        return {
-            "major": major_info["name"],
-            "major_abbr": major_info["abbr"],
-            "courses": assignment["initial_courses"],
-        }
+        return lifecycle_state.summary
 
     async def reset_courses_for_new_semester(self, semester_idx: int):
         """Replace course state and recover energy for a newly entered semester."""
@@ -169,45 +137,25 @@ class GameService:
         major_abbr = stats.get("major_abbr", "")
         my_courses = await self.world.get_semester_courses(major_abbr, semester_idx)
 
-        sem_names = [
-            "大一秋冬", "大一春夏", "大二秋冬", "大二春夏",
-            "大三秋冬", "大三春夏", "大四秋冬", "大四春夏",
-        ]
-        term_name = (
-            sem_names[semester_idx - 1]
-            if 1 <= semester_idx <= 8
-            else f"延毕学期 {semester_idx}"
-        )
-
         energy_default = stat_definitions.by_id["energy"].default
         try:
             current_energy = int(stats.get("energy", energy_default))
         except (TypeError, ValueError):
             current_energy = energy_default
-        recovered_energy = self.recover_energy_for_new_semester(current_energy)
-        update_fields = {
-            "semester": term_name,
-            "elapsed_game_time": 0,
-            "exam_completed": 0,
-            "energy": recovered_energy,
-            "course_info_json": json.dumps(my_courses, ensure_ascii=False),
-        }
-
-        courses_mastery = {str(c["id"]): 0 for c in my_courses}
-        course_states = {str(c["id"]): 1 for c in my_courses}
+        lifecycle_state = build_semester_reset_state(
+            semester_idx=semester_idx,
+            courses=my_courses,
+            current_energy=current_energy,
+            energy_default=energy_default,
+            energy_minimum=stat_definitions.by_id["energy"].min,
+        )
 
         await self.repo.update_courses_and_states(
-            stats_update=update_fields,
-            courses=courses_mastery,
-            states=course_states,
+            stats_update=lifecycle_state.stats_update,
+            courses=lifecycle_state.courses_mastery,
+            states=lifecycle_state.course_states,
         )
-        return {
-            "semester": term_name,
-            "energy_recovery": {
-                "before": current_energy,
-                "after": recovered_energy,
-            },
-        }
+        return lifecycle_state.summary
 
     async def process_semester_transition(
         self,

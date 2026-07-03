@@ -5,7 +5,7 @@ This page is for future agents taking over esimu lab work.
 ## First Move
 
 ```powershell
-cd D:\projects\simulator-framework-lab
+cd D:\projects\ZJUers_simulator\labs\esimu
 git status --short
 ```
 
@@ -37,6 +37,11 @@ The backend extraction is currently split like this:
 - `esimu_core.runtime`: reusable runtime orchestration for clock math, action
   decisions, snapshot payloads, cooldown calculations, runtime DTOs, and
   background-task bookkeeping.
+- `esimu_core.lifecycle`: pure setup/transition contracts for fresh-character
+  state, semester reset state, and achievement detail payloads.
+- `esimu_core.content`: pure event/forum/messenger payload contracts, legacy
+  `cc98`/`dingtalk` concept mapping, local-library selection, reply options,
+  and settlement-effect normalization.
 - `apps/zju-reference/zjus-backend`: adapter code that owns Redis, FastAPI,
   SQLAlchemy, WebSocket, save services, admin pages, and LLM clients.
 - `apps/zju-reference/zjus-frontend`: copied frontend shell that consumes
@@ -56,6 +61,10 @@ objects, or reference-app services.
   `simulator-core/backend/esimu_core/world/catalog.py`.
 - Add pure stat/effect/semester/rules code in `simulator-core/backend/esimu_core/domain/`.
 - Add pure tick/action/snapshot/task orchestration in `simulator-core/backend/esimu_core/runtime/`.
+- Add pure character setup, semester transition, and achievement detail
+  contracts in `simulator-core/backend/esimu_core/lifecycle/`.
+- Add pure event/forum/messenger contracts in
+  `simulator-core/backend/esimu_core/content/`.
 - Keep external I/O and compatibility glue in `apps/zju-reference/`.
 - Update `docs/` whenever an extraction boundary or startup workflow changes.
 
@@ -79,6 +88,8 @@ Core from `simulator-core/backend/`:
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_world_catalog.py
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_demo_theme_smoke.py
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_lifecycle_contracts.py
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_content_contracts.py
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m ruff check esimu_core scripts tests
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
 $env:SIMULATOR_THEME='demo-campus'; D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py

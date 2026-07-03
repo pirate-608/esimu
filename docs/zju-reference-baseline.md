@@ -5,7 +5,10 @@ This document records the first code-copy baseline for the framework lab.
 ## Source
 
 - Source workspace: `D:\projects\ZJUers_simulator`
-- Destination workspace: `D:\projects\simulator-framework-lab\apps\zju-reference`
+- Original destination workspace:
+  `D:\projects\simulator-framework-lab\apps\zju-reference`
+- Current submodule workspace:
+  `D:\projects\ZJUers_simulator\labs\esimu\apps\zju-reference`
 - Source commit at verification time: `53cb7d176bb68094beb30979eff70fd15aa6220e`
 - Copy time: `2026-07-01T19:33:51+08:00`
 - Source worktree after copy verification: clean
@@ -36,5 +39,6 @@ known runnable game instead of rebuilding glue code from scratch.
 - Local Nginx HTTP port is `18080`.
 - Vite dev server port is `15173`.
 - Vite proxy points to `127.0.0.1:18000`.
-- Frontend browser storage keys use the `simlab_` prefix.
+- Frontend browser storage keys originally used the `simlab_` prefix. Runtime
+  code now derives storage keys from the active theme's `storage.prefix`.
 

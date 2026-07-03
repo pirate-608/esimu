@@ -21,7 +21,7 @@ Runtime multi-theme switching is not part of the current lab contract.
 Copy the minimal theme:
 
 ```powershell
-cd D:\projects\simulator-framework-lab
+cd D:\projects\ZJUers_simulator\labs\esimu
 Copy-Item -Recurse themes\demo-campus themes\<theme_id>
 ```
 

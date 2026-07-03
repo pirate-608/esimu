@@ -6,15 +6,16 @@ session.
 ## 1. Open The Lab
 
 ```powershell
-cd D:\projects\simulator-framework-lab
+cd D:\projects\ZJUers_simulator\labs\esimu
 git status --short
 ```
 
 If the worktree is dirty, read the diff before editing the same files. This lab
 often keeps extraction work in progress between sessions.
 
-Do not work from `D:\projects\ZJUers_simulator` unless the user explicitly asks
-for main-game changes.
+The lab is a submodule under `D:\projects\ZJUers_simulator\labs\esimu`. Do not
+modify the main ZJU game outside `labs/esimu` unless the user explicitly asks
+for a cross-repository change.
 
 ## 2. Know The Four Moving Parts
 
@@ -45,18 +46,21 @@ back to the local core package:
 
 If editable install support is unavailable in an offline Windows environment, a
 local `.pth` file pointing at
-`D:\projects\simulator-framework-lab\simulator-core\backend` is acceptable for
-development. Do not add bridge code to the reference backend.
+`D:\projects\ZJUers_simulator\labs\esimu\simulator-core\backend` is acceptable
+for development. Do not add bridge code to the reference backend or point the
+venv at the old standalone lab path.
 
 ## 4. Validate Core And Theme Data
 
 Run these from `simulator-core/backend/`:
 
 ```powershell
-cd D:\projects\simulator-framework-lab\simulator-core\backend
+cd D:\projects\ZJUers_simulator\labs\esimu\simulator-core\backend
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_world_catalog.py
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_demo_theme_smoke.py
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_lifecycle_contracts.py
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_content_contracts.py
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m ruff check esimu_core scripts tests
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
 $env:SIMULATOR_THEME='demo-campus'; D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
@@ -86,7 +90,7 @@ Then run validation again.
 Run these from `apps/zju-reference/zjus-backend/`:
 
 ```powershell
-cd D:\projects\simulator-framework-lab\apps\zju-reference\zjus-backend
+cd D:\projects\ZJUers_simulator\labs\esimu\apps\zju-reference\zjus-backend
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\unit\test_demo_campus_reference_smoke.py
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\unit
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m ruff check app tests\unit
@@ -102,7 +106,7 @@ loaded in the same order as a real app startup.
 Run these from `apps/zju-reference/zjus-frontend/`:
 
 ```powershell
-cd D:\projects\simulator-framework-lab\apps\zju-reference\zjus-frontend
+cd D:\projects\ZJUers_simulator\labs\esimu\apps\zju-reference\zjus-frontend
 npx vue-tsc --noEmit
 npx vitest run src\utils\theme.spec.ts
 npx vitest run src\components\themeRuntime.spec.js

@@ -53,6 +53,27 @@ The first runtime orchestration helpers are now under `esimu_core/runtime/`:
 Runtime helpers may know about simulator concepts, but they must not import
 Redis, FastAPI, SQLAlchemy, OpenAI, or reference-app services.
 
+The first lifecycle contracts are now under `esimu_core/lifecycle/`:
+
+- fresh-character state fragments for adapter storage writes.
+- new-semester reset state fragments and energy recovery summaries.
+- achievement detail payload normalization.
+
+Lifecycle helpers may shape plain payload dictionaries, but they must not import
+reference-app Pydantic schemas, Redis repositories, database sessions, WebSocket
+objects, or LLM clients.
+
+The first content and message contracts are now under `esimu_core/content/`:
+
+- framework-facing concepts for feed, forum, and messenger payloads.
+- compatibility mapping for legacy reference IDs such as `cc98` and `dingtalk`.
+- local event and forum-post selection plus result normalization.
+- private-message contact, reply-option, and settlement-effect normalization.
+
+Content helpers may understand simulator payload concepts, but they must not
+perform LLM calls, cache Redis content pools, emit WebSocket messages, or own
+database/save schemas.
+
 `esimu_core.world.catalog` owns the static world-directory contract for majors,
 course plans, achievements, event libraries, forum-library JSON, and optional
 query embeddings. Reference apps may wrap it with async caching or API-specific
@@ -69,9 +90,10 @@ through the editable requirement in `apps/zju-reference/zjus-backend/requirement
 ```
 
 If an offline Windows venv cannot build editable installs because `setuptools`
-is unavailable, a local `.pth` file pointing at `D:\projects\simulator-framework-lab\simulator-core\backend`
-is an acceptable development fallback. Do not reintroduce `sys.path` bridge code
-inside the reference backend.
+is unavailable, a local `.pth` file pointing at
+`D:\projects\ZJUers_simulator\labs\esimu\simulator-core\backend` is an
+acceptable development fallback. Do not point it at the old standalone lab path,
+and do not reintroduce `sys.path` bridge code inside the reference backend.
 
 ## Active Theme Path
 
@@ -85,9 +107,11 @@ themes/zju/world/
 Validation commands from this directory:
 
 ```powershell
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m py_compile esimu_core\world\theme_paths.py esimu_core\world\theme.py esimu_core\world\story.py esimu_core\world\prompts.py esimu_core\world\balance.py esimu_core\world\items.py esimu_core\world\stat_definitions.py esimu_core\world\catalog.py esimu_core\domain\semester.py esimu_core\domain\effects.py esimu_core\domain\actions.py esimu_core\runtime\clock.py esimu_core\runtime\actions.py esimu_core\runtime\state.py esimu_core\runtime\cooldowns.py esimu_core\runtime\snapshot.py esimu_core\runtime\tasks.py
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m py_compile esimu_core\world\theme_paths.py esimu_core\world\theme.py esimu_core\world\story.py esimu_core\world\prompts.py esimu_core\world\balance.py esimu_core\world\items.py esimu_core\world\stat_definitions.py esimu_core\world\catalog.py esimu_core\domain\semester.py esimu_core\domain\effects.py esimu_core\domain\actions.py esimu_core\runtime\clock.py esimu_core\runtime\actions.py esimu_core\runtime\state.py esimu_core\runtime\cooldowns.py esimu_core\runtime\snapshot.py esimu_core\runtime\tasks.py esimu_core\lifecycle\__init__.py esimu_core\content\__init__.py
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_world_catalog.py
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_lifecycle_contracts.py
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_content_contracts.py
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m ruff check esimu_core scripts tests
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
 $env:SIMULATOR_THEME='demo-campus'; D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py

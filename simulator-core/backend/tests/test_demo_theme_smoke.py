@@ -27,6 +27,11 @@ def test_demo_campus_theme_loads_world_and_runtime_payloads() -> None:
         import json
         from pathlib import Path
 
+        from esimu_core.content import (
+            normalize_message_payload,
+            select_local_event,
+            select_local_forum_post,
+        )
         from esimu_core.runtime.snapshot import (
             build_init_payload_from_snapshot,
             build_tick_payload_from_snapshot,
@@ -71,6 +76,27 @@ def test_demo_campus_theme_loads_world_and_runtime_payloads() -> None:
 
         tick = build_tick_payload_from_snapshot(snapshot)
         init = build_init_payload_from_snapshot(snapshot)
+        event = select_local_event(
+            catalog.event_library(),
+            sanity=100,
+            stress=20,
+            choose=lambda candidates: candidates[0],
+        )
+        forum_post = select_local_forum_post(
+            catalog.forum_library(),
+            effect="positive",
+            trigger="校园梗",
+            fallback="forum fallback",
+            choose=lambda candidates: candidates[0],
+        )
+        message = normalize_message_payload(
+            {
+                "contact": {"sender": "星桥同学", "role": "同学"},
+                "content": "欢迎来到星桥学院。",
+                "reply_options": ["谢谢", "一起走走"],
+            },
+            contact_prefix="dt",
+        )
         print(json.dumps({
             "theme": active_theme_id(),
             "display": theme.display_name,
@@ -81,8 +107,11 @@ def test_demo_campus_theme_loads_world_and_runtime_payloads() -> None:
             "major": majors[0]["id"],
             "course_count": len(courses),
             "catalog_achievement": catalog.achievements()["first_step"]["name"],
-            "event_title": catalog.event_library()[0]["title"],
-            "forum_content": catalog.forum_library()[0]["content"],
+            "event_title": event.title if event else "",
+            "forum_content": forum_post.content if forum_post else "",
+            "message_sender": message.contact.sender,
+            "message_role": message.contact.role,
+            "message_reply_count": len(message.reply_options),
             "item_count": len(items.public_items),
             "tick_course_count": len(tick["courses"]),
             "init_has_items": "items_state" in init,
@@ -112,6 +141,9 @@ def test_demo_campus_theme_loads_world_and_runtime_payloads() -> None:
         "catalog_achievement": "迈出第一步",
         "event_title": "社团摊位前",
         "forum_content": "有人分享了一个跨主题也能成立的校园笑话，评论区气氛很好。",
+        "message_sender": "星桥同学",
+        "message_role": "classmate",
+        "message_reply_count": 2,
         "item_count": 2,
         "tick_course_count": 3,
         "init_has_items": True,

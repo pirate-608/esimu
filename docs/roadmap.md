@@ -96,11 +96,20 @@ Progress:
 - Runtime browser storage in the reference frontend now goes through
   `storageKeys.ts`, so login tokens, save selection, guide state, prologue state,
   and console-theme preferences are scoped by the active theme prefix.
+- `esimu_core.content` now maps legacy `cc98`/`dingtalk` IDs to framework
+  `forum`/`messenger` concepts and owns local event/forum/message payload
+  normalization for both ZJU and demo-campus validation paths.
 
-## Next Planned Phases
+## Framework Completion Roadmap
 
-These phases are intentionally broad. Each should become a smaller
-implementation plan before coding starts.
+The remaining roadmap turns esimu from a research lab into a basically complete
+single-theme simulator framework. "Basically complete" means a new project can
+start from esimu, define a theme/world pack, run the starter backend/frontend,
+and customize gameplay content without copying ZJU-specific product code.
+
+Each phase should still become a smaller implementation plan before coding
+starts. The ZJU main game remains the primary product and should not be changed
+as part of this roadmap unless explicitly requested.
 
 ### Phase 4A: Demo Campus Runnable Reference
 
@@ -161,7 +170,104 @@ Goal: define the reusable contracts before moving more engine code.
   adapter.
 - Avoid moving the full `GameEngine` until these contracts have stable tests.
 
-### Phase 4D: Starter App Shape
+Deliverables:
+
+- `esimu_core.lifecycle` or equivalent module containing plain DTOs and helpers
+  for player identity, initial stats, major assignment, semester transition,
+  achievements, and content result normalization.
+- Reference backend adapters that call these helpers instead of duplicating
+  normalization and payload shaping.
+- Tests that run the same lifecycle helpers against `zju` and `demo-campus`
+  world data.
+
+Completion criteria:
+
+- Character initialization, semester transition, achievement detail lookup, and
+  local content result shaping can be tested without Redis, SQLAlchemy, FastAPI,
+  WebSocket, or OpenAI clients.
+- The reference backend still exposes the same player HTTP/WebSocket contracts.
+
+Do not:
+
+- Move database persistence or WebSocket connection management into core.
+- Rename legacy protocol/action IDs during this phase.
+
+Progress:
+
+- `esimu_core.lifecycle` now provides pure helpers for fresh-character state,
+  new-semester reset state, achievement detail payloads, and local event/forum
+  result normalization.
+- The ZJU reference `GameService` calls lifecycle helpers for character
+  initialization and semester course reset while keeping Redis and PostgreSQL
+  persistence in the adapter.
+- The ZJU reference engine uses lifecycle achievement-detail normalization.
+- `test_lifecycle_contracts.py` covers these helpers with demo-campus world
+  data and compatibility-style fallback cases.
+
+Remaining work:
+
+- Extract player identity DTOs and auth/session-facing normalization.
+- Move achievement condition evaluation into core once behavior thresholds are
+  represented as data instead of reference-engine branches.
+- Extract player identity DTOs and auth/session-facing normalization.
+- Move achievement condition evaluation into core once behavior thresholds are
+  represented as data instead of reference-engine branches.
+
+### Phase 4D: Content And Message Contracts
+
+Goal: make events, forum posts, and messenger conversations theme-neutral at the
+contract layer while keeping legacy IDs compatible.
+
+- Define core result shapes for local event entries, forum posts, message
+  contacts, message rounds, reply options, and stat/gold effects.
+- Add a terminology mapper so `forum` and `messenger` are the framework-facing
+  concepts, while `cc98` and `dingtalk` remain legacy adapter IDs for the ZJU
+  reference app.
+- Move local-library selection and fallback result normalization into core where
+  it can be tested against both themes.
+- Keep actual LLM calls, Redis content pools, and WebSocket emission in the
+  reference adapter.
+
+Deliverables:
+
+- Core contracts for event/feed/forum/messenger payloads.
+- Reference adapter mapping from legacy `cc98`/`dingtalk` actions to
+  framework-level `forum`/`messenger` concepts.
+- Demo-campus smoke that triggers at least one local event, one forum entry, one
+  messenger contact, and one reply option without ZJU-visible terms.
+
+Completion criteria:
+
+- Adding a non-ZJU theme no longer requires accepting `CC98` or DingTalk as
+  visible labels.
+- Existing ZJU save/WebSocket compatibility remains intact.
+
+Progress:
+
+- `esimu_core.content` now defines framework-facing `feed`/`forum`/`messenger`
+  concepts plus compatibility mapping for legacy reference IDs `cc98` and
+  `dingtalk`.
+- Local random-event and forum-post selection now lives in core; the reference
+  `event_library.py` keeps active-theme JSON caching and delegates selection
+  plus fallback normalization to core.
+- Messenger opening payloads, contact IDs, reply options, replyable-role
+  aliases, and settlement-effect clamping now have pure core helpers while the
+  reference adapter keeps DingTalk-compatible Pydantic save/WebSocket schemas.
+- `test_content_contracts.py` covers concept mapping, local event/forum
+  selection, message payload normalization, reply fallbacks, and effect clamps.
+- The demo-campus smoke now triggers one local event, one local forum post, and
+  one messenger payload without ZJU-visible terms.
+
+Remaining work:
+
+- Define a fuller message-round state contract before moving persisted
+  DingTalk-compatible inbox state out of the reference schema layer.
+- Move reusable contact selection/compaction into core once the message state
+  DTO is stable.
+- Keep LLM calls, Redis content pools, and WebSocket emissions in the adapter
+  until the starter app shape is decided.
+
+### Phase 4E: Starter App Shape
 
 Goal: decide what a new simulator project should copy.
 
@@ -172,9 +278,154 @@ Goal: decide what a new simulator project should copy.
 - Expand `templates/` only after the copy boundary is clear.
 - Produce a concrete recommendation before Phase 5.
 
-## Phase 5: Framework Decision
+Deliverables:
 
-Decide whether the lab should become:
+- A written decision record in `docs/` explaining the chosen starter strategy.
+- A file classification list for `apps/zju-reference`: keep as adapter, copy to
+  starter, move into core, or leave as ZJU-specific reference.
+- A minimal `templates/agent/AGENTS.md` plus starter checklist that matches the
+  chosen strategy.
+
+Completion criteria:
+
+- A future project maintainer can tell which directories to copy and which are
+  reference-only.
+- The starter strategy does not require editing the ZJU reference theme.
+
+### Phase 5: Theme Contract Hardening
+
+Goal: turn the current theme pack convention into a stable framework contract.
+
+- Write JSON Schema or schema-equivalent validators for `theme.json`,
+  `story.json`, `prompts.json`, and major world files.
+- Make `validate_world_data.py` the canonical CI gate for new themes.
+- Document field semantics, defaults, compatibility guarantees, and common
+  migration patterns.
+- Add fixtures for both `zju` and `demo-campus` so schema changes are tested
+  against a full theme and a minimal theme.
+
+Deliverables:
+
+- Machine-checkable theme schemas or Pydantic models with clear error messages.
+- `docs/theme-pack-contract.md` updated from descriptive notes into a real
+  authoring contract.
+- A "new theme checklist" that includes metadata generation, validation, smoke
+  tests, and known legacy-ID caveats.
+
+Completion criteria:
+
+- A malformed theme fails validation before runtime.
+- A minimal valid theme can be created without reading ZJU-specific source code.
+
+### Phase 6: Minimal Starter App
+
+Goal: create the first non-ZJU starter app that depends on `esimu-core`.
+
+- Add `apps/starter/` or equivalent minimal backend/frontend pair.
+- Use `demo-campus` as the default starter theme.
+- Keep starter backend as an adapter: FastAPI/WebSocket/Redis/Postgres may live
+  there, but game rules and world loading should come from `esimu-core`.
+- Keep starter frontend as a skin/template, not a heavy frontend framework
+  package yet.
+
+Deliverables:
+
+- A runnable starter backend with basic auth placeholder, character creation,
+  WebSocket init/tick, one relax action, one event, one forum entry, one
+  messenger round, one item buy/sell path, semester settlement, and end screen.
+- A minimal starter frontend that consumes generated theme/story/stat metadata.
+- Local run instructions and smoke tests for the starter app.
+
+Completion criteria:
+
+- A new simulator can be bootstrapped from `apps/starter` without importing or
+  editing `apps/zju-reference`.
+- ZJU reference behavior still passes its existing tests.
+
+### Phase 7: Packaging And Versioning
+
+Goal: make `esimu-core` consumable as a real dependency instead of a lab-only
+editable package.
+
+- Finalize Python package metadata, extras, and supported Python versions.
+- Add changelog/version policy for `esimu-core`.
+- Decide whether releases are Git tags only, GitHub packages, or a future PyPI
+  package.
+- Add CI checks for core tests, starter smoke, demo theme validation, and
+  reference adapter compatibility.
+
+Deliverables:
+
+- Versioned `esimu-core` package.
+- Release checklist and compatibility policy.
+- CI matrix covering `esimu-core`, `apps/starter`, and `apps/zju-reference`.
+
+Completion criteria:
+
+- A downstream project can pin an esimu-core version and upgrade intentionally.
+- Breaking changes to theme/world contracts are documented and tested.
+
+### Phase 8: Project Bootstrap Tooling
+
+Goal: reduce the cost of creating a new simulator from the framework.
+
+- Add a small bootstrap script or CLI after the starter app shape is stable.
+- Generate a new project skeleton with selected theme ID, storage prefix,
+  package names, docs, and agent handoff files.
+- Provide scaffold helpers for stats, items, achievements, courses, events, and
+  prompt fragments.
+- Keep the CLI small; prefer validation and generated checklists over magical
+  source rewrites.
+
+Deliverables:
+
+- `scripts/new_project.py` or equivalent command.
+- Theme/world scaffolding commands or documented templates.
+- Bootstrap smoke that creates a temporary project and runs validation.
+
+Completion criteria:
+
+- A new project can be generated, validated, and started locally in a predictable
+  workflow.
+- The generated project contains no ZJU product names unless the user selects
+  the ZJU theme.
+
+### Phase 9: Framework Readiness Review
+
+Goal: decide whether esimu is ready to be treated as a basically complete
+framework.
+
+- Run a full audit across core, starter, reference adapter, docs, and theme
+  contracts.
+- Build a second small non-ZJU theme beyond demo-campus, or expand demo-campus
+  enough to prove the framework supports real content authoring.
+- Review performance boundaries: tick loop, content generation, storage I/O,
+  LLM timeouts, and background task de-duplication.
+- Review UX boundaries: onboarding, save/load, theme terms, prologue/endings,
+  item and achievement feedback.
+
+Deliverables:
+
+- Framework readiness report.
+- Remaining-blockers list, if any.
+- Recommendation for one of:
+  - internal reusable framework,
+  - library plus starter app,
+  - template repository,
+  - research lab only.
+
+Completion criteria:
+
+- A new simulator can be created without copying ZJU-specific code.
+- A theme author can add world data and assets through documented contracts.
+- Core behavior is covered by tests independent of FastAPI/Redis/Postgres.
+- The starter app can run a minimal full game loop.
+- ZJU reference behavior remains protected by tests and can cherry-pick mature
+  framework improvements intentionally.
+
+## Framework Decision
+
+The decision point remains open until Phase 9. esimu may become:
 
 - a reusable internal framework,
 - a template repository,
