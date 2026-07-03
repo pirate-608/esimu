@@ -93,6 +93,7 @@ import {
   STAT_INITIAL_BUDGET,
 } from '@/data/statDefinitions.generated'
 import { statDefault, statIcon, statLabel } from '@/utils/statDisplay'
+import { STORAGE_KEYS } from '@/utils/storageKeys'
 
 const store = useGameStore()
 
@@ -151,7 +152,7 @@ const confirmCreate = async () => {
     alert(`${labels} 初始总点数必须等于 ${STAT_INITIAL_BUDGET}`)
     return
   }
-  const jwt = localStorage.getItem('simlab_jwt')
+  const jwt = localStorage.getItem(STORAGE_KEYS.jwt)
   if (!jwt) {
     alert('认证凭据已过期，请重新登录')
     store.setPhase('login')
@@ -173,8 +174,8 @@ const confirmCreate = async () => {
       stats: statPayload,
     }
     await initCharacter(payload)
-    localStorage.setItem('simlab_game_started', '1')
-    localStorage.removeItem('simlab_selected_save_slot')
+    localStorage.setItem(STORAGE_KEYS.gameStarted, '1')
+    localStorage.removeItem(STORAGE_KEYS.selectedSaveSlot)
     store.setPhase('loading')
   } catch (err) {
     console.error('Init character error:', err)

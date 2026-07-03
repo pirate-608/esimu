@@ -26,6 +26,7 @@ import TopNav from './components/TopNav.vue'
 import ExitConfirmModal from './components/modals/ExitConfirmModal.vue'
 import EndScreen from './components/EndScreen.vue'
 import { themeTerm } from '@/utils/theme'
+import { STORAGE_KEYS } from '@/utils/storageKeys'
 
 const store = useGameStore()
 const { connect, disconnect, isConnected, send } = useGameWebSocket()
@@ -64,17 +65,17 @@ const bootstrapEntryFlow = () => {
   if (hasBootstrappedEntry) return
   hasBootstrappedEntry = true
 
-  const storedJwt = localStorage.getItem('simlab_jwt')
-  if (storedJwt) localStorage.setItem('simlab_token', storedJwt)
+  const storedJwt = localStorage.getItem(STORAGE_KEYS.jwt)
+  if (storedJwt) localStorage.setItem(STORAGE_KEYS.token, storedJwt)
 
-  let existingToken = localStorage.getItem('simlab_token')
+  let existingToken = localStorage.getItem(STORAGE_KEYS.token)
   if (!storedJwt && existingToken && existingToken.split('.').length !== 3) {
-    localStorage.setItem('simlab_user_token', existingToken)
-    localStorage.removeItem('simlab_token')
+    localStorage.setItem(STORAGE_KEYS.userToken, existingToken)
+    localStorage.removeItem(STORAGE_KEYS.token)
     existingToken = null
   }
-  const gameStarted = localStorage.getItem('simlab_game_started')
-  const savedChoices = localStorage.getItem('simlab_saves')
+  const gameStarted = localStorage.getItem(STORAGE_KEYS.gameStarted)
+  const savedChoices = localStorage.getItem(STORAGE_KEYS.saves)
 
   if (existingToken) {
     if (savedChoices && !gameStarted) {
@@ -106,7 +107,7 @@ watch(
   () => store.currentPhase,
   (phase) => {
     if (phase === 'loading') {
-      const token = localStorage.getItem('simlab_token') || ''
+      const token = localStorage.getItem(STORAGE_KEYS.token) || ''
       const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
       const wsUrl = `${wsProtocol}//${window.location.host}`
       connect(token, wsUrl)
@@ -120,10 +121,10 @@ const handleEnterGame = () => {
 
 const handleReturnHome = () => {
   disconnect()
-  localStorage.removeItem('simlab_game_started')
-  localStorage.removeItem('simlab_selected_save_slot')
-  localStorage.removeItem('simlab_token')
-  localStorage.removeItem('simlab_jwt')
+  localStorage.removeItem(STORAGE_KEYS.gameStarted)
+  localStorage.removeItem(STORAGE_KEYS.selectedSaveSlot)
+  localStorage.removeItem(STORAGE_KEYS.token)
+  localStorage.removeItem(STORAGE_KEYS.jwt)
   store.resetRuntimeStateForInit()
   store.setPhase('login')
 }
@@ -184,7 +185,7 @@ const handleReturnHome = () => {
         role="status"
       />
       <h4 class="text-muted">
-        正在连接「zdbk」...
+        正在连接「{{ themeTerm('server', '服务器') }}」...
       </h4>
       <div
         v-if="!isConnected"

@@ -8,7 +8,7 @@
         class="spinner-border spinner-border-sm text-info mb-2"
         role="status"
       />
-      <div>正在加载课程大纲...</div>
+      <div>正在加载{{ themeTerm('course', '课程') }}大纲...</div>
     </div>
 
     <div
@@ -85,6 +85,7 @@
 import { computed } from 'vue'
 import { useGameStore } from '../stores/gameStore.ts'
 import type { WsClientAction } from '@/types/websocket'
+import { themeTerm } from '@/utils/theme'
 
 const store = useGameStore()
 const emit = defineEmits<{

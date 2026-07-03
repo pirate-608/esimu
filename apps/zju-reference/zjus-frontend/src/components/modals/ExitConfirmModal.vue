@@ -21,7 +21,7 @@
             role="status"
           />
           <p class="fs-6 mb-0">
-            正在将数据持久化到服务器...
+            正在将数据持久化到{{ themeTerm('server', '服务器') }}...
           </p>
         </div>
         <!-- 默认确认提示 UI -->

@@ -52,7 +52,7 @@
             <thead class="table-light">
               <tr>
                 <th class="text-start">
-                  课程名称
+                  {{ themeTerm('course', '课程') }}名称
                 </th>
                 <th>学分</th>
                 <th>考前掌握度</th>
@@ -86,7 +86,7 @@
           v-if="hasFailedCourse"
           class="alert alert-danger mt-3 mb-0 small"
         >
-          ⚠️ 警告：你有课程不及格！心态大幅下降，请下学期注意选课和学习策略。
+          ⚠️ 警告：你有{{ themeTerm('course', '课程') }}不及格！心态大幅下降，请下学期注意选课和学习策略。
         </div>
 
         <div
@@ -137,6 +137,7 @@ import { useGameStore } from '../../stores/gameStore.ts'
 import type { WsClientAction } from '@/types/websocket'
 import type { TranscriptModalData, TranscriptModalCourseRow } from '@/types/modal'
 import { statIcon } from '@/utils/statDisplay'
+import { themeTerm } from '@/utils/theme'
 
 const store = useGameStore()
 const emit = defineEmits<{

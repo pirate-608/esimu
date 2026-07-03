@@ -21,6 +21,7 @@ The first low-coupling world loaders have been placed under
 - `story.py`
 - `prompts.py`
 - `theme_paths.py`
+- `catalog.py`
 - `scripts/validate_world_data.py`
 - `scripts/sync_stat_definitions.py`
 - `scripts/scaffold_game_stat.py`
@@ -52,6 +53,11 @@ The first runtime orchestration helpers are now under `esimu_core/runtime/`:
 Runtime helpers may know about simulator concepts, but they must not import
 Redis, FastAPI, SQLAlchemy, OpenAI, or reference-app services.
 
+`esimu_core.world.catalog` owns the static world-directory contract for majors,
+course plans, achievements, event libraries, forum-library JSON, and optional
+query embeddings. Reference apps may wrap it with async caching or API-specific
+schemas, but they should not reintroduce their own `/app/world` path resolver.
+
 ## Package Boundary
 
 The Python package is installed as `esimu-core` and imported as
@@ -79,8 +85,9 @@ themes/zju/world/
 Validation commands from this directory:
 
 ```powershell
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m py_compile esimu_core\world\theme_paths.py esimu_core\world\theme.py esimu_core\world\story.py esimu_core\world\prompts.py esimu_core\world\balance.py esimu_core\world\items.py esimu_core\world\stat_definitions.py esimu_core\domain\semester.py esimu_core\domain\effects.py esimu_core\domain\actions.py esimu_core\runtime\clock.py esimu_core\runtime\actions.py esimu_core\runtime\state.py esimu_core\runtime\cooldowns.py esimu_core\runtime\snapshot.py esimu_core\runtime\tasks.py
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m py_compile esimu_core\world\theme_paths.py esimu_core\world\theme.py esimu_core\world\story.py esimu_core\world\prompts.py esimu_core\world\balance.py esimu_core\world\items.py esimu_core\world\stat_definitions.py esimu_core\world\catalog.py esimu_core\domain\semester.py esimu_core\domain\effects.py esimu_core\domain\actions.py esimu_core\runtime\clock.py esimu_core\runtime\actions.py esimu_core\runtime\state.py esimu_core\runtime\cooldowns.py esimu_core\runtime\snapshot.py esimu_core\runtime\tasks.py
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_world_catalog.py
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m ruff check esimu_core scripts tests
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
 $env:SIMULATOR_THEME='demo-campus'; D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py

@@ -30,7 +30,8 @@ the main game working tree.
 The backend extraction is currently split like this:
 
 - `esimu_core.world`: active theme path resolution plus loaders for balance,
-  stat definitions, items, theme manifests, story data, and prompt fragments.
+  stat definitions, items, theme manifests, story data, prompt fragments, and
+  the static world catalog for majors/courses/achievements/local libraries.
 - `esimu_core.domain`: pure gameplay rules for semester settlement, effects,
   stat bounds, relax overflow, and action gates.
 - `esimu_core.runtime`: reusable runtime orchestration for clock math, action
@@ -39,7 +40,8 @@ The backend extraction is currently split like this:
 - `apps/zju-reference/zjus-backend`: adapter code that owns Redis, FastAPI,
   SQLAlchemy, WebSocket, save services, admin pages, and LLM clients.
 - `apps/zju-reference/zjus-frontend`: copied frontend shell that consumes
-  generated theme, story, and stat metadata.
+  generated theme, story, and stat metadata. Browser persistence should use
+  `src/utils/storageKeys.ts`, not fixed `simlab_*` keys.
 
 Core modules must not import Redis, FastAPI, SQLAlchemy, OpenAI, WebSocket
 objects, or reference-app services.
@@ -50,6 +52,8 @@ objects, or reference-app services.
 - Add display terms, storage prefixes, and theme assets in `theme.json`.
 - Add long narrative copy in `story.json`.
 - Add model-facing prompt context in `prompts.json`.
+- Add reusable static-world file shape compatibility in
+  `simulator-core/backend/esimu_core/world/catalog.py`.
 - Add pure stat/effect/semester/rules code in `simulator-core/backend/esimu_core/domain/`.
 - Add pure tick/action/snapshot/task orchestration in `simulator-core/backend/esimu_core/runtime/`.
 - Keep external I/O and compatibility glue in `apps/zju-reference/`.
@@ -73,6 +77,7 @@ Core from `simulator-core/backend/`:
 
 ```powershell
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_world_catalog.py
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_demo_theme_smoke.py
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m ruff check esimu_core scripts tests
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
@@ -82,6 +87,7 @@ $env:SIMULATOR_THEME='demo-campus'; D:\projects\ZJUers_simulator\.venv\Scripts\p
 Reference backend from `apps/zju-reference/zjus-backend/`:
 
 ```powershell
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\unit\test_demo_campus_reference_smoke.py
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\unit
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m ruff check app tests\unit
 ```
@@ -90,6 +96,7 @@ Reference frontend from `apps/zju-reference/zjus-frontend/`:
 
 ```powershell
 npx vitest run src\utils\theme.spec.ts
+npx vitest run src\components\themeRuntime.spec.js
 npx vue-tsc --noEmit
 npx vitest run
 npx vite build

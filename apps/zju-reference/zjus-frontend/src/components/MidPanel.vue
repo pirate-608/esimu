@@ -214,7 +214,7 @@
             v-model="itemSearch"
             class="form-control form-control-sm item-search"
             type="search"
-            placeholder="搜索道具、分类或标签"
+            :placeholder="`搜索${themeTerm('item', '道具')}、分类或标签`"
           >
         </div>
 
@@ -238,7 +238,7 @@
             v-if="filteredItems.length === 0"
             class="text-center text-muted small py-4"
           >
-            暂无匹配道具
+            暂无匹配{{ themeTerm('item', '道具') }}
           </div>
 
           <article
@@ -456,7 +456,7 @@ function itemActionDisabled(item: GameItem): boolean {
 }
 
 function itemActionTitle(item: GameItem): string {
-  if (store.isPaused) return '游戏暂停中，暂不能买卖道具'
+  if (store.isPaused) return `游戏暂停中，暂不能买卖${themeTerm('item', '道具')}`
   if (isItemOwned(item.id)) return `出售后回收 ${item.sell_price} ${statLabel('gold')}`
   if (goldAmount.value < item.price) return `${statLabel('gold')}不足，还差 ${item.price - goldAmount.value} 枚`
   return `购买 ${item.name}`

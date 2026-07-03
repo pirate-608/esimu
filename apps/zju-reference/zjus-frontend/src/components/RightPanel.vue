@@ -102,7 +102,7 @@
       </div>
       <div class="card-body p-3 d-flex flex-column justify-content-center">
         <div class="d-flex justify-content-between align-items-end mb-1">
-          <span class="small fw-bold text-muted">平均课程掌握度</span>
+          <span class="small fw-bold text-muted">平均{{ themeTerm('course', '课程') }}掌握度</span>
           <span class="text-primary fw-bold">{{ averageProgress.toFixed(1) }}%</span>
         </div>
         <div
@@ -282,7 +282,7 @@ const miniStats = computed(() => [
     id: 'reputation',
     icon: statIcon('reputation'),
     value: formatStatValue(store.currentStats, 'reputation'),
-    title: `${statLabel('reputation')}影响部分课程和NPC互动`,
+    title: `${statLabel('reputation')}影响部分${themeTerm('course', '课程')}和NPC互动`,
   },
   {
     id: 'charm',

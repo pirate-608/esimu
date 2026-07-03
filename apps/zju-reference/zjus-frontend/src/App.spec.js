@@ -3,6 +3,7 @@ import { createTestingPinia } from '@pinia/testing'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App.vue'
 import { PROLOGUE_LINES, PROLOGUE_SEEN_STORAGE_KEY } from './data/prologue'
+import { STORAGE_KEYS } from './utils/storageKeys'
 
 const webSocketMock = vi.hoisted(() => ({
   connect: vi.fn(),
@@ -70,9 +71,9 @@ describe('App.vue', () => {
   })
 
   it('holds returning-game startup behind the first-visit prologue until skipped', async () => {
-    localStorage.setItem('simlab_jwt', 'header.payload.signature')
-    localStorage.setItem('simlab_token', 'header.payload.signature')
-    localStorage.setItem('simlab_game_started', '1')
+    localStorage.setItem(STORAGE_KEYS.jwt, 'header.payload.signature')
+    localStorage.setItem(STORAGE_KEYS.token, 'header.payload.signature')
+    localStorage.setItem(STORAGE_KEYS.gameStarted, '1')
 
     const wrapper = mountApp()
     await wrapper.vm.$nextTick()

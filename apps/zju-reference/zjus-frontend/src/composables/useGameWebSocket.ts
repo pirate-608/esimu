@@ -13,6 +13,7 @@ import { extractGraduationFinalStats, extractNewSemesterName } from '../types/we
 import { ALLOCATABLE_STATS } from '@/data/statDefinitions.generated'
 import { safeNumber, statDefault } from '@/utils/statDisplay'
 import { themeTerm } from '@/utils/theme'
+import { STORAGE_KEYS } from '@/utils/storageKeys'
 
 /**
  * Narrow an unknown value to an object record.
@@ -107,10 +108,10 @@ export function useGameWebSocket() {
    * Remove per-game markers while keeping the long-lived student credential.
    */
   const clearGameSessionMarkers = () => {
-    localStorage.removeItem('simlab_token')
-    localStorage.removeItem('simlab_jwt')
-    localStorage.removeItem('simlab_game_started')
-    localStorage.removeItem('simlab_selected_save_slot')
+    localStorage.removeItem(STORAGE_KEYS.token)
+    localStorage.removeItem(STORAGE_KEYS.jwt)
+    localStorage.removeItem(STORAGE_KEYS.gameStarted)
+    localStorage.removeItem(STORAGE_KEYS.selectedSaveSlot)
   }
 
   /**
@@ -176,7 +177,7 @@ export function useGameWebSocket() {
       const llmModel = sessionStorage.getItem('custom_llm_model')
       const llmKey = sessionStorage.getItem('custom_llm_key')
       const rpKey = sessionStorage.getItem('custom_rp_key')
-      const selectedSaveSlot = localStorage.getItem('simlab_selected_save_slot')
+      const selectedSaveSlot = localStorage.getItem(STORAGE_KEYS.selectedSaveSlot)
 
       const payload: Record<string, unknown> = { token }
       if (llmProvider) payload.custom_llm_provider = llmProvider
@@ -235,7 +236,7 @@ export function useGameWebSocket() {
           isConnected.value = true
           reconnectAttempts = 0
           startHeartbeat()
-          gameStore.addLog('系统', '已连接服务器...', 'text-success')
+          gameStore.addLog('系统', `已连接${themeTerm('server', '服务器')}...`, 'text-success')
           break
         }
 
@@ -244,13 +245,13 @@ export function useGameWebSocket() {
           const message = typeof wsMsg.message === 'string' ? wsMsg.message : '认证失败'
           gameStore.addLog('系统', message, 'text-danger')
           gameStore.showToast(message, 'danger')
-          localStorage.removeItem('simlab_game_started')
-          localStorage.removeItem('simlab_selected_save_slot')
-          if (message.includes('存档') && localStorage.getItem('simlab_saves')) {
+          localStorage.removeItem(STORAGE_KEYS.gameStarted)
+          localStorage.removeItem(STORAGE_KEYS.selectedSaveSlot)
+          if (message.includes('存档') && localStorage.getItem(STORAGE_KEYS.saves)) {
             gameStore.setPhase('save_select')
           } else {
-            localStorage.removeItem('simlab_token')
-            localStorage.removeItem('simlab_jwt')
+            localStorage.removeItem(STORAGE_KEYS.token)
+            localStorage.removeItem(STORAGE_KEYS.jwt)
             gameStore.setPhase('login')
           }
           break
@@ -597,7 +598,7 @@ export function useGameWebSocket() {
           return
         }
         gameStore.showToast('连接在保存确认前断开，请重试保存并退出。', 'warning', 5000)
-        gameStore.addLog('系统', '保存退出未收到服务器确认，已解除等待状态。', 'text-warning')
+        gameStore.addLog('系统', `保存退出未收到${themeTerm('server', '服务器')}确认，已解除等待状态。`, 'text-warning')
       }
 
       const retryableCloseCodes = new Set([1001, 1006])

@@ -60,6 +60,8 @@ Current core loaders already routed through the active theme path:
 - `game_balance.json`
 - `items.json`
 - `stat_definitions.json`
+- majors, course plans, achievements, event libraries, and forum libraries
+  through `esimu_core.world.catalog`
 
 Theme manifests are also loaded through core and generated into the reference
 frontend:
@@ -71,7 +73,15 @@ apps/zju-reference/zjus-frontend/src/data/theme.generated.ts
 
 The reference frontend uses `src/utils/theme.ts` for high-frequency shell terms
 such as product title, campus feed, messenger name, forum name, and exit/login
-copy.
+copy. Browser persistence uses `src/utils/storageKeys.ts`, which derives
+localStorage keys from `theme.json`'s `storage.prefix`; do not add fixed
+`simlab_*` keys to runtime code.
+
+The reference backend keeps `app.services.world_service.WorldService` as an
+async/cache adapter, but the actual static world directory contract now lives in
+`esimu_core.world.catalog`. Reference app code should not add new `/app/world`
+or copied-repo path fallbacks when a theme-owned file can be resolved through
+the catalog.
 
 Long-form story content is loaded separately:
 

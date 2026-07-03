@@ -32,6 +32,7 @@ def test_demo_campus_theme_loads_world_and_runtime_payloads() -> None:
             build_tick_payload_from_snapshot,
         )
         from esimu_core.runtime.state import RuntimeSnapshot
+        from esimu_core.world.catalog import WorldCatalog
         from esimu_core.world.balance import GameBalance
         from esimu_core.world.items import ItemCatalog
         from esimu_core.world.prompts import ThemePrompts
@@ -41,9 +42,11 @@ def test_demo_campus_theme_loads_world_and_runtime_payloads() -> None:
         from esimu_core.world.theme_paths import active_theme_id, world_dir
 
         world = world_dir()
-        majors = json.loads((world / "majors.json").read_text(encoding="utf-8"))
-        course_path = world / "courses" / f"{majors[0]['id']}.json"
-        courses = json.loads(course_path.read_text(encoding="utf-8"))
+        catalog = WorldCatalog()
+        majors = catalog.majors()
+        assignment = catalog.major_assignment("GEN")
+        assert assignment is not None
+        courses = assignment["initial_courses"]
 
         theme = ThemeManifest().config
         story = ThemeStory().config
@@ -77,6 +80,9 @@ def test_demo_campus_theme_loads_world_and_runtime_payloads() -> None:
             "prompt": prompts.campus_context,
             "major": majors[0]["id"],
             "course_count": len(courses),
+            "catalog_achievement": catalog.achievements()["first_step"]["name"],
+            "event_title": catalog.event_library()[0]["title"],
+            "forum_content": catalog.forum_library()[0]["content"],
             "item_count": len(items.public_items),
             "tick_course_count": len(tick["courses"]),
             "init_has_items": "items_state" in init,
@@ -103,6 +109,9 @@ def test_demo_campus_theme_loads_world_and_runtime_payloads() -> None:
         "prompt": "星桥学院校园",
         "major": "GEN",
         "course_count": 3,
+        "catalog_achievement": "迈出第一步",
+        "event_title": "社团摊位前",
+        "forum_content": "有人分享了一个跨主题也能成立的校园笑话，评论区气氛很好。",
         "item_count": 2,
         "tick_course_count": 3,
         "init_has_items": True,

@@ -2,14 +2,72 @@ import json
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
+from esimu_core.world.catalog import WorldCatalog
 
+from app.content import event_library
 from app.game.engine import GameEngine
 from app.schemas.dingtalk import DingTalkState
 from app.services.game_service import GameService
+from app.services.world_service import WorldService
 
 
 def test_engine_imports_from_packaged_core_without_framework_bridge():
     assert GameEngine.__name__ == "GameEngine"
+
+
+@pytest.mark.asyncio
+async def test_world_service_reads_demo_campus_theme_catalog():
+    world = WorldService(theme_id="demo-campus")
+
+    majors = await world.get_all_majors()
+    assignment = await world.get_major_by_abbr("GEN")
+    second_semester = await world.get_semester_courses("GEN", 2)
+    achievements = await world.get_achievements()
+
+    assert majors[0]["abbr"] == "GEN"
+    assert majors[0]["iq_buff"] == 0
+    assert assignment is not None
+    assert assignment["major_info"]["name"] == "通识探索"
+    assert assignment["initial_courses"][0]["id"] == "intro"
+    assert second_semester == []
+    assert achievements["first_step"]["name"] == "迈出第一步"
+
+
+def test_local_content_library_reads_demo_campus_theme_catalog():
+    original_catalog = event_library._catalog
+    original_events = event_library._event_library
+    original_posts = event_library._cc98_library
+    try:
+        event_library._catalog = WorldCatalog("demo-campus")
+        event_library._event_library = []
+        event_library._cc98_library = []
+
+        event = event_library.pick_random_event(sanity=100, stress=0)
+        post = event_library.pick_cc98_post(effect="positive", trigger="校园梗")
+
+        assert event is not None
+        assert event["title"] == "社团摊位前"
+        assert post is not None
+        assert "校园笑话" in post
+    finally:
+        event_library._catalog = original_catalog
+        event_library._event_library = original_events
+        event_library._cc98_library = original_posts
+
+
+def test_engine_achievement_config_reads_demo_campus_theme_catalog():
+    engine = GameEngine(
+        "1",
+        repo=Mock(),
+        save_service=Mock(),
+        game_service=Mock(),
+    )
+    engine.world_catalog = WorldCatalog("demo-campus")
+
+    config = engine._load_achievement_config()
+
+    assert config["first_step"]["name"] == "迈出第一步"
+    assert config["steady_graduate"]["icon"] == "🎓"
 
 
 class DummyRepo:

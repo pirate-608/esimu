@@ -10,9 +10,9 @@ Notes:
 
 import json
 import logging
-from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from esimu_core.world.catalog import WorldCatalog
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -26,13 +26,7 @@ logger = logging.getLogger(__name__)
 # ============================================================
 
 _query_embeddings: Dict[str, List[float]] = {}
-
-
-def _world_dir() -> Path:
-    docker_path = Path("/app/world")
-    if docker_path.exists():
-        return docker_path
-    return Path(__file__).resolve().parent.parent.parent / "world"
+_catalog = WorldCatalog()
 
 
 def _load_query_embeddings() -> Dict[str, List[float]]:
@@ -51,7 +45,7 @@ def _load_query_embeddings() -> Dict[str, List[float]]:
     if _query_embeddings:
         return _query_embeddings
 
-    path = _world_dir() / "query_embeddings.json"
+    path = _catalog.query_embeddings_path()
     if not path.exists():
         logger.warning("query_embeddings.json not found at %s", path)
         return {}

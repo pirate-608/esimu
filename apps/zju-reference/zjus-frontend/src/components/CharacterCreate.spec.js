@@ -2,6 +2,7 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ALLOCATABLE_STATS } from '@/data/statDefinitions.generated'
+import { STORAGE_KEYS } from '@/utils/storageKeys'
 import CharacterCreate from './CharacterCreate.vue'
 
 const apiMocks = vi.hoisted(() => ({
@@ -17,7 +18,7 @@ vi.mock('@/api/client', () => ({
 describe('CharacterCreate stat registry integration', () => {
   beforeEach(() => {
     localStorage.clear()
-    localStorage.setItem('simlab_jwt', 'jwt-token')
+    localStorage.setItem(STORAGE_KEYS.jwt, 'jwt-token')
     apiMocks.fetchMajors.mockReset()
     apiMocks.initCharacter.mockReset()
     apiMocks.fetchMajors.mockResolvedValue([

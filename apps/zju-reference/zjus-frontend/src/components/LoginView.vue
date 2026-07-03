@@ -174,6 +174,7 @@ import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { useGameStore } from '../stores/gameStore.ts'
 import { auth } from '@/api/client'
 import { themeDisplayName, themeTerm } from '@/utils/theme'
+import { STORAGE_KEYS } from '@/utils/storageKeys'
 
 const store = useGameStore()
 
@@ -232,11 +233,11 @@ const doLogin = async () => {
       return
     }
 
-    // simlab_token is the short-lived JWT used by HTTP/WS auth.
-    if (result.jwt) localStorage.setItem('simlab_token', result.jwt)
-    if (result.jwt) localStorage.setItem('simlab_jwt', result.jwt)
-    if (result.user_token) localStorage.setItem('simlab_user_token', result.user_token)
-    localStorage.setItem('simlab_username', result.username || form.username.trim())
+    // The theme-scoped token is the short-lived JWT used by HTTP/WS auth.
+    if (result.jwt) localStorage.setItem(STORAGE_KEYS.token, result.jwt)
+    if (result.jwt) localStorage.setItem(STORAGE_KEYS.jwt, result.jwt)
+    if (result.user_token) localStorage.setItem(STORAGE_KEYS.userToken, result.user_token)
+    localStorage.setItem(STORAGE_KEYS.username, result.username || form.username.trim())
 
     // Clear session-scoped model settings before applying this login's choices.
     sessionStorage.removeItem('custom_llm_provider')
@@ -253,14 +254,14 @@ const doLogin = async () => {
     }
 
     if (result.status === 'returning') {
-      localStorage.setItem('simlab_saves', JSON.stringify(result.saves || []))
-      localStorage.removeItem('simlab_game_started')
-      localStorage.removeItem('simlab_selected_save_slot')
+      localStorage.setItem(STORAGE_KEYS.saves, JSON.stringify(result.saves || []))
+      localStorage.removeItem(STORAGE_KEYS.gameStarted)
+      localStorage.removeItem(STORAGE_KEYS.selectedSaveSlot)
       store.setPhase('save_select')
     } else {
-      localStorage.removeItem('simlab_saves')
-      localStorage.removeItem('simlab_selected_save_slot')
-      localStorage.removeItem('simlab_game_started')
+      localStorage.removeItem(STORAGE_KEYS.saves)
+      localStorage.removeItem(STORAGE_KEYS.selectedSaveSlot)
+      localStorage.removeItem(STORAGE_KEYS.gameStarted)
       store.setPhase('character_create')
     }
   } catch (err) {
@@ -293,8 +294,8 @@ const switchBg = () => {
 }
 
 onMounted(() => {
-  form.username = localStorage.getItem('simlab_username') || ''
-  form.token = localStorage.getItem('simlab_user_token') || ''
+  form.username = localStorage.getItem(STORAGE_KEYS.username) || ''
+  form.token = localStorage.getItem(STORAGE_KEYS.userToken) || ''
   bgImages.forEach((src) => { const img = new Image(); img.src = src })
   bgSwitchInterval = setInterval(switchBg, 10000)
 })

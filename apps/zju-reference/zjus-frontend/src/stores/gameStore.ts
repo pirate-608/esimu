@@ -7,6 +7,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref, reactive } from 'vue'
 import { STAT_DEFINITIONS } from '@/data/statDefinitions.generated'
+import { STORAGE_KEYS } from '@/utils/storageKeys'
 import type { GamePhase, PlayerStats } from '../types/game'
 import type { CoursesMap, CourseMetadata, CourseProgressUpdate } from '../types/course'
 import type { GameItem, ItemsState } from '../types/items'
@@ -41,7 +42,7 @@ type EventLog = {
   cssClass: string
 }
 
-const CONSOLE_THEME_STORAGE_KEY = 'zjus_console_theme'
+const CONSOLE_THEME_STORAGE_KEY = STORAGE_KEYS.consoleTheme
 const CONSOLE_THEMES: ConsoleTheme[] = ['lantian', 'yunfeng', 'danqing']
 const DEFAULT_STAT_VALUES = Object.fromEntries(
   STAT_DEFINITIONS.map((stat) => [stat.id, stat.default]),

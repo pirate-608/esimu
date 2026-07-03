@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import { useGameStore } from './gameStore'
+import { STORAGE_KEYS } from '@/utils/storageKeys'
 
 describe('gameStore DingTalk threads', () => {
   beforeEach(() => {
@@ -106,7 +107,7 @@ describe('gameStore console theme', () => {
     let store = useGameStore()
     expect(store.consoleTheme).toBe('lantian')
 
-    localStorage.setItem('zjus_console_theme', 'unknown')
+    localStorage.setItem(STORAGE_KEYS.consoleTheme, 'unknown')
     setActivePinia(createPinia())
     store = useGameStore()
 
@@ -119,7 +120,7 @@ describe('gameStore console theme', () => {
     store.setConsoleTheme('yunfeng')
 
     expect(store.consoleTheme).toBe('yunfeng')
-    expect(localStorage.getItem('zjus_console_theme')).toBe('yunfeng')
+    expect(localStorage.getItem(STORAGE_KEYS.consoleTheme)).toBe('yunfeng')
   })
 })
 

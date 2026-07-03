@@ -14,7 +14,6 @@ import logging
 import math
 import random
 import time
-from pathlib import Path
 from typing import Any, Callable, Coroutine, Literal, Optional
 
 from sqlalchemy import update
@@ -31,6 +30,7 @@ from app.core.llm import (
     generate_random_event,
 )
 from esimu_core.world.balance import balance
+from esimu_core.world.catalog import WorldCatalog
 from esimu_core.world.items import items
 from esimu_core.world.stat_definitions import stat_definitions
 from app.models.user import User
@@ -415,14 +415,7 @@ class GameEngine:
         self.llm_available: bool = True
         self._llm_probed: bool = False
 
-        # Docker images mount world data at /app/world; local tests use repo paths.
-        self.achievement_path = Path("/app/world/achievements.json")
-        if not self.achievement_path.exists():
-            self.achievement_path = (
-                Path(__file__).resolve().parent.parent.parent
-                / "world"
-                / "achievements.json"
-            )
+        self.world_catalog = WorldCatalog()
         self._achievement_config: dict[str, Any] | None = None
 
         # Course strategy values: 0=lay flat, 1=balanced, 2=hardcore.
@@ -2240,13 +2233,8 @@ class GameEngine:
     def _load_achievement_config(self) -> dict[str, Any]:
         if self._achievement_config is not None:
             return self._achievement_config
-        if not self.achievement_path.exists():
-            self._achievement_config = {}
-            return self._achievement_config
         try:
-            with open(self.achievement_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            self._achievement_config = data if isinstance(data, dict) else {}
+            self._achievement_config = self.world_catalog.achievements()
         except Exception as e:
             logger.error("Failed to load achievements config: %s", e)
             self._achievement_config = {}

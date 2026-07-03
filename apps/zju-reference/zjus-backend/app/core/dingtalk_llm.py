@@ -11,9 +11,9 @@ Notes:
 import json
 import logging
 import random
-from pathlib import Path
 from typing import Any, Dict, List, Optional, cast
 
+from esimu_core.world.catalog import WorldCatalog
 from esimu_core.world.prompts import theme_prompts
 from esimu_core.world.stat_definitions import stat_definitions
 from openai import APITimeoutError, AsyncOpenAI, OpenAIError
@@ -92,12 +92,7 @@ def _load_characters() -> List[Dict[str, Any]]:
     if _CHARACTER_CACHE is not None:
         return _CHARACTER_CACHE
 
-    base_dir = Path(__file__).resolve().parent.parent.parent
-    char_path = (
-        Path("/app/world/characters.json")
-        if Path("/app/world/characters.json").exists()
-        else base_dir / "world" / "characters.json"
-    )
+    char_path = WorldCatalog().path("characters.json")
     try:
         with open(char_path, "r", encoding="utf-8") as f:
             data = json.load(f)

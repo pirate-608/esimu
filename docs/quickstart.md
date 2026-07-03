@@ -55,6 +55,7 @@ Run these from `simulator-core/backend/`:
 ```powershell
 cd D:\projects\simulator-framework-lab\simulator-core\backend
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_world_catalog.py
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_demo_theme_smoke.py
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m ruff check esimu_core scripts tests
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
@@ -86,13 +87,15 @@ Run these from `apps/zju-reference/zjus-backend/`:
 
 ```powershell
 cd D:\projects\simulator-framework-lab\apps\zju-reference\zjus-backend
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\unit\test_demo_campus_reference_smoke.py
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\unit
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m ruff check app tests\unit
 ```
 
 The reference backend is the adapter layer. It may use Redis, FastAPI,
 SQLAlchemy, WebSocket, and OpenAI-compatible clients. The core package should
-not.
+not. The demo-campus smoke starts a fresh process so active-theme singletons are
+loaded in the same order as a real app startup.
 
 ## 7. Check The Reference Frontend
 
@@ -102,9 +105,14 @@ Run these from `apps/zju-reference/zjus-frontend/`:
 cd D:\projects\simulator-framework-lab\apps\zju-reference\zjus-frontend
 npx vue-tsc --noEmit
 npx vitest run src\utils\theme.spec.ts
+npx vitest run src\components\themeRuntime.spec.js
 npx vitest run
 npx vite build
 ```
+
+`themeRuntime.spec.js` is the quick smoke for mocked `demo-campus` frontend
+metadata. It checks that App startup copy and browser storage keys follow the
+generated theme manifest instead of fixed ZJU/simlab values.
 
 If a command fails only because an agent sandbox cannot spawn esbuild, treat it
 as an execution-environment issue and rerun outside the sandbox. Do not add fake

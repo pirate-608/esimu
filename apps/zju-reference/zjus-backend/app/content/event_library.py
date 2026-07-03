@@ -10,24 +10,14 @@ Notes:
 import json
 import logging
 import random
-from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
+from esimu_core.world.catalog import WorldCatalog
 from esimu_core.world.stat_definitions import stat_definitions
 
 logger = logging.getLogger(__name__)
 
-# ============================================================
-# World data path resolution.
-# ============================================================
-
-
-def _world_dir() -> Path:
-    """Prefer Docker's `/app/world`, then fall back to the local repo path."""
-    docker_path = Path("/app/world")
-    if docker_path.exists():
-        return docker_path
-    return Path(__file__).resolve().parent.parent.parent / "world"
+_catalog = WorldCatalog()
 
 
 # ============================================================
@@ -50,7 +40,7 @@ def _load_event_library() -> List[Dict[str, Any]]:
     global _event_library
     if _event_library:
         return _event_library
-    path = _world_dir() / "event_library.json"
+    path = _catalog.event_library_path()
     if not path.exists():
         logger.warning("event_library.json not found at %s", path)
         return []
@@ -119,7 +109,7 @@ def _load_cc98_library() -> List[Dict[str, Any]]:
     global _cc98_library
     if _cc98_library:
         return _cc98_library
-    path = _world_dir() / "cc98_library.json"
+    path = _catalog.forum_library_path()
     if not path.exists():
         logger.warning("cc98_library.json not found at %s", path)
         return []

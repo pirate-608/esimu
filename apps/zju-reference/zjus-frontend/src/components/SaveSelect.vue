@@ -48,11 +48,12 @@
 import { computed } from 'vue'
 import { useGameStore } from '../stores/gameStore.ts'
 import type { SaveSummary } from '@/api/client'
+import { STORAGE_KEYS } from '@/utils/storageKeys'
 
 const store = useGameStore()
 
 const saves = computed<SaveSummary[]>(() => {
-  const raw = localStorage.getItem('simlab_saves')
+  const raw = localStorage.getItem(STORAGE_KEYS.saves)
   if (!raw) return []
   try {
     const parsed = JSON.parse(raw)
@@ -74,15 +75,15 @@ function loadSave(slot: number) {
     store.showToast('存档槽位无效，请重新登录刷新列表', 'warning')
     return
   }
-  localStorage.setItem('simlab_selected_save_slot', String(slot))
-  localStorage.setItem('simlab_game_started', '1')
+  localStorage.setItem(STORAGE_KEYS.selectedSaveSlot, String(slot))
+  localStorage.setItem(STORAGE_KEYS.gameStarted, '1')
   store.setPhase('loading')
 }
 
 function startNewGame() {
-  localStorage.removeItem('simlab_selected_save_slot')
-  localStorage.removeItem('simlab_saves')
-  localStorage.removeItem('simlab_game_started')
+  localStorage.removeItem(STORAGE_KEYS.selectedSaveSlot)
+  localStorage.removeItem(STORAGE_KEYS.saves)
+  localStorage.removeItem(STORAGE_KEYS.gameStarted)
   store.setPhase('character_create')
 }
 </script>
