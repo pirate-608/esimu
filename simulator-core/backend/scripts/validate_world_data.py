@@ -27,6 +27,9 @@ from esimu_core.world.prompts import ThemePrompts  # noqa: E402
 from esimu_core.world.stat_definitions import StatDefinitions  # noqa: E402
 from esimu_core.world.story import ThemeStory  # noqa: E402
 from esimu_core.world.theme import ThemeManifest  # noqa: E402
+from esimu_core.world.theme_contract import (  # noqa: E402
+    validate_active_theme_contract,
+)
 from esimu_core.world.theme_paths import (  # noqa: E402
     DEFAULT_THEME_ID,
     active_theme_id,
@@ -191,6 +194,9 @@ def main() -> int:
     except Exception as exc:
         print(f"prompts.json: {exc}", file=sys.stderr)
         return 1
+
+    for issue in validate_active_theme_contract():
+        errors.append(issue.format())
 
     for filename in ("game_balance.json", "items.json"):
         try:

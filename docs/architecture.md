@@ -63,6 +63,11 @@ Current core loaders already routed through the active theme path:
 - majors, course plans, achievements, event libraries, and forum libraries
   through `esimu_core.world.catalog`
 
+Authoring-time theme validation lives in `esimu_core.world.theme_contract` and
+is invoked by `scripts/validate_world_data.py`. Runtime loaders remain
+tolerant where useful; the contract validator is the stricter pre-runtime gate
+for missing files and malformed theme/world data.
+
 Theme manifests are also loaded through core and generated into the reference
 frontend:
 
@@ -205,6 +210,7 @@ adapter-extraction phase.
 - `quickstart.md`: setup and validation commands.
 - `theme-pack-contract.md`: current theme file contract.
 - `new-project-bootstrap.md`: checklist for a new simulator/theme.
+- `starter-app-shape.md`: decision record for what a new project should copy.
 - `agent-handoff.md`: current agent operating notes.
 - `roadmap.md`: extraction phases and current progress.
 

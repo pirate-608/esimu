@@ -32,6 +32,8 @@ The backend extraction is currently split like this:
 - `esimu_core.world`: active theme path resolution plus loaders for balance,
   stat definitions, items, theme manifests, story data, prompt fragments, and
   the static world catalog for majors/courses/achievements/local libraries.
+  `esimu_core.world.theme_contract` is the strict authoring-time validator
+  invoked by `validate_world_data.py`.
 - `esimu_core.domain`: pure gameplay rules for semester settlement, effects,
   stat bounds, relax overflow, and action gates.
 - `esimu_core.runtime`: reusable runtime orchestration for clock math, action
@@ -47,6 +49,8 @@ The backend extraction is currently split like this:
 - `apps/zju-reference/zjus-frontend`: copied frontend shell that consumes
   generated theme, story, and stat metadata. Browser persistence should use
   `src/utils/storageKeys.ts`, not fixed `simlab_*` keys.
+- `docs/starter-app-shape.md`: Phase 4E decision record for whether a new
+  project should copy the reference app or wait for the future starter.
 
 Core modules must not import Redis, FastAPI, SQLAlchemy, OpenAI, WebSocket
 objects, or reference-app services.
@@ -59,12 +63,16 @@ objects, or reference-app services.
 - Add model-facing prompt context in `prompts.json`.
 - Add reusable static-world file shape compatibility in
   `simulator-core/backend/esimu_core/world/catalog.py`.
+- Add theme authoring validation in
+  `simulator-core/backend/esimu_core/world/theme_contract.py`.
 - Add pure stat/effect/semester/rules code in `simulator-core/backend/esimu_core/domain/`.
 - Add pure tick/action/snapshot/task orchestration in `simulator-core/backend/esimu_core/runtime/`.
 - Add pure character setup, semester transition, and achievement detail
   contracts in `simulator-core/backend/esimu_core/lifecycle/`.
 - Add pure event/forum/messenger contracts in
   `simulator-core/backend/esimu_core/content/`.
+- Add starter-shape decisions and reference-app file classification in
+  `docs/starter-app-shape.md`.
 - Keep external I/O and compatibility glue in `apps/zju-reference/`.
 - Update `docs/` whenever an extraction boundary or startup workflow changes.
 
@@ -90,6 +98,7 @@ D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_world
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_demo_theme_smoke.py
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_lifecycle_contracts.py
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_content_contracts.py
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_theme_contract.py
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m ruff check esimu_core scripts tests
 D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
 $env:SIMULATOR_THEME='demo-campus'; D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
@@ -126,7 +135,8 @@ Then manually confirm all linked `docs/*.md` paths exist.
 When creating a new simulator project from this lab:
 
 1. Start from `docs/new-project-bootstrap.md`.
-2. Copy `templates/agent/AGENTS.md` into the new project.
-3. Fill in project-specific roots, commands, theme IDs, and deployment limits.
-4. Keep esimu package names exact: package `esimu-core`, import namespace
+2. Read `docs/starter-app-shape.md` before copying `apps/zju-reference/`.
+3. Copy `templates/agent/AGENTS.md` into the new project.
+4. Fill in project-specific roots, commands, theme IDs, and deployment limits.
+5. Keep esimu package names exact: package `esimu-core`, import namespace
    `esimu_core`.

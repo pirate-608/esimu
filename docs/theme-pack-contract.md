@@ -1,122 +1,270 @@
 # Theme Pack Contract
 
-This contract is provisional. It exists to make copied ZJU code move toward a
-clear theme boundary instead of becoming another one-off game.
+This page is the authoring contract for esimu theme packs. A theme pack owns the
+world, narrative, prompt, and asset data for one simulator deployment; core code
+and adapter code should consume this data instead of hardcoding product nouns.
 
-Use `new-project-bootstrap.md` for the step-by-step process of creating a theme
-pack from this contract.
+Use `new-project-bootstrap.md` for the step-by-step workflow, and use
+`starter-app-shape.md` before copying the reference app.
 
-## Required Files
+## Validation Gate
+
+The canonical validation command is:
+
+```powershell
+cd D:\projects\ZJUers_simulator\labs\esimu\simulator-core\backend
+$env:SIMULATOR_THEME='<theme_id>'
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
+```
+
+`validate_world_data.py` now includes the schema-equivalent validator in
+`esimu_core.world.theme_contract`. It validates:
+
+- required theme files and world files,
+- `theme.json`, `story.json`, `prompts.json`, and `stat_definitions.json`
+  through Pydantic models,
+- structural contracts for majors, courses, achievements, event libraries,
+  forum libraries, characters, items, balance, and graduation comments,
+- item/event effect allowlists from the stat registry,
+- story image availability,
+- generated frontend metadata freshness for the default theme.
+
+For non-default themes, generated frontend metadata freshness is skipped unless
+`SIMULATOR_VALIDATE_GENERATED=1` is set. This prevents demo-theme validation
+from overwriting the reference frontend by accident.
+
+## Required Directory
 
 ```text
 themes/<theme_id>/
   theme.json
   story.json
   prompts.json
-  world/
   assets/
+  world/
+    stat_definitions.json
+    game_balance.json
+    items.json
+    majors.json
+    achievements.json
+    event_library.json
+    cc98_library.json
+    characters.json
+    graduation_comments.json
+    courses/
+      <major_abbr>.json
 ```
 
-## `theme.json`
+`assets/` may be minimal, but images referenced by `story.json` must exist in
+either the theme assets directory or the reference frontend public images
+directory while the reference app remains the active adapter.
 
-Minimal shape:
+## Theme Manifest
 
-```json
-{
-  "theme_id": "zju",
-  "display_name": "ZJUers Simulator",
-  "locale": "zh-CN",
-  "terms": {
-    "institution": "折姜大学",
-    "institution_short": "折大",
-    "campus": "求是园",
-    "feed": "求是园动态",
-    "forum": "CC98",
-    "messenger": "钉钉",
-    "server": "折大服务器",
-    "player": "同学",
-    "player_nickname": "折大人",
-    "semester": "学期"
-  },
-  "storage": {
-    "prefix": "zjus"
-  },
-  "assets": {
-    "hero": "assets/hero.webp",
-    "logo": "assets/logo.webp"
-  }
-}
+`theme.json` owns short structural terms and public metadata.
+
+Required fields:
+
+- `theme_id`: stable lowercase ID matching `[a-z][a-z0-9-]*`.
+- `display_name`: public product/theme name.
+- `terms`: must include at least `campus`, `forum`, `messenger`, `player`,
+  `semester`, `course`, and `item`.
+- `storage.prefix`: browser storage namespace matching `[a-z][a-z0-9_]*`.
+
+Recommended terms:
+
+- `institution`
+- `institution_short`
+- `feed`
+- `server`
+- `player_nickname`
+- `rules`
+- `notice`
+
+Use `theme.json` for short nouns only. Do not put prologue writing, prompt
+templates, item descriptions, or course data here.
+
+## Story Content
+
+`story.json` owns long narrative copy:
+
+- first-visit prologue dedication lines,
+- diary pages and scene image mappings,
+- failure ending copy,
+- graduation ending copy,
+- GPA-branched graduation lines,
+- fallback graduation summary,
+- graduation background image filenames.
+
+Scene and ending image fields are filenames, not paths. Path traversal and
+subdirectories are rejected.
+
+## Prompt Fragments
+
+`prompts.json` owns model-facing context:
+
+- campus context,
+- forum and messenger names,
+- forum batch instruction,
+- random-event instruction,
+- messenger batch instruction,
+- private-chat instruction,
+- player identity template,
+- messenger scene/opening templates,
+- graduation-summary instruction,
+- forum fallback text.
+
+Prompt fragments theme the visible and model-visible context. They do not
+rename legacy internal IDs such as `cc98` and `dingtalk`; those remain adapter
+compatibility IDs until a later protocol migration.
+
+## World Data
+
+### Stats
+
+`world/stat_definitions.json` is the stat registry:
+
+- every stat ID must match `[a-z][a-z0-9_]*`,
+- `default` must be inside `min`/`max`,
+- allocatable stats must show in character creation,
+- allocatable defaults must sum to `initial_budget`,
+- item and event effect allowlists come from `allow_item_effect` and
+  `allow_event_effect`.
+
+### Balance
+
+`world/game_balance.json` must contain at least:
+
+- `tick.interval_seconds`,
+- `events.random_event`,
+- `events.dingtalk`,
+- `game_over`.
+
+The reference adapter may support additional balance fields. Theme validation
+checks only the structural minimum that a starter app can depend on.
+
+### Items
+
+`world/items.json` must contain:
+
+- `economy` object,
+- `items` array,
+- unique item IDs,
+- item names and numeric prices,
+- optional `effects` object.
+
+Item effect fields must also be allowed by `stat_definitions.json`.
+
+### Majors And Courses
+
+`world/majors.json` may be either:
+
+- a flat list of major objects, or
+- a grouped object whose values are lists of major objects.
+
+Each major needs:
+
+- `abbr` or `id`,
+- `name`.
+
+For each major, `world/courses/<major_abbr>.json` must exist. Course files may
+be either:
+
+- a flat list of course objects, treated as one starter term, or
+- an object with `plan` or `semesters`, where each term has `courses`.
+
+Each course needs:
+
+- `id`,
+- `name`,
+- numeric `credits` greater than zero.
+
+### Achievements
+
+`world/achievements.json` may be either:
+
+- an object keyed by achievement code, or
+- a list of objects with `code` or `id`.
+
+Each achievement needs:
+
+- code/id,
+- `name`,
+- `desc` or `description`.
+
+Condition expressions remain reference-adapter behavior for now; later phases
+may move achievement evaluation into core.
+
+### Events And Forum
+
+`world/event_library.json` must be a non-empty array. Each event needs:
+
+- `title`,
+- `desc` or `description`,
+- non-empty `options` array,
+- each option needs `text` and `effects` object.
+
+`world/cc98_library.json` is still the compatibility filename for the local
+forum library. Each forum entry needs `content`; `effect`, `trigger`, and
+`topic` are optional.
+
+### Characters
+
+`world/characters.json` must be a non-empty array. Each character needs:
+
+- `name`,
+- `role`,
+- `content` or `description`.
+
+The current ZJU reference app still uses DingTalk-compatible role IDs for
+private-message behavior. Theme-visible messenger names come from `theme.json`
+and `prompts.json`.
+
+### Graduation Comments
+
+`world/graduation_comments.json` must contain a non-empty `comments` array.
+Each comment needs either:
+
+- `texts`, or
+- `paragraphs`.
+
+Optional `min_gpa` and `max_gpa` fields define GPA branches.
+
+## New Theme Checklist
+
+1. Copy `themes/demo-campus/` to `themes/<theme_id>/`.
+2. Update `theme.json`, especially `theme_id` and `storage.prefix`.
+3. Update `story.json` and referenced images.
+4. Update `prompts.json`.
+5. Replace `world/majors.json` and `world/courses/*.json`.
+6. Replace stats, items, achievements, events, forum posts, characters, and
+   graduation comments.
+7. Run `validate_world_data.py`.
+8. If the reference frontend should run this theme, regenerate metadata:
+
+```powershell
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\sync_theme_metadata.py --write
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\sync_story_metadata.py --write
+D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\sync_stat_definitions.py --write
 ```
 
-## Design Notes
+9. Run validation again.
+10. Run the relevant reference backend/frontend smoke checks.
 
-- `theme_id` should be stable because saves may eventually bind to it.
-- `terms` replaces hardcoded product nouns in frontend and backend messages.
-- `storage.prefix` prevents browser state from colliding across themes.
-- Asset paths are relative to the theme directory until a runtime manifest
-  loader says otherwise.
+## Compatibility Notes
 
-## `story.json`
-
-`story.json` owns long narrative text: first-visit prologue scenes, diary pages,
-ending copy, graduation background images, and deterministic graduation fallback
-summaries. It is intentionally separate from `theme.json` so theme manifests
-stay small and mostly structural.
-
-## `prompts.json`
-
-`prompts.json` owns model-facing short fragments for content generation:
-
-```json
-{
-  "campus_context": "星桥学院校园",
-  "forum_name": "星桥论坛",
-  "messenger_name": "校内信",
-  "forum_batch_instruction": "模拟星桥学院的校内论坛，生成 5 条帖子。",
-  "random_event_instruction": "生成 3 个星桥学院校园随机事件，风格迥异。",
-  "messenger_batch_instruction": "模拟星桥学院校内信消息，生成 5 条。",
-  "private_chat_instruction": "你正在模拟星桥学院校园校内信私聊。",
-  "player_identity_template": "你是一位星桥学院{major}专业的学生，名叫{username}，目前处于{semester}，{charm_label}值约为{charm}。",
-  "messenger_scene_template": "场景：星桥学院校园，{semester}，校内信对话。当前情境：{scene}。",
-  "messenger_open_template": "（{username}打开了校内信，看到一条新消息）",
-  "graduation_instruction": "请根据玩家结业数据撰写毕业总结。",
-  "forum_empty_fallback": "星桥论坛现在没有新的帖子。",
-  "forum_unavailable_fallback": "星桥论坛暂时维护中..."
-}
-```
-
-These fragments theme the visible and model-visible context. They do not rename
-legacy internal IDs such as `cc98` and `dingtalk`, because those still appear in
-WebSocket payloads, Redis keys, save data, and compatibility tests.
-
-## Current Loader Defaults
-
-- `SIMULATOR_THEME` selects the theme and defaults to `zju`.
-- `SIMULATOR_LAB_ROOT` may override automatic lab-root discovery.
-- `SIMULATOR_WORLD_DIR` may point directly at a world directory for one-off
-  checks.
-- `SIMULATOR_FRONTEND_STAT_OUTPUT` may override the generated TypeScript stat
-  metadata destination.
-- `sync_theme_metadata.py` generates `theme.generated.ts` for frontend shell
-  copy and storage metadata.
-- `validate_world_data.py` validates `theme.json`, `story.json`,
-  `prompts.json`, world data, and generated frontend metadata freshness for the
-  active theme.
-
-## Later Candidates
-
-These are intentionally not required in the bootstrap:
-
-- `prologue`
-- `ending_text`
-- `admin_labels`
-- `default_models`
-- `route_titles`
-- `legal_links`
+- `cc98` and `dingtalk` are legacy internal IDs in the reference app.
+- Theme authors should change visible labels through `forum` and `messenger`
+  terms rather than renaming protocol IDs.
+- `cc98_library.json` keeps its compatibility filename until the protocol/data
+  migration phase explicitly renames it.
+- Runtime multi-theme switching is out of scope; esimu uses startup/build-time
+  theme selection.
 
 ## Related Documents
 
 - `quickstart.md`: validation and metadata-generation commands.
 - `new-project-bootstrap.md`: practical new-theme checklist.
+- `starter-app-shape.md`: whether to copy the reference app.
 - `agent-handoff.md`: agent rules for keeping theme data out of core logic.
 - `architecture.md`: how theme packs relate to `esimu-core` and adapters.

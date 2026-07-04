@@ -31,7 +31,7 @@ depend on this lab by accident.
 Start here when opening the lab for the first time:
 
 ```powershell
-cd D:\projects\simulator-framework-lab
+cd D:\projects\ZJUers_simulator\labs\esimu
 git status --short
 ```
 
@@ -41,6 +41,7 @@ Then read:
 2. `docs/quickstart.md` for setup and validation commands.
 3. `docs/architecture.md` for the current core/theme/adapter boundary.
 4. `docs/new-project-bootstrap.md` when starting a new simulator theme or app.
+5. `docs/starter-app-shape.md` before copying the reference app.
 
 The active theme is selected at build/startup time:
 
@@ -95,6 +96,7 @@ themes/
 docs/
   quickstart.md
   new-project-bootstrap.md
+  starter-app-shape.md
   agent-handoff.md
   architecture.md
   roadmap.md
@@ -110,8 +112,8 @@ Use `docs/new-project-bootstrap.md` as the main checklist. The short version is:
 1. Copy `themes/demo-campus/` to a new `themes/<theme_id>/`.
 2. Edit `theme.json`, `story.json`, `prompts.json`, and `world/`.
 3. Run world-data validation for the new theme.
-4. Reuse `apps/zju-reference/` as the first adapter only if you need a runnable
-   app immediately.
+4. Read `docs/starter-app-shape.md`, then reuse `apps/zju-reference/` only if
+   you need a runnable app immediately.
 5. Keep ZJU-specific protocol IDs such as `cc98` and `dingtalk` as compatibility
    IDs until the roadmap explicitly migrates them.
 

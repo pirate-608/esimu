@@ -105,12 +105,20 @@ Then run validation again.
 
 ## 6. Decide Whether To Reuse The Reference App
 
+Read `starter-app-shape.md` before copying any reference-app files.
+
 For the first demo, reuse `apps/zju-reference/` as the adapter. It already knows
 how to run the backend, WebSocket loop, frontend, saves, admin pages, and
 content-generation fallback path.
 
 Only fork or copy the adapter when the new project needs different product
 behavior, not just different nouns or world data.
+
+Current recommendation:
+
+- Use a reference-app fork only when a runnable product shell is needed now.
+- Keep ZJU reference as a regression target, not the final starter template.
+- Prefer the future `apps/starter/` once Phase 6 creates it.
 
 ## 7. Preserve Compatibility IDs
 

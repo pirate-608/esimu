@@ -292,6 +292,25 @@ Completion criteria:
   reference-only.
 - The starter strategy does not require editing the ZJU reference theme.
 
+Progress:
+
+- `docs/starter-app-shape.md` now records the Phase 4E decision: use
+  `apps/zju-reference/` as a short-term runnable adapter when necessary, but do
+  not treat it as the long-term starter template.
+- The reference app has file-area classification guidance covering backend API,
+  engine, services, repositories, schemas, content adapters, frontend skin,
+  generated metadata, docs, deployment, and agent workflows.
+- `docs/new-project-bootstrap.md`, `docs/agent-handoff.md`, and `README.md`
+  now point maintainers to the starter-shape decision before they copy
+  reference-app files.
+
+Remaining work:
+
+- Phase 5 should harden theme schemas before any clean starter is generated.
+- Phase 6 should introduce `apps/starter/` as the preferred new-project base.
+- Advanced reference features should be copied into future projects only after
+  the starter exposes the minimal full game loop.
+
 ### Phase 5: Theme Contract Hardening
 
 Goal: turn the current theme pack convention into a stable framework contract.
@@ -316,6 +335,27 @@ Completion criteria:
 
 - A malformed theme fails validation before runtime.
 - A minimal valid theme can be created without reading ZJU-specific source code.
+
+Progress:
+
+- `esimu_core.world.theme_contract` now provides schema-equivalent theme pack
+  validation for required files plus majors, courses, achievements, event
+  libraries, forum libraries, characters, items, balance, and graduation
+  comments.
+- `scripts/validate_world_data.py` calls the theme contract validator, making
+  it the default CI/local gate for active-theme world data.
+- `docs/theme-pack-contract.md` has been rewritten as an authoring contract
+  with file requirements, field semantics, validation commands, and a new-theme
+  checklist.
+- `test_theme_contract.py` verifies that both `zju` and `demo-campus` satisfy
+  the contract and that malformed themes fail before runtime.
+
+Remaining work:
+
+- Decide whether to emit standalone JSON Schema files in addition to the
+  Python/Pydantic validation layer.
+- Extend validation for optional theme assets, legal links, and future starter
+  frontend route metadata when those contracts become stable.
 
 ### Phase 6: Minimal Starter App
 
