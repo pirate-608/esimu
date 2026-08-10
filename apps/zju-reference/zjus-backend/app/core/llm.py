@@ -12,6 +12,8 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from esimu_core.ai.config import PROVIDER_BASE_URLS
+from esimu_core.ai.parsing import json_object_from_text
 from esimu_core.world.prompts import theme_prompts
 from esimu_core.world.stat_definitions import stat_definitions
 from esimu_core.world.theme_paths import world_file
@@ -28,15 +30,6 @@ from app.schemas.dingtalk import (
 
 logger = logging.getLogger(__name__)
 
-
-PROVIDER_BASE_URLS = {
-    "openai": "https://api.openai.com/v1",
-    "deepseek": "https://api.deepseek.com",
-    "qwen": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-    "glm": "https://open.bigmodel.cn/api/paas/v4",
-    "moonshot": "https://api.moonshot.cn/v1",
-    "minimax": "https://api.minimaxi.com/v1",
-}
 
 DEFAULT_LLM_MODEL = "gpt-4o-mini"
 DEFAULT_LLM_TIMEOUT_SECONDS = 20.0
@@ -202,18 +195,8 @@ def _use_global_content_cache(llm_override: Optional[Dict[str, Any]]) -> bool:
 
 
 def _json_from_text(content: object) -> dict[str, Any]:
-    if not isinstance(content, str) or not content.strip():
-        return {}
-    text = content.strip()
-    if text.startswith("```"):
-        text = text.strip("`")
-        if text.lower().startswith("json"):
-            text = text[4:].strip()
-    try:
-        parsed = json.loads(text)
-    except json.JSONDecodeError:
-        return {}
-    return parsed if isinstance(parsed, dict) else {}
+    """Delegate model-output parsing to the framework AI contract."""
+    return json_object_from_text(content)
 
 
 def _coerce_cached_json(content: object) -> dict[str, Any] | None:

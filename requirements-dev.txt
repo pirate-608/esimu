@@ -1,0 +1,6 @@
+-e simulator-core/backend[dev]
+-r docs/requirements.txt
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic>=2
+build>=1.2

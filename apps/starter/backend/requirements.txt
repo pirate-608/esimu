@@ -1,0 +1,4 @@
+-e ../../../simulator-core/backend[ai]
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic>=2

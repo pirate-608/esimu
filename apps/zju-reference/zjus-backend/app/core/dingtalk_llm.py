@@ -13,6 +13,8 @@ import logging
 import random
 from typing import Any, Dict, List, Optional, cast
 
+from esimu_core.ai.parsing import json_object_from_text
+from esimu_core.ai.service import M2HER_ALLOWED_ROLES
 from esimu_core.world.catalog import WorldCatalog
 from esimu_core.world.prompts import theme_prompts
 from esimu_core.world.stat_definitions import stat_definitions
@@ -53,16 +55,6 @@ def _stat_ratio(value: int, stat_id: str) -> float:
         return 0.0
     return max(0.0, min(1.0, (value - definition.min) / span))
 
-
-_M2HER_ALLOWED_ROLES = {
-    "system",
-    "user",
-    "assistant",
-    "user_system",
-    "group",
-    "sample_message_user",
-    "sample_message_ai",
-}
 
 # Redis-backed cache for platform-default generated messages.
 _CACHE_KEY = "game:dingtalk_m2her"
@@ -114,18 +106,8 @@ def get_character_by_contact_id(contact_id: str) -> Optional[Dict[str, Any]]:
 
 
 def _json_from_text(content: object) -> dict[str, Any]:
-    if not isinstance(content, str):
-        return {}
-    text = content.strip()
-    if text.startswith("```"):
-        text = text.strip("`")
-        if text.lower().startswith("json"):
-            text = text[4:].strip()
-    try:
-        parsed = json.loads(text)
-    except json.JSONDecodeError:
-        return {}
-    return parsed if isinstance(parsed, dict) else {}
+    """Delegate model-output parsing to the framework AI contract."""
+    return json_object_from_text(content)
 
 
 def _fallback_reply_options(role: str) -> list[dict[str, str]]:
@@ -162,7 +144,7 @@ def _sanitize_m2her_messages(messages: List[Dict]) -> list[dict[str, str]]:
     for message in messages:
         role = str(message.get("role") or "").strip()
         content = str(message.get("content") or "").strip()
-        if role in _M2HER_ALLOWED_ROLES and content:
+        if role in M2HER_ALLOWED_ROLES and content:
             sanitized.append({"role": role, "content": content})
     return sanitized
 

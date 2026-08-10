@@ -5,6 +5,8 @@ copying the FastAPI app shell.
 
 The first extracted pieces from ZJUers Simulator are now normalized into the
 `esimu_core.*` namespace instead of preserving their source `app.game.*` paths.
+The package version is exposed as `esimu_core.__version__` and consumed by
+`pyproject.toml` as dynamic package metadata.
 
 Do not copy production Docker, secrets, or deployment workflows during the first
 pass.
@@ -26,6 +28,8 @@ The first low-coupling world loaders have been placed under
 - `scripts/validate_world_data.py`
 - `scripts/sync_stat_definitions.py`
 - `scripts/scaffold_game_stat.py`
+- `scripts/scaffold_world_data.py`
+- `scripts/new_project.py`
 - `scripts/sync_theme_metadata.py`
 - `scripts/sync_story_metadata.py`
 
@@ -52,7 +56,9 @@ The first runtime orchestration helpers are now under `esimu_core/runtime/`:
 - `tasks.py`: background task tracking and target-level de-duplication.
 
 Runtime helpers may know about simulator concepts, but they must not import
-Redis, FastAPI, SQLAlchemy, OpenAI, or reference-app services.
+Redis, FastAPI, SQLAlchemy, or reference-app services. The optional
+`esimu_core.ai` package may lazily use the OpenAI SDK through the `[ai]` extra,
+but does not own application credentials, caches, or persistence.
 
 The first lifecycle contracts are now under `esimu_core/lifecycle/`:
 
@@ -62,7 +68,7 @@ The first lifecycle contracts are now under `esimu_core/lifecycle/`:
 
 Lifecycle helpers may shape plain payload dictionaries, but they must not import
 reference-app Pydantic schemas, Redis repositories, database sessions, WebSocket
-objects, or LLM clients.
+objects, or application-owned LLM clients.
 
 The first content and message contracts are now under `esimu_core/content/`:
 
@@ -96,9 +102,8 @@ through the editable requirement in `apps/zju-reference/zjus-backend/requirement
 
 If an offline Windows venv cannot build editable installs because `setuptools`
 is unavailable, a local `.pth` file pointing at
-`D:\projects\ZJUers_simulator\labs\esimu\simulator-core\backend` is an
-acceptable development fallback. Do not point it at the old standalone lab path,
-and do not reintroduce `sys.path` bridge code inside the reference backend.
+`simulator-core\backend` is an acceptable development fallback. Do not
+reintroduce `sys.path` bridge code inside the reference backend.
 
 ## Active Theme Path
 
@@ -112,26 +117,58 @@ themes/zju/world/
 Validation commands from this directory:
 
 ```powershell
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m py_compile esimu_core\world\theme_paths.py esimu_core\world\theme.py esimu_core\world\story.py esimu_core\world\prompts.py esimu_core\world\balance.py esimu_core\world\items.py esimu_core\world\stat_definitions.py esimu_core\world\catalog.py esimu_core\world\theme_contract.py esimu_core\domain\semester.py esimu_core\domain\effects.py esimu_core\domain\actions.py esimu_core\runtime\clock.py esimu_core\runtime\actions.py esimu_core\runtime\state.py esimu_core\runtime\cooldowns.py esimu_core\runtime\snapshot.py esimu_core\runtime\tasks.py esimu_core\lifecycle\__init__.py esimu_core\content\__init__.py
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_world_catalog.py
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_lifecycle_contracts.py
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_content_contracts.py
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_theme_contract.py
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m ruff check esimu_core scripts tests
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
-$env:SIMULATOR_THEME='demo-campus'; D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
+python -m py_compile esimu_core\world\theme_paths.py esimu_core\world\theme.py esimu_core\world\story.py esimu_core\world\prompts.py esimu_core\world\balance.py esimu_core\world\items.py esimu_core\world\stat_definitions.py esimu_core\world\catalog.py esimu_core\world\theme_contract.py esimu_core\domain\semester.py esimu_core\domain\effects.py esimu_core\domain\actions.py esimu_core\runtime\clock.py esimu_core\runtime\actions.py esimu_core\runtime\state.py esimu_core\runtime\cooldowns.py esimu_core\runtime\snapshot.py esimu_core\runtime\tasks.py esimu_core\lifecycle\__init__.py esimu_core\content\__init__.py
+python -m pytest tests
+python -m pytest tests\test_world_catalog.py
+python -m pytest tests\test_lifecycle_contracts.py
+python -m pytest tests\test_content_contracts.py
+python -m pytest tests\test_theme_contract.py
+python -m pytest tests\test_package_metadata.py
+python -m ruff check esimu_core scripts tests
+python scripts\validate_world_data.py
+$env:SIMULATOR_THEME='demo-campus'; python scripts\validate_world_data.py
 ```
 
 Theme manifest generation:
 
 ```powershell
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\sync_theme_metadata.py --write
+python scripts\sync_theme_metadata.py --write
 ```
 
 Story metadata generation:
 
 ```powershell
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\sync_story_metadata.py --write
+python scripts\sync_story_metadata.py --write
 ```
 
+Project bootstrap:
+
+```powershell
+python scripts\new_project.py <target-project> --project-name "My Simulator" --theme-id my-simulator
+python scripts\scaffold_world_data.py item focus_card --name 专注卡
+```
+
+
+## Installed Validation
+
+`esimu-core` exposes a project-local command after installation:
+
+```powershell
+esimu-validate-world --root <simulator-root> --theme <theme-id>
+```
+
+The CLI configures the project root before importing world loaders, so it works
+from outside the source repository. Repository maintainers still use
+`scripts/validate_world_data.py` when they also need checked-in frontend metadata
+freshness checks.
+
+## Release Artifact Smoke
+
+From the repository root:
+
+```powershell
+python simulator-core\backend\scripts\release_smoke.py
+```
+
+This builds sdist/wheel and proves that a generated project can install the
+wheel in a new venv, validate its copied theme, and start the Starter API.
