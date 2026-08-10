@@ -166,6 +166,8 @@ The core `dev` extra intentionally includes FastAPI and HTTPX because the
 bootstrap test starts a generated Starter application through `TestClient`.
 In CI, install pnpm before enabling pnpm-aware caching; `setup-node` queries the
 package manager while the action itself is initializing.
+Generated frontend theme, story, and stat metadata are repository-owned build
+inputs and must remain tracked for clean-checkout validation and typechecking.
 
 For documentation-only changes, `git diff --check` plus link/path review is
 usually enough.

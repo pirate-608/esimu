@@ -24,6 +24,8 @@ site/
 data/
 !apps/starter/frontend/src/data/
 !apps/starter/frontend/src/data/*.generated.ts
+!apps/zju-reference/zjus-frontend/src/data/
+!apps/zju-reference/zjus-frontend/src/data/*.generated.ts
 logs/
 *.log
 

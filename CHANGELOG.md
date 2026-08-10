@@ -14,8 +14,9 @@ This lab follows a lightweight Semantic Versioning policy for `esimu-core`:
 
 - Fixed clean-runner CI by declaring the FastAPI TestClient dependencies used
   by project bootstrap tests and installing pnpm before frontend cache setup.
-- Added the Starter's generated default-theme metadata to source control and
-  made the Ruff version and lint baseline explicit across local and CI runs.
+- Added the Starter and ZJU reference generated theme metadata to source
+  control, and made the Ruff version and lint baseline explicit across local
+  and CI runs.
 - Updated first-party GitHub Actions to their Node 24-based v7 releases.
 - Updated the documentation toolchain from Zensical 0.0.46 to 0.0.53 and
   enabled configuration-level strict builds.
