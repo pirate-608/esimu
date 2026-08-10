@@ -17,6 +17,8 @@ This lab follows a lightweight Semantic Versioning policy for `esimu-core`:
 - Added the Starter and ZJU reference generated theme metadata to source
   control, and made the Ruff version and lint baseline explicit across local
   and CI runs.
+- Added a reproducible Starter backend development dependency set and local
+  Ruff configuration for generated projects.
 - Updated first-party GitHub Actions to their Node 24-based v7 releases.
 - Updated the documentation toolchain from Zensical 0.0.46 to 0.0.53 and
   enabled configuration-level strict builds.
