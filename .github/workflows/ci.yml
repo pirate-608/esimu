@@ -24,8 +24,8 @@ jobs:
       matrix:
         python-version: ["3.11", "3.12", "3.13"]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install core
@@ -53,8 +53,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: core
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: Install starter backend
@@ -74,31 +74,33 @@ jobs:
     name: starter frontend
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 9.15.9
+          cache: true
+          cache_dependency_path: apps/starter/frontend/pnpm-lock.yaml
+      - uses: actions/setup-node@v7
         with:
           node-version: "22"
-          cache: pnpm
-          cache-dependency-path: apps/starter/frontend/pnpm-lock.yaml
-      - name: Enable pnpm
-        run: corepack enable
       - name: Install starter frontend
         working-directory: apps/starter/frontend
-        run: corepack pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
       - name: Typecheck starter frontend
         working-directory: apps/starter/frontend
-        run: corepack pnpm typecheck
+        run: pnpm typecheck
       - name: Build starter frontend
         working-directory: apps/starter/frontend
-        run: corepack pnpm build
+        run: pnpm build
 
   release-smoke:
     name: external install smoke
     runs-on: ubuntu-latest
     needs: [core, starter, starter-frontend]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: Install release build tooling
@@ -110,8 +112,8 @@ jobs:
     name: docs site
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: Install docs dependencies
@@ -148,8 +150,8 @@ jobs:
     needs: core
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.run-reference == 'true'
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: Install reference backend

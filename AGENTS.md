@@ -162,6 +162,11 @@ installed CLI, and exercises the generated Starter API. The default generated
 Git dependency becomes usable only after the matching `esimu-core-v<version>`
 tag is pushed.
 
+The core `dev` extra intentionally includes FastAPI and HTTPX because the
+bootstrap test starts a generated Starter application through `TestClient`.
+In CI, install pnpm before enabling pnpm-aware caching; `setup-node` queries the
+package manager while the action itself is initializing.
+
 For documentation-only changes, `git diff --check` plus link/path review is
 usually enough.
 
