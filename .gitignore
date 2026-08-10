@@ -22,6 +22,8 @@ site/
 
 # Local runtime data
 data/
+!apps/starter/frontend/src/data/
+!apps/starter/frontend/src/data/*.generated.ts
 logs/
 *.log
 
@@ -31,4 +33,3 @@ Thumbs.db
 .idea/
 .vscode/*
 !.vscode/extensions.json
-
