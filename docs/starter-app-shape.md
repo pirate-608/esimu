@@ -5,22 +5,22 @@ should wait for the future minimal starter app.
 
 ## Decision
 
-Use the ZJU reference app as the short-term runnable adapter, but do not bless
-it as the long-term starter template.
+Use `apps/starter/` as the default new-project base. Keep the ZJU reference app
+as the rich compatibility adapter and regression target.
 
 For a new simulator today:
 
 1. Create or copy a theme pack.
 2. Validate the theme through `esimu-core`.
-3. Reuse `apps/zju-reference/` only when a runnable product shell is needed
-   immediately.
+3. Start from `apps/starter/` for the first runnable product shell.
 4. Rename visible product surfaces through theme/story/prompt metadata first.
-5. Avoid deep product rewrites until the minimal starter app exists.
+5. Reuse `apps/zju-reference/` only when the project needs its save/admin,
+   Redis/PostgreSQL, vector retrieval, or legacy compatibility behavior.
 
 For the framework roadmap:
 
 - Phase 5 should harden theme/world contracts.
-- Phase 6 should create `apps/starter/` as the first minimal non-ZJU app.
+- Phase 6 created `apps/starter/` as the first minimal non-ZJU app.
 - `apps/zju-reference/` remains a compatibility-rich reference adapter and
   regression target.
 
@@ -56,8 +56,8 @@ in a new project.
 | `zjus-backend/app/models/` | SQLAlchemy persistence models | Copy for PostgreSQL-based fork; a starter may offer simpler persistence. |
 | `zjus-backend/app/schemas/` | Reference save/WebSocket payload schemas | Copy for compatibility; future starter should rename public concepts while preserving core shapes. |
 | `zjus-backend/app/content/` | Local library cache plus core selection adapter | Copy for now; keep local selection rules in `esimu_core.content`. |
-| `zjus-backend/app/core/llm.py` | OpenAI-compatible content generation adapter | Copy only when the new project wants the same LLM fallback strategy. |
-| `zjus-backend/app/core/dingtalk_llm.py` | MiniMax RP adapter with legacy DingTalk naming | ZJU-specific reference code; new projects should wait for a neutral messenger adapter. |
+| `zjus-backend/app/core/llm.py` | Redis-cached compatibility adapter over reusable AI contracts | Prefer `esimu_core.ai`; copy only reference cache/key policy when required. |
+| `zjus-backend/app/core/dingtalk_llm.py` | MiniMax RP compatibility adapter with vector selection | Prefer neutral `esimu_core.ai` M2-her support; copy only pgvector/cache integration when required. |
 | `zjus-backend/app/admin.py` and admin services | Operational editors for world files | Copy if useful, but rename visible terms and keep file publishing theme-aware. |
 | `zjus-frontend/src/components/` | Full game console and onboarding skin | Copy for runnable fork; future starter should keep a smaller component set. |
 | `zjus-frontend/src/utils/theme.ts` and `storageKeys.ts` | Theme/runtime helpers | Good starter candidates; keep generated metadata boundary. |
@@ -85,26 +85,19 @@ generalizes them:
 
 - ZJU invitation/login policy,
 - ZJU-specific prologue and graduation writing,
-- MiniMax M2-her DingTalk RP integration details,
+- ZJU-specific MiniMax/DingTalk cache, pgvector, and legacy payload details,
 - CC98/DingTalk visible copy and legacy compatibility tests,
 - production Docker image names, domains, and Nginx rules,
 - ZJU docs and deployment guidance.
 
 ## Recommended Starter Strategy
 
-Until `apps/starter/` exists:
-
-1. Fork or copy `apps/zju-reference/` only for a concrete game project.
-2. Immediately rename package/display/deployment identifiers in that copy.
-3. Keep `esimu-core` as an explicit dependency.
-4. Keep theme content in `themes/<theme_id>/`, not in adapter code.
-5. Run the reference smoke tests after each extraction or theme swap.
-
-After Phase 6:
-
 1. Prefer `apps/starter/` for new games.
-2. Use `apps/zju-reference/` as a regression-rich example, not a template.
+2. Use `apps/zju-reference/` as a regression-rich example, not a default
+   template.
 3. Copy only the specific advanced features the starter lacks.
+4. Keep `esimu-core` as an explicit dependency.
+5. Keep theme content in `themes/<theme_id>/`, not in adapter code.
 
 ## Phase 4E Completion Criteria
 

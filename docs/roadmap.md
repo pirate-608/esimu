@@ -382,6 +382,29 @@ Completion criteria:
   editing `apps/zju-reference`.
 - ZJU reference behavior still passes its existing tests.
 
+Progress:
+
+- `apps/starter/backend` now provides a minimal FastAPI adapter using
+  `demo-campus` by default and keeping session state in memory.
+- The starter backend calls `esimu-core` lifecycle, runtime, content, effects,
+  items, catalog, and semester helpers for character setup, init/tick payloads,
+  relax effects, event/forum/messenger payloads, item buy/sell, and final exam
+  settlement.
+- `apps/starter/frontend` now provides a tiny Vite/TypeScript skin that
+  consumes generated theme, story, and stat metadata and talks to the starter
+  backend over HTTP/WebSocket.
+- `apps/starter/backend/tests/test_starter_smoke.py` verifies the minimal loop
+  through direct session calls, HTTP routes, and WebSocket actions.
+
+Remaining work:
+
+- Decide whether the starter should gain optional Redis/PostgreSQL adapters or
+  remain memory-only while downstream projects add persistence themselves.
+- Add frontend build/typecheck coverage once starter frontend dependencies are
+  installed in CI/local workflow.
+- Expand starter docs with a copy-and-rename checklist after the first external
+  simulator project uses it.
+
 ### Phase 7: Packaging And Versioning
 
 Goal: make `esimu-core` consumable as a real dependency instead of a lab-only
@@ -392,18 +415,42 @@ editable package.
 - Decide whether releases are Git tags only, GitHub packages, or a future PyPI
   package.
 - Add CI checks for core tests, starter smoke, demo theme validation, and
-  reference adapter compatibility.
+  optional reference adapter compatibility.
 
 Deliverables:
 
 - Versioned `esimu-core` package.
 - Release checklist and compatibility policy.
-- CI matrix covering `esimu-core`, `apps/starter`, and `apps/zju-reference`.
+- CI matrix covering required `esimu-core` and `apps/starter` checks, plus
+  optional `apps/zju-reference` compatibility checks.
 
 Completion criteria:
 
 - A downstream project can pin an esimu-core version and upgrade intentionally.
 - Breaking changes to theme/world contracts are documented and tested.
+
+Progress:
+
+- `esimu-core` now exposes `esimu_core.__version__` as the runtime version
+  source, and `pyproject.toml` reads it dynamically through setuptools.
+- Package metadata now declares README, license, Python version classifiers,
+  project URLs, typed package data, and a small `dev` extra.
+- `CHANGELOG.md` records the initial `0.1.0` baseline and Semantic Versioning
+  expectations.
+- `docs/release-policy.md` defines Git tags as the current release channel,
+  tag naming, compatibility policy, and a release checklist.
+- Root CI now covers core tests/lint, default and demo theme validation,
+  starter backend smoke/lint, docs build, and optional focused ZJU reference
+  backend compatibility.
+- `test_package_metadata.py` verifies import-time and installed package
+  metadata versions stay in sync.
+
+Remaining work:
+
+- Decide after Phase 9 whether to publish to PyPI, GitHub Packages, or keep
+  Git tags as the only release channel.
+- Add frontend starter build/typecheck to CI once dependencies and lockfile
+  strategy are finalized.
 
 ### Phase 8: Project Bootstrap Tooling
 
@@ -429,6 +476,34 @@ Completion criteria:
   workflow.
 - The generated project contains no ZJU product names unless the user selects
   the ZJU theme.
+
+Progress:
+
+- `scripts/new_project.py` now generates a starter project from
+  `apps/starter/` plus a source theme, rewrites the theme ID, storage prefix,
+  institution/forum/messenger terms, generated frontend metadata, starter
+  backend default theme, frontend package name, README, `.env.example`, and
+  project `AGENTS.md`.
+- Generated projects copy story image assets into the theme asset directory when
+  the source lab has matching images, so standalone validation does not depend
+  on `apps/zju-reference`.
+- `scripts/scaffold_world_data.py` drafts or appends reviewable item,
+  achievement, event, course, and prompt fragments. It complements
+  `scaffold_game_stat.py` for stat definitions.
+- `test_project_bootstrap.py` creates a temporary project, validates it through
+  the existing world-data validator using `SIMULATOR_LAB_ROOT`, and checks the
+  world-data scaffolding output.
+- `new-project-bootstrap.md`, `quickstart.md`, `agent-handoff.md`, and the core
+  README now document the bootstrap workflow.
+
+Remaining work:
+
+- Decide whether `new_project.py` should become an installed console script
+  after the release channel moves beyond Git tags.
+- Add frontend starter build/typecheck coverage for generated projects once the
+  dependency/lockfile strategy is finalized.
+- Consider richer project templates only after the first external simulator
+  uses the minimal starter and reports what was missing.
 
 ### Phase 9: Framework Readiness Review
 
@@ -463,14 +538,38 @@ Completion criteria:
 - ZJU reference behavior remains protected by tests and can cherry-pick mature
   framework improvements intentionally.
 
+Progress:
+
+- `docs/framework-readiness-review.md` records the Phase 9 verdict: esimu is
+  ready as a basically complete alpha framework for single-theme simulator
+  prototypes.
+- The recommended shape is `esimu-core + starter app + theme pack`.
+- Validation evidence includes core tests, theme validation for `zju` and
+  `demo-campus`, starter backend smoke, reference backend smoke/game-state
+  tests, ruff checks, and hardcoded-name scanning.
+- The review recommends keeping Git tags as the release channel for now and
+  deferring PyPI/GitHub Packages until external starter-project feedback,
+  starter frontend dependency policy, and at least one version upgrade path are
+  proven.
+- Remaining gaps are explicitly tracked: optional persistence adapters, starter
+  frontend build/typecheck CI, legacy `cc98`/`dingtalk` protocol IDs, and a real
+  second non-ZJU simulator beyond the minimal `demo-campus` theme.
+
 ## Framework Decision
 
-The decision point remains open until Phase 9. esimu may become:
+Phase 9 chooses **library plus starter app**.
 
-- a reusable internal framework,
-- a template repository,
-- a library plus starter app,
-- or remain a research branch with cherry-picked improvements.
+esimu should continue as:
+
+- `esimu-core`: versioned Python package for reusable rules, loaders,
+  validation, runtime helpers, lifecycle contracts, and content contracts.
+- `apps/starter`: minimal app shell for new single-theme simulator prototypes.
+- `themes/<theme_id>`: project-owned theme/world/story/prompt data.
+- `apps/zju-reference`: compatibility-rich reference adapter and regression
+  target, not the default project template.
+
+It should not yet be published as a stable public framework. The current
+release channel remains Git tags.
 
 Supporting handoff work now lives in:
 
@@ -478,4 +577,252 @@ Supporting handoff work now lives in:
 - `new-project-bootstrap.md`: new theme/app startup checklist.
 - `agent-handoff.md`: current extraction state for future agents.
 - `theme-pack-contract.md`: active theme pack contract.
+- `framework-readiness-review.md`: Phase 9 verdict and residual gaps.
+
+## Independence Roadmap
+
+The next roadmap turns esimu from a lab nested under the ZJU main repository
+into an independent framework repository.
+
+There are two different finish lines:
+
+- **Repository independence**: `pirate-608/esimu-lab` can be cloned, tested,
+  documented, and released without the ZJU parent workspace.
+- **Framework formality**: esimu is polished enough to present as a real alpha
+  framework project, with clear starter guarantees, versioned docs, CI, and a
+  migration path for downstream simulators.
+
+Repository independence should be achievable in Phase 10-11. Framework
+formality needs Phase 12-14.
+
+### Phase 10: Remove Parent-Workspace Assumptions
+
+Goal: make a fresh clone of `pirate-608/esimu-lab` work without the ZJU mother
+repository.
+
+Status: complete for the core/starter/docs path. Reference-app compatibility
+work remains optional and continues in Phase 11.
+
+Key work:
+
+- Replace hardcoded parent-workspace commands in README, docs, generated
+  checklist examples, and tests with repository-relative commands.
+- Add a root-level `.python-version` or documented Python version matrix, plus
+  a bootstrap command that creates/uses a local `.venv` inside the esimu repo.
+- Update `docs/quickstart.md` so the first path is:
+
+```powershell
+git clone https://github.com/pirate-608/esimu-lab.git
+cd esimu-lab
+```
+
+- Ensure `docs/requirements.txt`, starter backend requirements, and core dev
+  extras are enough to install everything in a clean clone.
+- Stop relying on parent repo images for story validation. Theme assets required
+  by `zju` and `demo-campus` must live under `themes/<theme_id>/assets/`, or
+  validation must clearly mark reference-only assets as optional.
+- Update tests that assume the lab lives inside the ZJU parent repository.
+
+Deliverables:
+
+- Clean-clone quickstart.
+- Root bootstrap instructions for Python, docs, core checks, starter checks,
+  and theme validation.
+- No required command in docs points at the ZJU parent venv or parent path.
+
+Completion criteria:
+
+- In a directory outside the ZJU repo, a fresh clone can run:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+.\.venv\Scripts\python.exe -m pytest simulator-core\backend\tests
+.\.venv\Scripts\python.exe simulator-core\backend\scripts\validate_world_data.py
+.\.venv\Scripts\zensical.exe build
+```
+
+Progress:
+
+- Root `requirements-dev.txt` now gives a clean-clone dependency entry point.
+- Quickstart and README now start from `git clone`, a local `.venv`, and
+  repository-relative commands.
+- Story image validation now requires theme-owned assets rather than falling
+  back to the ZJU reference frontend public image directory.
+- The `zju` and `demo-campus` themes now carry the story images they reference.
+- `new_project.py` validates that copied source themes already contain required
+  story assets instead of borrowing files from the reference frontend.
+
+### Phase 11: Split Reference App From Framework Core
+
+Goal: prevent the copied ZJU reference app from being perceived as required for
+the framework.
+
+Key work:
+
+- Decide whether `apps/zju-reference/` remains in the independent repo as a
+  compatibility fixture, moves to a separate archival branch, or becomes an
+  optional test fixture downloaded only in CI.
+- If it stays, mark it clearly as `reference-only` and remove it from the
+  default quickstart path.
+- Make `apps/starter/` the only app path required by docs and CI defaults.
+- Move ZJU-heavy docs to an appendix or archival section.
+- Make hardcoded-name scans part of CI for `esimu_core`, `apps/starter`, and
+  docs landing pages.
+
+Deliverables:
+
+- Default docs and homepage explain esimu without needing the ZJU reference app.
+- CI has separate jobs: required core/starter/docs jobs, optional reference
+  compatibility job.
+- New-project generation no longer mentions ZJU paths or reference app unless
+  advanced docs are opened.
+
+Completion criteria:
+
+- A new maintainer can understand and run esimu without reading any ZJU
+  reference source.
+- Removing or ignoring `apps/zju-reference/` does not break core, starter,
+  docs, theme validation, or bootstrap tooling.
+
+Progress:
+
+- `apps/starter/` is now documented as the default app path in README,
+  quickstart, handoff notes, and release checks.
+- The default CI path runs required core, starter, and docs jobs. The
+  ZJU reference backend job is manual-only through `workflow_dispatch` with
+  `run-reference=true`.
+- CI includes a guard that rejects ZJU-specific visible names in `apps/starter`
+  and the docs landing pages.
+- Reference checks moved to a maintainer appendix:
+  `docs/reference-compatibility.md`.
+
+### Phase 12: Starter App Hardening
+
+Goal: make starter strong enough for real downstream prototypes.
+
+Key work:
+
+- Add starter frontend dependency lock strategy and CI build/typecheck.
+- Provide optional persistence adapters:
+  - memory-only default,
+  - file-based/dev persistence,
+  - optional Redis/PostgreSQL example if still useful.
+- Expand starter smoke to cover a full browser-like flow: auth, character
+  creation, init/tick, event, forum, messenger, item buy/sell, exam, ending.
+- Add neutral public IDs for forum/messenger while preserving compatibility
+  mappers for legacy `cc98`/`dingtalk` in reference-only code.
+- Improve generated project checklist and starter README from actual usage.
+
+Deliverables:
+
+- Starter backend/frontend CI.
+- Optional persistence module or documented persistence extension point.
+- Realistic starter smoke tests.
+- Public starter contract document.
+
+Completion criteria:
+
+- A downstream project can keep starter as its app base for more than a toy
+  prototype without immediately copying ZJU reference code.
+
+Progress:
+
+- Starter backend now has a `SessionStore` protocol, memory default, and a
+  local JSON-file development store behind `ESIMU_STARTER_SESSION_STORE=file`.
+- Starter WebSocket smoke covers a browser-like loop: init, relax, event,
+  event choice, forum, messenger, item buy/sell, exam, and ending.
+- Starter public actions use neutral `forum` and `messenger` names; legacy
+  `cc98`/`dingtalk` names stay in reference compatibility space.
+- Starter frontend now commits a pnpm lockfile and has CI typecheck/build
+  commands.
+- `docs/starter-contract.md` records the starter HTTP/WebSocket surface,
+  persistence extension point, and frontend dependency policy.
+- The original simulator's reusable AI path now lives in `esimu_core.ai`:
+  OpenAI-compatible configuration/transport, M2-her role messages, structured
+  event/forum/messenger/graduation generation, output validation, effect
+  clamps, and library/hybrid/AI degradation policy.
+- Starter actions can opt into AI through `ESIMU_CONTENT_MODE` and
+  `ESIMU_LLM_*`/`ESIMU_RP_*`; default library mode remains network-free.
+- ZJU reference AI code reuses the core provider table, JSON parser, and
+  M2-her role contract while retaining Redis pools, vector retrieval, and
+  player-key policy in the compatibility adapter.
+
+### Phase 13: Release Channel Decision
+
+Goal: choose the official package distribution story.
+
+Key work:
+
+- Decide between Git tags only, GitHub Packages, or PyPI for `esimu-core`.
+- Add build artifacts and release workflow if publishing beyond Git tags.
+- Version docs and publish the Zensical site from the independent repo.
+- Define compatibility guarantees for:
+  - Python APIs,
+  - theme/world contract,
+  - starter app behavior,
+  - scaffold CLI output.
+- Add an upgrade guide template for breaking changes.
+
+Deliverables:
+
+- Release workflow.
+- Versioned docs publishing workflow.
+- Compatibility policy promoted from alpha notes into a formal document.
+
+Completion criteria:
+
+- A downstream project can pin `esimu-core`, read matching docs, and upgrade
+  intentionally.
+
+Progress:
+
+- Added the installed `esimu-validate-world` command and removed generated
+  project validation dependence on an esimu-lab path.
+- Added package artifact smoke: build sdist/wheel, generate a project, create a
+  clean venv, install `esimu-core[ai]`, validate the theme, and call Starter API.
+- Added tag-triggered CI with exact `esimu-core-v<version>` validation.
+- Added browser HTTP/WebSocket proxy smoke and configurable split-origin
+  frontend/backend deployment settings.
+- Remaining before Phase 13 is complete: commit and push the release candidate,
+  create the first matching Git tag, and verify its CI from the remote checkout.
+
+### Phase 14: First External Simulator Trial
+
+Goal: prove independence with a real non-ZJU simulator generated from esimu.
+
+Key work:
+
+- Use `new_project.py` to create a second non-ZJU simulator outside the esimu
+  repo.
+- Replace demo-campus placeholder content with a small but coherent playable
+  theme.
+- Record every missing hook, unclear contract, hardcoded assumption, and
+  bootstrap pain point.
+- Feed framework-worthy fixes back into esimu.
+
+Deliverables:
+
+- External simulator trial report.
+- Starter/framework improvement backlog.
+- Recommendation: keep alpha, publish beta, or revise architecture.
+
+Completion criteria:
+
+- The external simulator can run without copying ZJU-specific product code.
+- Its changes to esimu are framework improvements, not one-off patches.
+- Phase 13 release story has been exercised by a real downstream project.
+
+## Independence Milestone Recommendation
+
+Do not call esimu a fully independent formal framework until Phase 12 is done.
+
+Use these labels:
+
+- After Phase 10: **independent clone works**.
+- After Phase 11: **framework repo no longer depends on ZJU reference by
+  default**.
+- After Phase 12: **starter is suitable for real prototypes**.
+- After Phase 13: **versioned framework release is credible**.
+- After Phase 14: **framework has been proven by an external simulator**.
 

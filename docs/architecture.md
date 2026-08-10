@@ -15,8 +15,10 @@ Core owns behavior that should survive theme changes:
   and effect feedback.
 - World-data loaders for balance, stat definitions, items, theme manifests,
   story content, and prompt fragments.
+- Optional AI contracts for OpenAI-compatible transport, theme-aware content
+  generation, M2-her role messages, output validation, and fallback policy.
 - Eventually: auth/session entry pattern, game loop, pause/resume state machine,
-  saves, event/message dispatch, LLM fallback policy, and admin editors.
+  saves, event/message dispatch, and admin editors.
 
 ## 2. Theme Pack
 
@@ -35,6 +37,18 @@ A theme pack owns world-specific nouns, data, and assets:
 The skin layer maps core UI surfaces to theme terminology and visual treatment.
 The first lab iteration should use build-time theme selection so that frontend
 types and assets stay simple.
+
+## Starter App
+
+`apps/starter/` is the first minimal non-ZJU app shape. Its backend is an
+in-memory FastAPI adapter over `esimu-core`, and its frontend is a small
+Vite/TypeScript skin that consumes generated theme/story/stat metadata. The
+starter is intentionally smaller than `apps/zju-reference/`: it excludes
+Redis, PostgreSQL, admin editors, production Docker, persistent model caches,
+and vector retrieval so new projects can add those decisions deliberately.
+
+The starter now includes an optional `esimu_core.ai` adapter, but remains in
+local `library` mode unless model environment variables are configured.
 
 ## Initial Constraint
 
@@ -197,6 +211,19 @@ values into `esimu_core.runtime` and emits the returned payloads. In the ZJU
 reference adapter, `_runtime_snapshot_from_repo()` is the current seam between
 Redis/Pydantic snapshots and `RuntimeSnapshot`.
 
+## Optional AI Layer
+
+Reusable AI generation lives under `esimu_core.ai`. The base package does not
+import the OpenAI SDK until an application constructs
+`OpenAICompatibleTransport`; the SDK is distributed through the `[ai]` extra.
+Prompt assembly, structured-output parsing, event-effect validation, M2-her
+role messages, and library/hybrid/AI fallback decisions belong to core.
+
+Applications still own credentials, Redis/database caches, embeddings,
+moderation, billing, WebSocket emission, and persistence. This preserves a
+small deterministic core while making the original simulator's AI behavior a
+reusable framework module.
+
 ## Compatibility IDs
 
 The lab currently keeps `dingtalk` and `cc98` as internal protocol/action IDs
@@ -211,6 +238,8 @@ adapter-extraction phase.
 - `theme-pack-contract.md`: current theme file contract.
 - `new-project-bootstrap.md`: checklist for a new simulator/theme.
 - `starter-app-shape.md`: decision record for what a new project should copy.
+- `release-policy.md`: package versioning and tag-based release process.
+- `framework-readiness-review.md`: Phase 9 framework readiness verdict.
 - `agent-handoff.md`: current agent operating notes.
 - `roadmap.md`: extraction phases and current progress.
 

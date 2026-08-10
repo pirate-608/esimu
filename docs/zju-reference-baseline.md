@@ -4,11 +4,12 @@ This document records the first code-copy baseline for the framework lab.
 
 ## Source
 
-- Source workspace: `D:\projects\ZJUers_simulator`
+- Source workspace: historical local ZJUers Simulator checkout on the original
+  development machine.
 - Original destination workspace:
-  `D:\projects\simulator-framework-lab\apps\zju-reference`
-- Current submodule workspace:
-  `D:\projects\ZJUers_simulator\labs\esimu\apps\zju-reference`
+  the original standalone lab checkout under `D:\projects`; the current copy
+  lives at `labs/esimu/apps/zju-reference` when used as a submodule
+- Current reference app location: `apps/zju-reference`
 - Source commit at verification time: `53cb7d176bb68094beb30979eff70fd15aa6220e`
 - Copy time: `2026-07-01T19:33:51+08:00`
 - Source worktree after copy verification: clean

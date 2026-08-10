@@ -4,22 +4,24 @@ This file is the handoff guide for AI agents working in Simulator Framework Lab.
 
 ## Prime Directive
 
-Do not modify `D:\projects\ZJUers_simulator` while working in this lab unless the
-user explicitly asks for a cross-repository change. ZJUers Simulator is the main
-game. This workspace is an experiment.
+Do not modify files outside this `esimu-lab` Git worktree unless the user
+explicitly asks for a cross-repository change. When this repository is checked
+out as `ZJUers_simulator/labs/esimu`, the parent ZJUers Simulator remains the
+main game and must not receive incidental edits.
 
 ## Startup Checklist
 
 Run these checks before changing files:
 
 ```powershell
-cd D:\projects\simulator-framework-lab
+git rev-parse --show-toplevel
 git status --short
 ```
 
 Confirm all three facts:
 
-- You are in `D:\projects\simulator-framework-lab`, not the ZJU main game.
+- The reported root is this `esimu-lab` repository, whether standalone or under
+  `ZJUers_simulator/labs/esimu`.
 - Any dirty worktree entries are understood and preserved.
 - The task belongs to the lab. If it belongs to the ZJU main game, stop and ask
   for explicit cross-repository permission.
@@ -29,8 +31,8 @@ clean; read the current diff before editing files that are already modified.
 
 ## Workspace Boundary
 
-- Lab root: `D:\projects\simulator-framework-lab`
-- Main game root: `D:\projects\ZJUers_simulator`
+- Lab root: the result of `git rev-parse --show-toplevel`
+- Parent/main game: outside this Git worktree; do not modify it implicitly
 - Reference app: `apps/zju-reference/`
 - Core package: `simulator-core/backend/`
 - Theme packs: `themes/`
@@ -69,8 +71,10 @@ migration notes.
 - Theme content, nouns, story, prompts, world JSON, and assets belong in
   `themes/<theme_id>/`.
 - Reusable backend rules and loaders belong in `simulator-core/backend/esimu_core/`.
-- Redis, FastAPI, WebSocket, SQLAlchemy, OpenAI, and save-service integration
-  stay in `apps/zju-reference/`.
+- Redis, FastAPI, WebSocket, SQLAlchemy, and save-service integration stay in
+  concrete apps. Reusable model configuration, transport, generation, output
+  validation, and fallback policy live in `esimu_core.ai`; app-specific model
+  caches, credentials, vector retrieval, billing, and telemetry stay in adapters.
 - Project-level learning, roadmap, and startup instructions belong in `docs/`.
 - Reusable handoff templates belong in `templates/`.
 
@@ -106,6 +110,12 @@ Runtime modules must not import Redis, FastAPI, SQLAlchemy, OpenAI, or
 reference-app services; adapters perform all I/O and emit returned
 decisions/payloads.
 
+`esimu_core.ai` is an optional core layer. The base package must remain usable
+without OpenAI installed; construct `OpenAICompatibleTransport` only through the
+`[ai]` extra or inject another `ChatTransport`. Platform credentials may use a
+shared transport, while player-provided credentials must use an uncached
+session transport and must never populate shared content pools.
+
 ## Current Entry Documents
 
 - `README.md`: human-facing project overview and first links.
@@ -121,26 +131,36 @@ decisions/payloads.
 Core checks from `simulator-core/backend/`:
 
 ```powershell
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m ruff check esimu_core scripts tests
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
-$env:SIMULATOR_THEME='demo-campus'; D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
+python -m pytest tests
+python -m ruff check esimu_core scripts tests
+python scripts\validate_world_data.py
+$env:SIMULATOR_THEME='demo-campus'; python scripts\validate_world_data.py
 ```
 
-Reference backend checks from `apps/zju-reference/zjus-backend/`:
+Starter checks:
 
 ```powershell
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\unit
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m ruff check app tests\unit
+cd apps\starter\backend
+python -m pytest tests
+python -m ruff check app tests
+cd ..\frontend
+corepack pnpm install --frozen-lockfile
+corepack pnpm typecheck
+corepack pnpm build
 ```
 
-Reference frontend checks from `apps/zju-reference/zjus-frontend/`:
+Release candidate and docs checks from the repository root:
 
 ```powershell
-npx vue-tsc --noEmit
-npx vitest run
-npx vite build
+python simulator-core\backend\scripts\release_smoke.py
+zensical build
 ```
+
+`release_smoke.py` is mandatory before tagging. It builds the wheel, installs it
+in a disposable venv, generates a standalone project, validates it through the
+installed CLI, and exercises the generated Starter API. The default generated
+Git dependency becomes usable only after the matching `esimu-core-v<version>`
+tag is pushed.
 
 For documentation-only changes, `git diff --check` plus link/path review is
 usually enough.

@@ -1,0 +1,91 @@
+site_name: esimu
+site_description: A theme-driven simulator framework extracted from ZJUers Simulator.
+site_url: https://pirate-608.github.io/esimu-lab/
+repo_url: https://github.com/pirate-608/esimu-lab
+repo_name: pirate-608/esimu-lab
+docs_dir: docs
+site_dir: site
+use_directory_urls: true
+strict: true
+
+theme:
+  name: material
+  language: en
+  palette:
+    - scheme: slate
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+    - scheme: default
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - content.code.copy
+
+nav:
+  - English:
+      - Home: index.md
+      - Start Here:
+          - Quickstart: quickstart.md
+          - Bootstrap A Project: new-project-bootstrap.md
+          - Starter App Shape: starter-app-shape.md
+          - Starter Contract: starter-contract.md
+          - AI Integration: ai-integration.md
+      - Framework:
+          - Architecture: architecture.md
+          - Theme Pack Contract: theme-pack-contract.md
+          - Roadmap: roadmap.md
+          - Readiness Review: framework-readiness-review.md
+          - Release Policy: release-policy.md
+      - Maintainers:
+          - Agent Handoff: agent-handoff.md
+          - Reference Compatibility: reference-compatibility.md
+          - ZJU Reference Baseline: zju-reference-baseline.md
+  - 中文:
+      - 首页: zh/index.md
+      - 开始使用:
+          - 快速开始: zh/quickstart.md
+          - 创建新项目: zh/new-project-bootstrap.md
+          - Starter 形态: zh/starter-app-shape.md
+          - Starter 契约: zh/starter-contract.md
+          - AI 集成: zh/ai-integration.md
+      - 框架:
+          - 架构: zh/architecture.md
+          - 主题包契约: zh/theme-pack-contract.md
+          - 路线图: zh/roadmap.md
+          - 就绪审查: zh/framework-readiness-review.md
+          - 发布策略: zh/release-policy.md
+      - 维护者:
+          - Agent 交接: zh/agent-handoff.md
+          - 参考应用兼容性: zh/reference-compatibility.md
+          - ZJU 参考基线: zh/zju-reference-baseline.md
+
+markdown_extensions:
+  - admonition
+  - fenced_code
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+extra_css:
+  - assets/stylesheets/extra.css
+
+extra:
+  alternate:
+    - name: English
+      link: /
+      lang: en
+    - name: 中文
+      link: /zh/
+      lang: zh

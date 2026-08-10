@@ -1,0 +1,127 @@
+# 快速开始
+
+这是从全新 clone 到运行 esimu Starter、再到生成独立模拟器的最短验收路径。
+
+## 克隆并安装实验仓
+
+```powershell
+git clone https://github.com/pirate-608/esimu-lab.git
+cd esimu-lab
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -U pip
+python -m pip install -r requirements-dev.txt
+```
+
+仓库应当可以独立运行，不要把 import、校验命令或生成文件指向 ZJUers
+Simulator 母仓。
+
+## 验证 core 与主题
+
+```powershell
+cd simulator-core\backend
+python -m pytest tests
+python -m ruff check esimu_core scripts tests
+python scripts\validate_world_data.py
+$env:SIMULATOR_THEME='demo-campus'
+python scripts\validate_world_data.py
+Remove-Item Env:SIMULATOR_THEME
+```
+
+生成项目不需要保留 esimu-lab 路径，安装 core 后直接运行：
+
+```powershell
+esimu-validate-world --root <项目根目录> --theme <主题 ID>
+```
+
+## 运行 Starter
+
+后端：
+
+```powershell
+cd apps\starter\backend
+python -m pytest tests
+python -m ruff check app tests
+python -m uvicorn app.main:app --reload --port 18001
+```
+
+健康检查位于 `http://127.0.0.1:18001/healthz`。
+
+前端在第二个终端运行：
+
+```powershell
+cd apps\starter\frontend
+corepack pnpm install --frozen-lockfile
+corepack pnpm typecheck
+corepack pnpm dev
+```
+
+打开 `http://127.0.0.1:15175`。开发服务器会把 `/api`、`/config`、
+`/healthz` 和 `/ws` 代理到后端，因此 HTTP 与 WebSocket 保持同源。
+
+前后端分域部署时，在前端 `.env` 设置：
+
+```dotenv
+VITE_ESIMU_API_BASE=https://api.example.com
+VITE_ESIMU_WS_BASE=wss://api.example.com
+```
+
+后端通过 `ESIMU_CORS_ORIGINS=https://game.example.com` 放行前端来源。若使用
+同域 Nginx 反向代理，则保持两个 `VITE_*` 变量为空即可。
+
+## 生成独立项目
+
+```powershell
+cd simulator-core\backend
+python scripts\new_project.py D:\projects\my-simulator `
+  --project-name "My Simulator" `
+  --theme-id my-simulator
+```
+
+生成项目拥有自己的 Starter、主题、资源、scaffold helper、README、环境模板
+和 AGENTS.md。正式标签发布后，可完全离开 esimu-lab 安装运行：
+
+```powershell
+cd D:\projects\my-simulator
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r apps\starter\backend\requirements.txt
+esimu-validate-world --root . --theme my-simulator
+cd apps\starter\backend
+python -m uvicorn app.main:app --reload --port 18001
+```
+
+开发未发布 core 时，给 `new_project.py` 传入 `--core-dependency`，使用本地
+editable 路径或刚构建的 wheel，不要依赖尚未推送的标签。
+
+## 编辑和校验世界数据
+
+```powershell
+cd D:\projects\my-simulator
+$env:SIMULATOR_LAB_ROOT=(Get-Location).Path
+$env:SIMULATOR_THEME='my-simulator'
+python scripts\scaffold_game_stat.py add focus --label 专注 --show-in-hud
+python scripts\scaffold_world_data.py item focus_card --name 专注卡
+esimu-validate-world --root . --theme my-simulator
+```
+
+使用 `--write` 前先审查生成的 JSON。
+
+## 发布候选验收
+
+```powershell
+cd esimu-lab
+python simulator-core\backend\scripts\release_smoke.py
+```
+
+该命令会构建 sdist/wheel、生成一次性项目、创建新 venv、从 wheel 安装
+`esimu-core[ai]`、校验主题并运行生成的 FastAPI Starter。CI 也执行同一条
+链，并在 tag 构建时校验 `esimu-core-v<version>` 与包版本一致。
+
+## 构建文档站
+
+```powershell
+zensical build
+```
+
+ZJU reference adapter 仅用于兼容性回归，不属于默认安装路径。

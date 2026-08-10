@@ -1,142 +1,130 @@
 # New Project Bootstrap
 
-Use this checklist when starting a new simulator from esimu.
+This checklist starts a simulator that can run independently after generation.
+The generator copies the small Starter app and one theme; it does not copy the
+ZJU reference product.
 
-The goal is not to fork a perfect framework on day one. The goal is to get one
-theme running, validate the data boundary, and only then decide how much of the
-reference app should be copied or rewritten.
+## Generate The Project
 
-## 1. Choose The Project Shape
-
-Start with one selected theme at build/startup time:
+From an esimu-lab checkout:
 
 ```powershell
-$env:SIMULATOR_THEME='<theme_id>'
+cd simulator-core\backend
+python scripts\new_project.py D:\projects\my-simulator `
+  --project-name "My Simulator" `
+  --theme-id my-simulator `
+  --institution "Star Academy" `
+  --institution-short "Star"
 ```
 
-Runtime multi-theme switching is not part of the current lab contract.
-
-## 2. Create A Theme Pack
-
-Copy the minimal theme:
-
-```powershell
-cd D:\projects\ZJUers_simulator\labs\esimu
-Copy-Item -Recurse themes\demo-campus themes\<theme_id>
-```
-
-Then edit:
+Generated shape:
 
 ```text
-themes/<theme_id>/theme.json
-themes/<theme_id>/story.json
-themes/<theme_id>/prompts.json
-themes/<theme_id>/world/
-themes/<theme_id>/assets/
+apps/starter/backend/
+apps/starter/frontend/
+themes/my-simulator/
+scripts/scaffold_game_stat.py
+scripts/scaffold_world_data.py
+docs/scaffold-checklist.md
+.env.example
+AGENTS.md
+README.md
 ```
 
-Keep `theme_id` stable. Future saves may bind to it.
+The backend requirement defaults to the Git tag matching the generator's
+`esimu_core.__version__`. That tag must exist remotely before another developer
+can install it. For unreleased development, pass an explicit dependency:
 
-## 3. Edit Theme Metadata
+```powershell
+python scripts\new_project.py D:\projects\my-simulator `
+  --core-dependency "-e D:\projects\esimu-lab\simulator-core\backend[ai]"
+```
 
-Use `theme.json` for short structural terms:
+A wheel URL is preferred when testing the exact release artifact.
 
-- product display name
-- institution/campus/player labels
-- forum and messenger display names
-- browser storage prefix
-- default visual assets
+## Install And Validate Independently
 
-Use `story.json` for long narrative text:
+After the tagged core is available:
 
-- first-visit prologue
-- diary or scene pages
-- ending text
-- graduation fallback comments
-- end-screen background references
+```powershell
+cd D:\projects\my-simulator
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r apps\starter\backend\requirements.txt
+esimu-validate-world --root . --theme my-simulator
+```
 
-Use `prompts.json` for model-facing content-generation context:
+The installed command resolves the generated project's own `themes/` directory.
+It does not need `validate_world_data.py` or any path back to esimu-lab.
 
-- campus context
-- forum and messenger names
-- random-event instruction
-- private-chat instruction
-- graduation-summary instruction
-- fallback messages
+## Run The App
 
-Do not move long prose into `theme.json`.
+Backend:
 
-## 4. Edit World Data
+```powershell
+cd apps\starter\backend
+python -m uvicorn app.main:app --reload --port 18001
+```
 
-The `world/` directory currently contains game balance, stats, items,
-achievements, courses, characters, event libraries, and forum/message libraries.
+Frontend in a second terminal:
 
-For a first playable theme, keep the data small. It is better to validate a tiny
-complete theme than to copy a large world pack full of hidden assumptions.
+```powershell
+cd apps\starter\frontend
+corepack pnpm install --frozen-lockfile
+corepack pnpm dev
+```
+
+Open `http://127.0.0.1:15175`. The checked-in Vite proxy connects both HTTP and
+WebSocket traffic to the backend. See `starter-contract.md` for split-origin and
+reverse-proxy deployment.
+
+## Edit The Theme
+
+Keep the deployment single-theme for now. Edit:
+
+```text
+themes/my-simulator/theme.json
+themes/my-simulator/story.json
+themes/my-simulator/prompts.json
+themes/my-simulator/world/
+themes/my-simulator/assets/
+```
 
 Recommended order:
 
-1. `stat_definitions.json`
-2. `game_balance.json`
-3. `items.json`
-4. majors and courses
-5. achievements
-6. characters
-7. event/forum/message libraries
+1. stats and balance,
+2. items and economy,
+3. majors and courses,
+4. achievements and characters,
+5. event/forum/message libraries,
+6. story assets and model prompts.
 
-## 5. Validate The Theme
+Use `theme.json` for short structural terms, `story.json` for narrative copy,
+and `prompts.json` for model-facing context.
 
-Run these from `simulator-core/backend/`:
-
-```powershell
-$env:SIMULATOR_THEME='<theme_id>'
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
-```
-
-If the theme should drive the reference frontend, regenerate metadata:
+## Use The Copied Scaffold Helpers
 
 ```powershell
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\sync_theme_metadata.py --write
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\sync_story_metadata.py --write
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\sync_stat_definitions.py --write
+cd D:\projects\my-simulator
+$env:SIMULATOR_LAB_ROOT=(Get-Location).Path
+$env:SIMULATOR_THEME='my-simulator'
+python scripts\scaffold_game_stat.py add focus --label Focus --show-in-hud
+python scripts\scaffold_world_data.py item focus_card --name "Focus Card"
+python scripts\scaffold_world_data.py achievement first_win --name "First Win"
+python scripts\scaffold_world_data.py event campus_moment --title "Campus Moment"
+esimu-validate-world --root . --theme my-simulator
 ```
 
-Then run validation again.
+Review output before adding `--write`.
 
-## 6. Decide Whether To Reuse The Reference App
+## Choose Persistence And AI Deliberately
 
-Read `starter-app-shape.md` before copying any reference-app files.
+Starter defaults to memory persistence and library content. File persistence is
+available for local development. Production Redis/PostgreSQL, admin editors,
+shared caches, credentials, billing, and telemetry remain adapter concerns.
 
-For the first demo, reuse `apps/zju-reference/` as the adapter. It already knows
-how to run the backend, WebSocket loop, frontend, saves, admin pages, and
-content-generation fallback path.
+Enable the optional `esimu_core.ai` transport only after reviewing
+`ai-integration.md` and filling the generated `.env.example` values.
 
-Only fork or copy the adapter when the new project needs different product
-behavior, not just different nouns or world data.
-
-Current recommendation:
-
-- Use a reference-app fork only when a runnable product shell is needed now.
-- Keep ZJU reference as a regression target, not the final starter template.
-- Prefer the future `apps/starter/` once Phase 6 creates it.
-
-## 7. Preserve Compatibility IDs
-
-The current lab still uses legacy internal IDs such as `cc98` and `dingtalk` in
-protocol payloads, Redis keys, save data, and tests. New themes should change
-the visible terms through `theme.json` and `prompts.json`, not by renaming these
-IDs yet.
-
-Protocol-ID migration is a separate roadmap item.
-
-## 8. Add A Project Handoff File
-
-For a new simulator project, copy the template:
-
-```powershell
-Copy-Item templates\agent\AGENTS.md <new-project-root>\AGENTS.md
-```
-
-Fill in the project root, theme ID, app entry points, validation commands, and
-any production boundaries. Keep ZJU-specific details out unless the new project
-is actually a ZJU reference derivative.
+Use `apps/zju-reference/` only as a compatibility reference when a project
+immediately needs its heavier production shape. It is not a required dependency.

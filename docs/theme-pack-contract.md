@@ -12,9 +12,9 @@ Use `new-project-bootstrap.md` for the step-by-step workflow, and use
 The canonical validation command is:
 
 ```powershell
-cd D:\projects\ZJUers_simulator\labs\esimu\simulator-core\backend
+cd esimu-lab\simulator-core\backend
 $env:SIMULATOR_THEME='<theme_id>'
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
+python scripts\validate_world_data.py
 ```
 
 `validate_world_data.py` now includes the schema-equivalent validator in
@@ -56,8 +56,8 @@ themes/<theme_id>/
 ```
 
 `assets/` may be minimal, but images referenced by `story.json` must exist in
-either the theme assets directory or the reference frontend public images
-directory while the reference app remains the active adapter.
+the theme assets directory. Theme validation no longer borrows story images
+from the ZJU reference frontend.
 
 ## Theme Manifest
 
@@ -243,9 +243,9 @@ Optional `min_gpa` and `max_gpa` fields define GPA branches.
 8. If the reference frontend should run this theme, regenerate metadata:
 
 ```powershell
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\sync_theme_metadata.py --write
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\sync_story_metadata.py --write
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\sync_stat_definitions.py --write
+python scripts\sync_theme_metadata.py --write
+python scripts\sync_story_metadata.py --write
+python scripts\sync_stat_definitions.py --write
 ```
 
 9. Run validation again.

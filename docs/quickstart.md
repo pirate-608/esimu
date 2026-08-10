@@ -1,131 +1,167 @@
 # Quickstart
 
-This page is the shortest path from a fresh checkout to a useful esimu lab
-session.
+This is the shortest verified path from a fresh clone to a running esimu
+starter and a standalone generated simulator.
 
-## 1. Open The Lab
-
-```powershell
-cd D:\projects\ZJUers_simulator\labs\esimu
-git status --short
-```
-
-If the worktree is dirty, read the diff before editing the same files. This lab
-often keeps extraction work in progress between sessions.
-
-The lab is a submodule under `D:\projects\ZJUers_simulator\labs\esimu`. Do not
-modify the main ZJU game outside `labs/esimu` unless the user explicitly asks
-for a cross-repository change.
-
-## 2. Know The Four Moving Parts
-
-```text
-simulator-core/backend/   # esimu-core Python package.
-apps/zju-reference/       # Runnable adapter copied from ZJUers Simulator.
-themes/zju/               # Full reference theme.
-themes/demo-campus/       # Minimal portability theme.
-```
-
-`esimu-core` is installed as a Python package and imported as `esimu_core.*`.
-The reference app should not use temporary `sys.path` bridges.
-
-## 3. Pick A Python Runtime
-
-The lab currently reuses the ZJU development virtual environment:
+## 1. Clone And Install The Lab
 
 ```powershell
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe --version
+git clone https://github.com/pirate-608/esimu-lab.git
+cd esimu-lab
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -U pip
+python -m pip install -r requirements-dev.txt
 ```
 
-From `apps/zju-reference/zjus-backend/`, the editable requirement should point
-back to the local core package:
+The repository is self-contained. Do not point imports, validation commands, or
+generated files at a ZJUers Simulator checkout.
 
-```text
--e ../../../simulator-core/backend
-```
-
-If editable install support is unavailable in an offline Windows environment, a
-local `.pth` file pointing at
-`D:\projects\ZJUers_simulator\labs\esimu\simulator-core\backend` is acceptable
-for development. Do not add bridge code to the reference backend or point the
-venv at the old standalone lab path.
-
-## 4. Validate Core And Theme Data
-
-Run these from `simulator-core/backend/`:
+## 2. Verify Core And Theme Data
 
 ```powershell
-cd D:\projects\ZJUers_simulator\labs\esimu\simulator-core\backend
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_world_catalog.py
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_demo_theme_smoke.py
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_lifecycle_contracts.py
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_content_contracts.py
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\test_theme_contract.py
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m ruff check esimu_core scripts tests
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
-$env:SIMULATOR_THEME='demo-campus'; D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\validate_world_data.py
+cd simulator-core\backend
+python -m pytest tests
+python -m ruff check esimu_core scripts tests
+python scripts\validate_world_data.py
+$env:SIMULATOR_THEME='demo-campus'
+python scripts\validate_world_data.py
+Remove-Item Env:SIMULATOR_THEME
 ```
 
-The first validation uses the default `zju` theme. The second confirms that the
-minimal `demo-campus` theme still catches portability issues. The
-`test_demo_theme_smoke.py` smoke starts a fresh Python process with
-`SIMULATOR_THEME=demo-campus` so singleton loaders cannot accidentally reuse the
-default ZJU theme.
-
-## 5. Regenerate Theme Metadata When Needed
-
-Run these from `simulator-core/backend/` after changing theme, story, or stat
-definitions:
+The repository validator also checks checked-in frontend metadata. Downstream
+projects use the installed, project-local command instead:
 
 ```powershell
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\sync_theme_metadata.py --write
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\sync_story_metadata.py --write
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe scripts\sync_stat_definitions.py --write
+esimu-validate-world --root <project-root> --theme <theme-id>
 ```
 
-Then run validation again.
-
-## 6. Check The Reference Backend
-
-Run these from `apps/zju-reference/zjus-backend/`:
+## 3. Run The Starter Backend
 
 ```powershell
-cd D:\projects\ZJUers_simulator\labs\esimu\apps\zju-reference\zjus-backend
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\unit\test_demo_campus_reference_smoke.py
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m pytest tests\unit
-D:\projects\ZJUers_simulator\.venv\Scripts\python.exe -m ruff check app tests\unit
+cd apps\starter\backend
+python -m pytest tests
+python -m ruff check app tests
+python -m uvicorn app.main:app --reload --port 18001
 ```
 
-The reference backend is the adapter layer. It may use Redis, FastAPI,
-SQLAlchemy, WebSocket, and OpenAI-compatible clients. The core package should
-not. The demo-campus smoke starts a fresh process so active-theme singletons are
-loaded in the same order as a real app startup.
+Readiness is available at `http://127.0.0.1:18001/healthz`. The starter defaults
+to memory sessions and the `demo-campus` theme.
 
-## 7. Check The Reference Frontend
+## 4. Run The Starter Frontend
 
-Run these from `apps/zju-reference/zjus-frontend/`:
+In a second terminal:
 
 ```powershell
-cd D:\projects\ZJUers_simulator\labs\esimu\apps\zju-reference\zjus-frontend
-npx vue-tsc --noEmit
-npx vitest run src\utils\theme.spec.ts
-npx vitest run src\components\themeRuntime.spec.js
-npx vitest run
-npx vite build
+cd apps\starter\frontend
+corepack pnpm install --frozen-lockfile
+corepack pnpm typecheck
+corepack pnpm dev
 ```
 
-`themeRuntime.spec.js` is the quick smoke for mocked `demo-campus` frontend
-metadata. It checks that App startup copy and browser storage keys follow the
-generated theme manifest instead of fixed ZJU/simlab values.
+Open `http://127.0.0.1:15175`. During development, Vite proxies `/api`,
+`/config`, `/healthz`, and `/ws` to `http://127.0.0.1:18001`, so browser HTTP
+and WebSocket traffic remain same-origin.
 
-If a command fails only because an agent sandbox cannot spawn esbuild, treat it
-as an execution-environment issue and rerun outside the sandbox. Do not add fake
-environment variables or wrapper scripts for esbuild.
+For a split-origin deployment, create `apps/starter/frontend/.env` from its
+`.env.example` and set:
 
-## 8. Where To Read Next
+```dotenv
+VITE_ESIMU_API_BASE=https://api.example.com
+VITE_ESIMU_WS_BASE=wss://api.example.com
+```
 
-- `architecture.md`: current core/theme/adapter split.
-- `theme-pack-contract.md`: required theme files and fields.
-- `new-project-bootstrap.md`: how to start a new simulator from esimu.
-- `agent-handoff.md`: current agent operating notes.
+Allow that frontend origin on the backend:
+
+```dotenv
+ESIMU_CORS_ORIGINS=https://game.example.com
+```
+
+For same-origin production behind a reverse proxy, leave both `VITE_*` values
+empty and route `/api`, `/config`, `/healthz`, and `/ws` to the backend.
+
+## 5. Generate A Standalone Simulator
+
+Run the generator from the lab checkout:
+
+```powershell
+cd simulator-core\backend
+python scripts\new_project.py D:\projects\my-simulator `
+  --project-name "My Simulator" `
+  --theme-id my-simulator
+```
+
+The generated project contains its own Starter app, theme, assets, scaffold
+helpers, README, environment template, and agent handoff. Its backend dependency
+is pinned to the Git tag matching `esimu_core.__version__`.
+
+After that tag has been published, install and run entirely from the generated
+project:
+
+```powershell
+cd D:\projects\my-simulator
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r apps\starter\backend\requirements.txt
+esimu-validate-world --root . --theme my-simulator
+cd apps\starter\backend
+python -m uvicorn app.main:app --reload --port 18001
+```
+
+During unreleased framework development, pass `--core-dependency` with an
+editable path or wheel URL instead of relying on a tag that has not been pushed.
+
+## 6. Scaffold World Data
+
+Generated projects carry the conservative scaffold helpers locally:
+
+```powershell
+cd D:\projects\my-simulator
+$env:SIMULATOR_LAB_ROOT=(Get-Location).Path
+$env:SIMULATOR_THEME='my-simulator'
+python scripts\scaffold_game_stat.py add focus --label 专注 --show-in-hud
+python scripts\scaffold_world_data.py item focus_card --name 专注卡
+python scripts\scaffold_world_data.py achievement first_win --name 第一次胜利
+esimu-validate-world --root . --theme my-simulator
+```
+
+Review generated JSON before using `--write`.
+
+## 7. Run The Release-Candidate Gate
+
+Maintainers should run the isolated installation smoke before tagging:
+
+```powershell
+cd esimu-lab
+python simulator-core\backend\scripts\release_smoke.py
+```
+
+It builds an sdist and wheel, generates a disposable simulator, creates a new
+venv, installs `esimu-core[ai]` from the wheel, validates the copied theme, and
+exercises the generated FastAPI starter. CI runs the same gate from a clean
+checkout and checks that `esimu-core-v<version>` matches package metadata on tag
+builds.
+
+## 8. Build The Docs
+
+```powershell
+cd esimu-lab
+zensical build
+```
+
+Use `zensical serve` for local browsing. The generated `site/` directory is
+ignored.
+
+## 9. Optional Reference Compatibility
+
+The ZJU reference adapter is not part of the default install path. Run it only
+when changing compatibility behavior:
+
+```powershell
+cd apps\zju-reference\zjus-backend
+python -m pytest tests\unit\test_demo_campus_reference_smoke.py `
+  tests\unit\test_game_state.py tests\unit\test_dingtalk_state.py
+python -m ruff check app tests\unit
+```
+
+See `reference-compatibility.md` for the full boundary.

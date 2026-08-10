@@ -75,11 +75,10 @@ renamed casually:
 
 ## Useful Commands
 
-Core checks:
+Installed core and theme checks:
 
 ```powershell
-<python> -m pytest <core-tests-path>
-<python> -m ruff check <core-package-path> <scripts-path> <tests-path>
+<python> -c "import esimu_core; print(esimu_core.__version__)"
 <python> <validate-world-data-script>
 ```
 
@@ -93,9 +92,10 @@ Backend checks:
 Frontend checks:
 
 ```powershell
-npx vue-tsc --noEmit
-npx vitest run
-npx vite build
+cd <frontend-path>
+corepack pnpm install --frozen-lockfile
+corepack pnpm typecheck
+corepack pnpm build
 ```
 
 Docs-only checks:
