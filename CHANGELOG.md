@@ -12,6 +12,8 @@ This lab follows a lightweight Semantic Versioning policy for `esimu-core`:
 
 ## Unreleased
 
+- Renamed the primary branch from `master` to `main` and aligned first-party
+  CI, documentation deployment, release instructions, and agent handoff notes.
 - Fixed clean-runner CI by declaring the FastAPI TestClient dependencies used
   by project bootstrap tests and installing pnpm before frontend cache setup.
 - Added the Starter and ZJU reference generated theme metadata to source

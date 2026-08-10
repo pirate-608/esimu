@@ -32,6 +32,8 @@ clean; read the current diff before editing files that are already modified.
 ## Workspace Boundary
 
 - Lab root: the result of `git rev-parse --show-toplevel`
+- Primary branch: `main`; do not reintroduce `master` in first-party workflows
+  or release commands.
 - Parent/main game: outside this Git worktree; do not modify it implicitly
 - Reference app: `apps/zju-reference/`
 - Core package: `simulator-core/backend/`

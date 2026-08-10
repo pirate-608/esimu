@@ -2,7 +2,7 @@ name: esimu ci
 
 on:
   push:
-    branches: [master, main]
+    branches: [main]
     tags: ["esimu-core-v*"]
   pull_request:
   workflow_dispatch:

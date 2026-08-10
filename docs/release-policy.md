@@ -88,7 +88,7 @@ Create and push the exact matching tag:
 
 ```powershell
 git tag esimu-core-v0.1.0
-git push origin master
+git push origin main
 git push origin esimu-core-v0.1.0
 ```
 
