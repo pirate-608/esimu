@@ -119,6 +119,7 @@ session transport and must never populate shared content pools.
 ## Current Entry Documents
 
 - `README.md`: human-facing project overview and first links.
+- `README.zh-CN.md`: Simplified Chinese counterpart to the root project overview.
 - `docs/quickstart.md`: local setup and validation path.
 - `docs/new-project-bootstrap.md`: start a new simulator or theme from esimu.
 - `docs/agent-handoff.md`: current extraction state and agent operating notes.

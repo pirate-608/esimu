@@ -1,5 +1,7 @@
 # Simulator Framework Lab
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
 `esimu` is an experimental lab for extracting a reusable narrative-simulator
 framework from ZJUers Simulator without disturbing the live ZJU game.
 
