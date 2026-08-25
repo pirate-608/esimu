@@ -3,7 +3,7 @@
 `esimu-core` is the typed, I/O-independent core and project CLI for esimu.
 
 ```powershell
-python -m pip install "esimu-core[ai]==0.2.0b4"
+python -m pip install "esimu-core[ai]==0.2.0b5"
 esimu version
 esimu new D:\projects\my-simulator --theme-id my-simulator
 esimu validate --root D:\projects\my-simulator --theme my-simulator

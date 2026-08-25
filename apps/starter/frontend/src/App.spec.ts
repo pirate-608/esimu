@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App.vue'
 
 const config = {
-  core_version: '0.2.0b4',
+  core_version: '0.2.0b5',
   protocol_version: 1,
   state_version: 1,
   theme: {
