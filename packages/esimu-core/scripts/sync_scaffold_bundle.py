@@ -27,6 +27,20 @@ SKIP_PARTS = {
     "dist",
     ".vite",
 }
+TEXT_SUFFIXES = {
+    ".css",
+    ".example",
+    ".html",
+    ".json",
+    ".md",
+    ".py",
+    ".toml",
+    ".ts",
+    ".txt",
+    ".vue",
+    ".yaml",
+    ".yml",
+}
 ARCHIVE_TIMESTAMP = (2026, 1, 1, 0, 0, 0)
 
 
@@ -54,7 +68,10 @@ def build_bundle() -> bytes:
             info = zipfile.ZipInfo(_archive_name(path), ARCHIVE_TIMESTAMP)
             info.compress_type = zipfile.ZIP_DEFLATED
             info.external_attr = 0o644 << 16
-            archive.writestr(info, path.read_bytes())
+            payload = path.read_bytes()
+            if path.suffix.lower() in TEXT_SUFFIXES:
+                payload = payload.replace(b"\r\n", b"\n")
+            archive.writestr(info, payload)
     return buffer.getvalue()
 
 
