@@ -76,7 +76,8 @@ def test_new_project_generates_valid_standalone_project(tmp_path: Path) -> None:
     generated_theme = (
         target / "apps" / "starter" / "frontend" / "src" / "data" / "theme.generated.ts"
     ).read_text(encoding="utf-8")
-    assert '"theme_id": "star-lab"' in generated_theme
+    assert '"themeId": "star-lab"' in generated_theme
+    assert '"displayName": "Star Lab"' in generated_theme
 
     env = {
         **os.environ,
