@@ -329,5 +329,22 @@ class ItemCatalog:
         return value
 
 
-items = ItemCatalog()
+class _LazyItemCatalog:
+    """Compatibility proxy that loads the active catalog on first use."""
+
+    _instance: ItemCatalog | None = None
+
+    def _get(self) -> ItemCatalog:
+        if self._instance is None:
+            self._instance = ItemCatalog()
+        return self._instance
+
+    def __getattr__(self, name: str):
+        return getattr(self._get(), name)
+
+    def reload(self) -> None:
+        self._instance = ItemCatalog()
+
+
+items = _LazyItemCatalog()
 

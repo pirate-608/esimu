@@ -212,5 +212,22 @@ class GameBalance:
         return self._config.get("game_over", {})
 
 
-balance = GameBalance()
+class _LazyGameBalance:
+    """Compatibility proxy that loads active balance data on first use."""
+
+    _instance: GameBalance | None = None
+
+    def _get(self) -> GameBalance:
+        if self._instance is None:
+            self._instance = GameBalance()
+        return self._instance
+
+    def __getattr__(self, name: str):
+        return getattr(self._get(), name)
+
+    def reload(self) -> None:
+        self._instance = GameBalance()
+
+
+balance = _LazyGameBalance()
 

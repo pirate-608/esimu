@@ -281,5 +281,22 @@ class StatDefinitions:
         return values
 
 
-stat_definitions = StatDefinitions()
+class _LazyStatDefinitions:
+    """Compatibility proxy that loads the active registry on first use."""
+
+    _instance: StatDefinitions | None = None
+
+    def _get(self) -> StatDefinitions:
+        if self._instance is None:
+            self._instance = StatDefinitions()
+        return self._instance
+
+    def __getattr__(self, name: str):
+        return getattr(self._get(), name)
+
+    def reload(self) -> None:
+        self._instance = StatDefinitions()
+
+
+stat_definitions = _LazyStatDefinitions()
 

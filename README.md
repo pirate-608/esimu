@@ -9,7 +9,7 @@ Its Beta shape is:
 esimu-core + generated Starter app + one theme pack
 ```
 
-`esimu-core 0.2.0b2` provides typed world loaders, theme validation, gameplay
+`esimu-core 0.2.0b3` provides typed world loaders, theme validation, gameplay
 rules, runtime payload helpers, optional AI generation, and a self-contained
 project CLI. The generated Starter includes a Vue 3/Pinia console, FastAPI and
 WebSocket adapter, real-time ticks, events, forum and messenger flows, items,
@@ -20,7 +20,7 @@ semester settlement, endings, and SQLite persistence.
 After the Beta is published:
 
 ```powershell
-python -m pip install "esimu-core[ai]==0.2.0b2"
+python -m pip install "esimu-core[ai]==0.2.0b3"
 esimu new D:\projects\my-simulator `
   --project-name "My Simulator" `
   --theme-id my-simulator `

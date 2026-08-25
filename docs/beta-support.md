@@ -1,6 +1,6 @@
 # Beta Support Policy
 
-`esimu-core 0.2.0b2` targets single-theme narrative simulator prototypes.
+`esimu-core 0.2.0b3` targets single-theme narrative simulator prototypes.
 
 Supported in this Beta:
 

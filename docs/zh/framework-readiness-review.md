@@ -1,6 +1,6 @@
 # Beta 就绪审查
 
-esimu `0.2.0b2` 已完成本地 Beta 门槛；TestPyPI 和独立示例仓验证通过后即可
+esimu `0.2.0b3` 已完成本地 Beta 门槛；TestPyPI 和独立示例仓验证通过后即可
 公开发布。
 
 当前已具备强类型 core、版本化主题/状态/协议、自包含 `esimu new`、严格主题

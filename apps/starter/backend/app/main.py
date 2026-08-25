@@ -36,7 +36,7 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     await _session_store.close()
 
 
-app = FastAPI(title="esimu Starter Backend", version="0.2.0b2", lifespan=lifespan)
+app = FastAPI(title="esimu Starter Backend", version="0.2.0b3", lifespan=lifespan)
 
 
 def _cors_origins() -> list[str]:
