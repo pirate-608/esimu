@@ -1,6 +1,6 @@
 # Beta 支持策略
 
-`esimu-core 0.2.0b3` 面向单主题叙事模拟器原型。
+`esimu-core 0.2.0b4` 面向单主题叙事模拟器原型。
 
 本 Beta 支持 Python 3.11–3.13、单部署单主题、版本 1 的主题/状态/WebSocket
 契约、Vue/Pinia Starter、单机 SQLite 持久化，以及带本地降级的可选

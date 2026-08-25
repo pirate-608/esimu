@@ -13,7 +13,7 @@ This lab follows a lightweight Semantic Versioning policy for `esimu-core`:
 ## Unreleased
 
 - Formalized esimu as an independent Beta framework and bumped `esimu-core` to
-  `0.2.0b3` with version-one theme, state, and WebSocket contracts.
+  `0.2.0b4` with version-one theme, state, and WebSocket contracts.
 - Replaced the source-dependent generator with wheel-packaged `esimu new`,
   retained `esimu validate`, and added artifact-to-consumer release coverage.
 - Upgraded the canonical Starter to a Vue 3/Pinia game console, real-time tick

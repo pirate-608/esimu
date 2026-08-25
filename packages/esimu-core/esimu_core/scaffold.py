@@ -230,6 +230,14 @@ def _patch_starter_files(target: Path, theme_id: str, core_dependency: str) -> N
     )
     bootstrap_path.write_text(bootstrap, encoding="utf-8")
 
+    backend_tests = (
+        target / "apps" / "starter" / "backend" / "tests" / "test_starter_smoke.py"
+    )
+    test_text = backend_tests.read_text(encoding="utf-8")
+    backend_tests.write_text(
+        test_text.replace('"demo-campus"', f'"{theme_id}"'),
+        encoding="utf-8",
+    )
     requirements = target / "apps" / "starter" / "backend" / "requirements.txt"
     lines = requirements.read_text(encoding="utf-8").splitlines()
     updated = [core_dependency if line.startswith("-e ") else line for line in lines]
@@ -267,7 +275,7 @@ This simulator was generated from esimu's starter app.
 ## Quick Start
 
 ```powershell
-cd {target}
+cd <project-directory>
 python -m venv .venv
 .\\.venv\\Scripts\\Activate.ps1
 python -m pip install -r apps\\starter\\backend\\requirements.txt
@@ -279,7 +287,7 @@ python -m uvicorn app.main:app --reload --port 18001
 Frontend (in a second terminal):
 
 ```powershell
-cd {target}\\apps\\starter\\frontend
+cd <project-directory>\\apps\\starter\\frontend
 corepack pnpm install --frozen-lockfile
 corepack pnpm dev
 ```
@@ -360,7 +368,7 @@ Use this checklist before turning `{args.project_name}` into a real game.
 ## Useful esimu Commands
 
 ```powershell
-cd {target}
+cd <project-directory>
 esimu validate --root . --theme {args.theme_id}
 python scripts\\scaffold_game_stat.py add focus --label 专注 --show-in-hud
 python scripts\\scaffold_world_data.py item focus_card --name 专注卡
@@ -377,14 +385,14 @@ def _write_agent_file(target: Path, args: argparse.Namespace) -> None:
     )
     replacements = {
         "<project-name>": args.project_name,
-        "<absolute-project-root>": str(target),
+        "<absolute-project-root>": ".",
         "<theme-id>": args.theme_id,
         "<backend-path>": "apps/starter/backend",
         "<frontend-path>": "apps/starter/frontend",
         "<theme-path>": f"themes/{args.theme_id}",
         "<python>": "python",
         "<validate-world-data-script>": (
-            f"-m esimu_core.cli --root {target} --theme {args.theme_id}"
+            f"-m esimu_core.cli --root . --theme {args.theme_id}"
         ),
         "<backend-tests-path>": "apps/starter/backend/tests",
         "<backend-app-path>": "apps/starter/backend/app",
