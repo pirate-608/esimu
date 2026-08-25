@@ -72,6 +72,3 @@ class ThemePrompts:
             self.load(self._config_path)
         assert self._config is not None
         return self._config
-
-
-theme_prompts = ThemePrompts()

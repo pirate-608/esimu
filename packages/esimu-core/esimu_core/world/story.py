@@ -146,7 +146,3 @@ class ThemeStory:
     def public_metadata(self) -> dict[str, Any]:
         """Return metadata for frontend generation."""
         return self.config.public_metadata()
-
-
-theme_story = ThemeStory()
-

@@ -8,7 +8,7 @@ esimu 是面向校园、职业和人生叙事模拟器的主题驱动框架。Be
 esimu-core + 生成的 Starter 应用 + 单一主题包
 ```
 
-`esimu-core 0.2.0b1` 提供强类型世界数据加载、主题校验、游戏规则、运行时
+`esimu-core 0.2.0b2` 提供强类型世界数据加载、主题校验、游戏规则、运行时
 payload、可选 AI 生成和自包含项目 CLI。生成的 Starter 包含 Vue 3/Pinia
 控制台、FastAPI/WebSocket、实时 Tick、事件、论坛、私聊、道具、学期结算、
 结局和 SQLite 持久化。
@@ -18,7 +18,7 @@ payload、可选 AI 生成和自包含项目 CLI。生成的 Starter 包含 Vue 
 Beta 发布后执行：
 
 ```powershell
-python -m pip install "esimu-core[ai]==0.2.0b1"
+python -m pip install "esimu-core[ai]==0.2.0b2"
 esimu new D:\projects\my-simulator `
   --project-name "My Simulator" `
   --theme-id my-simulator `

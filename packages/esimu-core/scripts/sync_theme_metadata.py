@@ -11,7 +11,7 @@ BACKEND_ROOT = Path(__file__).resolve().parents[1]
 if str(BACKEND_ROOT) not in sys.path:
     sys.path.insert(0, str(BACKEND_ROOT))
 
-from esimu_core.world.theme import theme_manifest  # noqa: E402
+from esimu_core.world.theme import ThemeManifest  # noqa: E402
 from esimu_core.world.theme_paths import frontend_theme_metadata_output, project_root  # noqa: E402
 
 PROJECT_ROOT = project_root()
@@ -21,7 +21,7 @@ OUTPUT_PATH = frontend_theme_metadata_output()
 def build_typescript() -> str:
     """Render the generated TypeScript theme metadata module."""
     metadata_json = json.dumps(
-        theme_manifest.public_metadata(),
+        ThemeManifest().public_metadata(),
         ensure_ascii=False,
         indent=2,
     )

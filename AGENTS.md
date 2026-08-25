@@ -11,7 +11,7 @@ dependencies. The historical extraction is preserved by `esimu-lab-final`.
 ## Current Beta State
 
 - Package: `packages/esimu-core`, distribution `esimu-core`, import
-  `esimu_core`, current version `0.2.0b1`.
+  `esimu_core`, current version `0.2.0b2`.
 - Starter: `apps/starter`, FastAPI/WebSocket backend plus Vue 3/Pinia frontend.
 - Default theme: `themes/demo-campus`.
 - Persistence: SQLite by default, memory for tests, JSON file as a temporary
@@ -79,7 +79,7 @@ both demo semesters without an esimu source checkout.
 - TestPyPI uses `.github/workflows/release-candidate.yml`.
 - PyPI and GitHub prerelease use `.github/workflows/release.yml` with trusted
   publishing; never add a long-lived PyPI token.
-- Run the external `esimu-beta-example` trial before publishing `0.2.0b1`.
+- Run the external `esimu-beta-example` trial before publishing `0.2.0b2`.
 
 Preserve unrelated dirty files. Do not reset or delete work that you did not
 create. Update this file and relevant bilingual docs when contracts, layout,

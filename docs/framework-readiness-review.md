@@ -1,6 +1,6 @@
 # Beta Readiness Review
 
-esimu `0.2.0b1` is ready for public Beta validation when its TestPyPI and
+esimu `0.2.0b2` is ready for public Beta validation when its TestPyPI and
 external-example gates pass.
 
 Ready locally: typed core, versioned theme/state/protocol contracts, wheel-owned
