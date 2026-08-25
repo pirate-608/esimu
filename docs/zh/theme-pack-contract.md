@@ -28,10 +28,10 @@ themes/<theme_id>/
 
 ## 校验入口
 
-从 `simulator-core/backend/` 运行：
+从 `packages/esimu-core/` 运行：
 
 ```powershell
-$env:SIMULATOR_THEME='<theme_id>'
+$env:ESIMU_THEME='<theme_id>'
 python scripts\validate_world_data.py
 ```
 

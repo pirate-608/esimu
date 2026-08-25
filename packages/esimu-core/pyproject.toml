@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "esimu-core"
+description = "Theme-driven core and project tooling for the esimu simulator framework."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [
+    { name = "pirate-608" },
+]
+keywords = ["simulation", "game", "framework", "theme-pack"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Typing :: Typed",
+]
+dependencies = [
+    "pydantic>=2",
+]
+dynamic = ["version"]
+
+[project.scripts]
+esimu = "esimu_core.cli:main"
+esimu-validate-world = "esimu_core.cli:validate_world"
+
+[project.optional-dependencies]
+ai = [
+    "openai>=1.12",
+]
+dev = [
+    "fastapi>=0.115",
+    "httpx>=0.27",
+    "pytest>=8",
+    "pytest-asyncio>=0.23",
+    "ruff==0.16.2",
+]
+
+[project.urls]
+Homepage = "https://esimu.67656.fun/"
+Documentation = "https://esimu.67656.fun/"
+Repository = "https://github.com/pirate-608/esimu"
+Issues = "https://github.com/pirate-608/esimu/issues"
+
+[tool.setuptools.packages.find]
+include = ["esimu_core*"]
+
+[tool.setuptools.package-data]
+esimu_core = ["py.typed", "scaffold/*.zip"]
+
+[tool.setuptools.dynamic]
+version = { attr = "esimu_core.__version__" }
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]

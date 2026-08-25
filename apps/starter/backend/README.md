@@ -1,13 +1,12 @@
 # esimu Starter Backend
 
-This is the first minimal non-ZJU backend adapter. It is intentionally small:
-state is kept in memory by default, the default theme is `demo-campus`, and all
-reusable game rules come from `esimu-core`.
+This is the Beta FastAPI/WebSocket adapter. SQLite is the default persistence,
+`demo-campus` is the default theme, and reusable rules come from `esimu-core`.
 
 Run locally:
 
 ```powershell
-cd esimu-lab\apps\starter\backend
+cd esimu\apps\starter\backend
 python -m uvicorn app.main:app --reload --port 18001
 ```
 
@@ -17,10 +16,8 @@ Smoke checks:
 python -m pytest tests
 ```
 
-The starter is not a production persistence model. It exists to show what a new
-project can copy before deciding whether to add Redis, PostgreSQL, admin pages,
-or mandatory model calls. The optional framework AI adapter is available but
-defaults to local `library` mode.
+SQLite targets single-node Beta deployments. Distributed persistence,
+production identity, and mandatory model calls remain downstream concerns.
 
 Optional file-backed development sessions:
 

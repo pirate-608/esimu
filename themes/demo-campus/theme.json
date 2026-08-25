@@ -1,4 +1,5 @@
 {
+  "schema_version": 1,
   "theme_id": "demo-campus",
   "display_name": "Demo Campus Simulator",
   "locale": "zh-CN",
@@ -15,11 +16,15 @@
     "semester": "学期",
     "course": "课程",
     "item": "道具",
+    "action_gym": "锻炼",
+    "action_game": "放松娱乐",
+    "action_walk": "校园散步",
+    "action_forum_browse": "浏览论坛",
     "rules": "星桥手册",
     "notice": "星桥学院入学须知"
   },
   "storage": {
-    "prefix": "simlab_demo"
+    "prefix": "esimu_demo"
   },
   "assets": {
     "hero": "assets/hero.webp",

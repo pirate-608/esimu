@@ -1,0 +1,97 @@
+import { onBeforeUnmount, ref } from 'vue'
+
+import { useGameStore } from '../stores/game'
+
+const wsBase = (
+  import.meta.env.VITE_ESIMU_WS_BASE
+  ?? `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}`
+).replace(/\/$/, '')
+
+export function useGameSocket() {
+  const store = useGameStore()
+  const socket = ref<WebSocket | null>(null)
+
+  function connect(): void {
+    socket.value?.close()
+    const ws = new WebSocket(`${wsBase}/ws`)
+    socket.value = ws
+    ws.addEventListener('open', () => {
+      ws.send(JSON.stringify({
+        token: store.token,
+        protocol_version: store.config?.protocol_version ?? 1,
+      }))
+    })
+    ws.addEventListener('close', () => {
+      store.connected = false
+    })
+    ws.addEventListener('error', () => {
+      store.error = '无法连接 Starter 后端，请检查服务是否已启动。'
+    })
+    ws.addEventListener('message', (event) => {
+      const message = JSON.parse(String(event.data)) as Record<string, any>
+      const type = String(message.type ?? '')
+      if (type === 'auth_ok') {
+        store.connected = true
+      } else if (type === 'init' || type === 'tick') {
+        store.applyRuntime(message)
+        store.phase = message.ended ? 'ending' : 'playing'
+      } else if (type === 'event') {
+        store.event = message.data
+      } else if (type === 'feedback') {
+        store.feedback = message.data
+        store.addLog(String(message.data?.desc ?? '行动已结算'))
+        if (message.data?.tick) store.applyRuntime(message.data.tick)
+      } else if (type === 'forum_post') {
+        store.activeTab = 'forum'
+        store.addLog(String(message.data?.content ?? '论坛出现了新动态'))
+      } else if (type === 'messenger_round') {
+        const contact = message.data?.contact
+        if (contact?.contact_id) {
+          const contacts = { ...((store.messenger.contacts as Record<string, unknown>) ?? {}) }
+          contacts[contact.contact_id] = {
+            ...contact,
+            messages: [{ speaker: 'npc', content: message.data.content }],
+            pending_options: message.data.reply_options ?? [],
+          }
+          store.messenger = { contacts }
+        }
+        store.activeTab = 'messenger'
+      } else if (type === 'messenger_reply') {
+        const contacts = { ...((message.data?.state?.contacts as Record<string, unknown>) ?? {}) }
+        store.messenger = { contacts }
+      } else if (type === 'items_state') {
+        store.itemsState = message.data
+        store.addLog('道具状态已更新')
+      } else if (type === 'semester_summary') {
+        store.transcript = message.data
+        store.examCompleted = true
+      } else if (type === 'new_semester') {
+        if (message.data?.tick) store.applyRuntime(message.data.tick)
+        if (message.data?.ended) store.phase = 'ending'
+        store.transcript = null
+      } else if (type === 'ending') {
+        store.ending = message.data
+        store.phase = 'ending'
+      } else if (type === 'toast' || type === 'error') {
+        store.error = String(message.message ?? '请求失败')
+      }
+    })
+  }
+
+  function send(action: string, data: Record<string, unknown> = {}): void {
+    if (!socket.value || socket.value.readyState !== WebSocket.OPEN) {
+      store.error = '连接尚未就绪。'
+      return
+    }
+    socket.value.send(JSON.stringify({ action, ...data }))
+  }
+
+  function disconnect(): void {
+    socket.value?.close(1000, 'client_disconnect')
+    socket.value = null
+    store.connected = false
+  }
+
+  onBeforeUnmount(disconnect)
+  return { connect, send, disconnect }
+}

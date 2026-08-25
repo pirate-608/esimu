@@ -1,12 +1,12 @@
 # 创建新项目
 
-这份清单用于生成一个离开 esimu-lab 后仍可独立安装运行的模拟器。生成器只复制
+这份清单用于生成一个离开 esimu 后仍可独立安装运行的模拟器。生成器只复制
 小型 Starter 和一个主题，不复制 ZJU reference 产品代码。
 
 ## 生成项目
 
 ```powershell
-cd simulator-core\backend
+cd packages\esimu-core
 python scripts\new_project.py D:\projects\my-simulator `
   --project-name "My Simulator" `
   --theme-id my-simulator `
@@ -44,7 +44,7 @@ python -m pip install -r apps\starter\backend\requirements.txt
 esimu-validate-world --root . --theme my-simulator
 ```
 
-校验命令来自已安装的 `esimu-core`，读取当前项目自己的 `themes/`，不再需要回到 esimu-lab 查找脚本。
+校验命令来自已安装的 `esimu-core`，读取当前项目自己的 `themes/`，不再需要回到 esimu 查找脚本。
 
 ## 运行 Starter
 
@@ -81,8 +81,8 @@ themes/my-simulator/assets/
 
 ```powershell
 cd D:\projects\my-simulator
-$env:SIMULATOR_LAB_ROOT=(Get-Location).Path
-$env:SIMULATOR_THEME='my-simulator'
+$env:ESIMU_PROJECT_ROOT=(Get-Location).Path
+$env:ESIMU_THEME='my-simulator'
 python scripts\scaffold_game_stat.py add focus --label 专注 --show-in-hud
 python scripts\scaffold_world_data.py item focus_card --name 专注卡
 python scripts\scaffold_world_data.py achievement first_win --name 第一次胜利

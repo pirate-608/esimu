@@ -32,7 +32,11 @@ from esimu_core.domain.semester import (  # noqa: E402
     settle_course_exam,
     settle_semester_exam,
 )
-from esimu_core.lifecycle import build_initial_character_state  # noqa: E402
+from esimu_core import PROTOCOL_VERSION, STATE_VERSION, __version__  # noqa: E402
+from esimu_core.lifecycle import (  # noqa: E402
+    build_initial_character_state,
+    build_semester_reset_state,
+)
 from esimu_core.runtime.snapshot import (  # noqa: E402
     RuntimePayloadDefaults,
     build_init_payload_from_snapshot,
@@ -66,6 +70,10 @@ class StarterGameSession:
     messenger_state: dict[str, Any] = field(default_factory=lambda: {"contacts": {}})
     last_event: dict[str, Any] | None = None
     ended: bool = False
+    state_version: int = STATE_VERSION
+    is_running: bool = False
+    speed_multiplier: float = 1.0
+    exam_completed: bool = False
 
     def __post_init__(self) -> None:
         self.catalog = WorldCatalog(self.theme_id)
@@ -84,9 +92,14 @@ class StarterGameSession:
     def config_payload(self) -> dict[str, Any]:
         """Return public starter config for the minimal frontend."""
         return {
+            "core_version": __version__,
+            "protocol_version": PROTOCOL_VERSION,
+            "state_version": STATE_VERSION,
             "theme": self.theme.public_metadata(),
             "story": self.story.public_metadata(),
             "stats": self.stats_registry.public_metadata(),
+            "items": self.items.public_catalog(),
+            "relax_actions": sorted(self.balance.relax_actions),
         }
 
     def majors_payload(self) -> list[dict[str, Any]]:
@@ -132,6 +145,9 @@ class StarterGameSession:
         self.messenger_state = {"contacts": {}}
         self.last_event = None
         self.ended = False
+        self.is_running = True
+        self.speed_multiplier = 1.0
+        self.exam_completed = False
         return state.summary
 
     def export_state(self) -> dict[str, Any]:
@@ -146,6 +162,10 @@ class StarterGameSession:
             "messenger_state": self.messenger_state,
             "last_event": self.last_event,
             "ended": self.ended,
+            "state_version": self.state_version,
+            "is_running": self.is_running,
+            "speed_multiplier": self.speed_multiplier,
+            "exam_completed": self.exam_completed,
         }
 
     @classmethod
@@ -173,6 +193,10 @@ class StarterGameSession:
             dict(last_event) if isinstance(last_event, Mapping) else None
         )
         session.ended = bool(state.get("ended", False))
+        session.state_version = int(state.get("state_version", STATE_VERSION))
+        session.is_running = bool(state.get("is_running", False))
+        session.speed_multiplier = float(state.get("speed_multiplier", 1.0))
+        session.exam_completed = bool(state.get("exam_completed", False))
         return session
 
     def snapshot(self) -> RuntimeSnapshot:
@@ -193,15 +217,170 @@ class StarterGameSession:
 
     def init_payload(self) -> dict[str, Any]:
         """Return the adapter's initial game payload."""
-        return build_init_payload_from_snapshot(
+        payload = build_init_payload_from_snapshot(
             self.snapshot(), self._payload_defaults()
         )
+        payload["messenger_state"] = payload.pop("dingtalk_state", {})
+        payload.update(
+            {
+                "protocol_version": PROTOCOL_VERSION,
+                "state_version": STATE_VERSION,
+                "is_running": self.is_running,
+                "speed_multiplier": self.speed_multiplier,
+                "exam_completed": self.exam_completed,
+                "ended": self.ended,
+            }
+        )
+        return payload
 
     def tick_payload(self) -> dict[str, Any]:
         """Return a current tick payload without advancing time."""
-        return build_tick_payload_from_snapshot(
+        payload = build_tick_payload_from_snapshot(
             self.snapshot(), self._payload_defaults()
         )
+        payload.update(
+            {
+                "protocol_version": PROTOCOL_VERSION,
+                "is_running": self.is_running,
+                "speed_multiplier": self.speed_multiplier,
+                "exam_completed": self.exam_completed,
+                "ended": self.ended,
+            }
+        )
+        return payload
+
+    def advance_tick(self) -> dict[str, Any]:
+        """Advance one virtual tick while the session is running."""
+        self._ensure_initialized()
+        if not self.is_running or self.exam_completed or self.ended:
+            return self.tick_payload()
+        tick_config = self.balance.raw.get("tick") or {}
+        course_config = self.balance.raw.get("course") or {}
+        interval = max(1, int(tick_config.get("interval_seconds", 3)))
+        self.stats["elapsed_game_time"] = int(
+            self.stats.get("elapsed_game_time", 0)
+        ) + interval
+        base_gain = float(course_config.get("base_mastery_gain", 0.8))
+        for course_id, state in self.course_states.items():
+            if int(state) <= 0:
+                continue
+            multiplier = 1.0 if int(state) == 1 else 1.5
+            self.courses[course_id] = min(
+                120.0,
+                float(self.courses.get(course_id, 0)) + base_gain * multiplier,
+            )
+        if int(self.stats["elapsed_game_time"]) >= self._semester_duration():
+            self.stats["elapsed_game_time"] = self._semester_duration()
+            self.is_running = False
+        return self.tick_payload()
+
+    def pause(self) -> dict[str, Any]:
+        """Pause gameplay mutation and ticking."""
+        self.is_running = False
+        return self.tick_payload()
+
+    def resume(self) -> dict[str, Any]:
+        """Resume ticking unless the term already requires settlement."""
+        if not self.exam_completed and not self.ended:
+            self.is_running = True
+        return self.tick_payload()
+
+    def set_speed(self, speed: object) -> dict[str, Any]:
+        """Set one of the Starter-supported speed multipliers."""
+        parsed = float(speed)
+        if parsed not in {1.0, 1.5, 2.0}:
+            raise ValueError("speed must be 1, 1.5, or 2")
+        self.speed_multiplier = parsed
+        return self.tick_payload()
+
+    def change_course_state(self, course_id: str, state: object) -> dict[str, Any]:
+        """Update one course strategy while gameplay is running."""
+        if not self.is_running:
+            raise ValueError("game is paused")
+        if course_id not in self.course_states:
+            raise ValueError(f"unknown course: {course_id}")
+        parsed = int(state)
+        if parsed not in {0, 1, 2}:
+            raise ValueError("course state must be 0, 1, or 2")
+        self.course_states[course_id] = parsed
+        return self.tick_payload()
+
+    def next_semester(self) -> dict[str, Any]:
+        """Advance to the next configured term after an exam."""
+        if not self.exam_completed:
+            raise ValueError("finish the exam before starting the next semester")
+        next_index = int(self.stats.get("semester_idx", 1)) + 1
+        major = str(self.stats.get("major_abbr") or "")
+        courses = self.catalog.courses_for_semester(major, next_index)
+        if not courses:
+            self.ended = True
+            self.is_running = False
+            return {"ended": True, "tick": self.tick_payload()}
+        reset = build_semester_reset_state(
+            semester_idx=next_index,
+            courses=courses,
+            current_energy=self.stats.get("energy", 100),
+            energy_default=self.stats_registry.by_id["energy"].default,
+            energy_minimum=self.stats_registry.by_id["energy"].min,
+        )
+        self.stats.update(reset.stats_update)
+        self.stats["semester_idx"] = next_index
+        self.courses = {
+            course_id: float(value)
+            for course_id, value in reset.courses_mastery.items()
+        }
+        self.course_states = dict(reset.course_states)
+        self.exam_completed = False
+        self.is_running = True
+        return {
+            "ended": False,
+            "summary": reset.summary,
+            "tick": self.tick_payload(),
+        }
+
+    def restart(self) -> dict[str, Any]:
+        """Reset the current local player to a fresh first term."""
+        major = str(self.stats.get("initial_major_abbr") or "") or None
+        self.initialize(major=major, username=self.username)
+        return self.init_payload()
+
+    def messenger_reply(
+        self,
+        contact_id: str,
+        option_id: str | None = None,
+        content: str | None = None,
+    ) -> dict[str, Any]:
+        """Append one player reply and an immediate deterministic NPC response."""
+        contacts = self.messenger_state.get("contacts") or {}
+        contact = contacts.get(contact_id)
+        if not isinstance(contact, dict):
+            raise ValueError(f"unknown messenger contact: {contact_id}")
+        options = list(contact.get("pending_options") or [])
+        selected = next(
+            (
+                option
+                for option in options
+                if str(option.get("id") or "") == str(option_id or "")
+            ),
+            options[0] if options else {"text": content or "收到"},
+        )
+        player_text = str(content or selected.get("text") or "收到")
+        messages = contact.setdefault("messages", [])
+        messages.append({"speaker": "player", "content": player_text})
+        npc_text = f"我知道了。关于“{player_text}”，我们之后再聊。"
+        messages.append({"speaker": "npc", "content": npc_text})
+        contact["pending_options"] = [
+            {"id": "continue", "text": "继续聊聊"},
+            {"id": "later", "text": "稍后再说"},
+        ]
+        contact["rounds"] = int(contact.get("rounds", 0)) + 1
+        return {
+            "contact_id": contact_id,
+            "player_message": player_text,
+            "npc_message": npc_text,
+            "reply_options": contact["pending_options"],
+            "state": self.messenger_state,
+        }
 
     def relax(self, action: str = "walk") -> dict[str, Any]:
         """Apply one configured relax action deterministically."""
@@ -224,7 +403,7 @@ class StarterGameSession:
             if result.change:
                 changes.append(result.change.as_dict())
 
-        if action == "cc98":
+        if action == "forum_browse":
             effect = (config.get("effects") or [{}])[0]
             if isinstance(effect, Mapping):
                 for field_name, delta in effect.items():
@@ -325,6 +504,7 @@ class StarterGameSession:
             **contact,
             "messages": [{"speaker": "npc", "content": payload.content}],
             "pending_options": [option.as_dict() for option in payload.reply_options],
+            "rounds": 0,
         }
         return {
             "contact": contact,
@@ -399,12 +579,19 @@ class StarterGameSession:
                 "gpa_credits_total": summary.gpa_credits_total,
             }
         )
-        self.ended = True
+        self.exam_completed = True
+        self.is_running = False
+        next_index = int(self.stats.get("semester_idx", 1)) + 1
+        major = str(self.stats.get("major_abbr") or "")
+        self.ended = not bool(
+            self.catalog.courses_for_semester(major, next_index)
+        )
         return {
             "term_gpa": summary.term_gpa,
             "cgpa": summary.cgpa,
             "failed_count": summary.failed_count,
             "courses": [course.__dict__ for course in summary.courses],
+            "ended": self.ended,
         }
 
     def _ensure_initialized(self) -> None:

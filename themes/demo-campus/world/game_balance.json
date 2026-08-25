@@ -47,7 +47,7 @@
       "cooldown": 16,
       "stress_change": -8
     },
-    "cc98": {
+    "forum_browse": {
       "cooldown": 20,
       "effects": [
         { "weight": 0.5, "sanity": 6, "stress": -4 },
@@ -61,7 +61,7 @@
       "check_interval_ticks": 12,
       "trigger_probability": 0.2
     },
-    "dingtalk": {
+    "messenger": {
       "check_interval_ticks": 10,
       "trigger_probability": 0.2,
       "max_contacts": 8,

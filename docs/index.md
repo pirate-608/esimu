@@ -28,8 +28,8 @@ hide:
 <h2>Current Verdict</h2>
 
 <p>
-  esimu is a <strong>basically complete alpha framework for single-theme
-  simulator prototypes</strong>.
+  esimu is a <strong>public Beta framework for single-theme narrative
+  simulators</strong>.
 </p>
 
 <p>The recommended shape is:</p>
@@ -74,15 +74,15 @@ hide:
 <p>Generate a new project:</p>
 
 <pre><code class="language-powershell">
-cd esimu-lab\simulator-core\backend
+cd esimu\packages\esimu-core
 python scripts\new_project.py <target-project> --project-name "My Simulator" --theme-id my-simulator
 </code></pre>
 
 <p>Validate its theme:</p>
 
 <pre><code class="language-powershell">
-$env:SIMULATOR_LAB_ROOT='<target-project>'
-$env:SIMULATOR_THEME='my-simulator'
+$env:ESIMU_PROJECT_ROOT='<target-project>'
+$env:ESIMU_THEME='my-simulator'
 python scripts\validate_world_data.py
 </code></pre>
 
@@ -100,7 +100,7 @@ themes/<theme_id>/
   prompts.json        # model-facing context
   world/              # stats, balance, items, courses, events, achievements
 
-simulator-core/backend/esimu_core/
+packages/esimu-core/esimu_core/
   world/              # loaders and validators
   domain/             # pure gameplay rules
   runtime/            # tick/snapshot/action/task helpers

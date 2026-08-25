@@ -1,5 +1,6 @@
--e simulator-core/backend[dev]
+-e packages/esimu-core[dev]
 -r docs/requirements.txt
+aiosqlite>=0.20
 fastapi>=0.115
 uvicorn[standard]>=0.30
 pydantic>=2

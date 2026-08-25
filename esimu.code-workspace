@@ -1,0 +1,14 @@
+{
+  "folders": [
+    { "name": "esimu", "path": "." },
+    { "name": "esimu-core", "path": "packages/esimu-core" },
+    { "name": "starter", "path": "apps/starter" }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/.venv": true,
+      "**/__pycache__": true
+    }
+  }
+}

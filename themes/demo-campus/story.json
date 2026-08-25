@@ -23,10 +23,10 @@
       ]
     ],
     "scenes": [
-      { "from_line": 0, "image": "zjg_night.jpeg", "tone": "night" },
-      { "from_line": 2, "image": "zjg_autumn.jpg", "tone": "morning" },
-      { "from_line": 5, "image": "qizhen_lake.jpg", "tone": "lake" },
-      { "from_line": 8, "image": "qiushimen.webp", "tone": "threshold" }
+      { "from_line": 0, "image": "campus_night.jpeg", "tone": "night" },
+      { "from_line": 2, "image": "campus_autumn.jpg", "tone": "morning" },
+      { "from_line": 5, "image": "campus_lake.jpg", "tone": "lake" },
+      { "from_line": 8, "image": "campus_gate.webp", "tone": "threshold" }
     ]
   },
   "endings": {
@@ -44,11 +44,11 @@
     "graduation_summary_label": "校史记录",
     "graduation_fallback_summary": "此行四年，虽有跌撞，却也认真走过。愿你带着这份答案，去往更远的明天。",
     "graduation_background_images": [
-      "qiushimen.webp",
-      "zjg_night.jpeg",
-      "zjg_autumn.jpg",
-      "qizhen_lake.jpg",
-      "sunset.webp"
+      "campus_gate.webp",
+      "campus_night.jpeg",
+      "campus_autumn.jpg",
+      "campus_lake.jpg",
+      "campus_sunset.webp"
     ]
   }
 }

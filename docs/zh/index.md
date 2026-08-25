@@ -28,7 +28,7 @@ hide:
 <h2>当前结论</h2>
 
 <p>
-  esimu 已经可以作为<strong>基本完整的 alpha 框架</strong>，用于创建单主题模拟器原型。
+  esimu 是面向单主题叙事模拟器的<strong>公开 Beta 框架</strong>。
 </p>
 
 <p>推荐形态是：</p>
@@ -72,15 +72,15 @@ hide:
 <p>生成一个新项目：</p>
 
 <pre><code class="language-powershell">
-cd esimu-lab\simulator-core\backend
+cd esimu\packages\esimu-core
 python scripts\new_project.py <target-project> --project-name "My Simulator" --theme-id my-simulator
 </code></pre>
 
 <p>验证生成的主题：</p>
 
 <pre><code class="language-powershell">
-$env:SIMULATOR_LAB_ROOT='<target-project>'
-$env:SIMULATOR_THEME='my-simulator'
+$env:ESIMU_PROJECT_ROOT='<target-project>'
+$env:ESIMU_THEME='my-simulator'
 python scripts\validate_world_data.py
 </code></pre>
 
@@ -98,7 +98,7 @@ themes/&lt;theme_id&gt;/
   prompts.json        # 面向模型的上下文
   world/              # 属性、平衡、道具、课程、事件、成就
 
-simulator-core/backend/esimu_core/
+packages/esimu-core/esimu_core/
   world/              # 加载器与校验器
   domain/             # 纯游戏规则
   runtime/            # tick、快照、action、后台任务辅助

@@ -12,6 +12,16 @@ This lab follows a lightweight Semantic Versioning policy for `esimu-core`:
 
 ## Unreleased
 
+- Formalized esimu as an independent Beta framework and bumped `esimu-core` to
+  `0.2.0b1` with version-one theme, state, and WebSocket contracts.
+- Replaced the source-dependent generator with wheel-packaged `esimu new`,
+  retained `esimu validate`, and added artifact-to-consumer release coverage.
+- Upgraded the canonical Starter to a Vue 3/Pinia game console, real-time tick
+  loop, neutral forum/messenger actions, and asynchronous SQLite persistence.
+- Archived and removed the copied ZJU reference application and theme from the
+  formal branch; the final extraction baseline remains tagged `esimu-lab-final`.
+- Added MIT licensing, security/contribution policies, TestPyPI/PyPI trusted
+  publishing workflows, and public Beta support documentation.
 - Renamed the primary branch from `master` to `main` and aligned first-party
   CI, documentation deployment, release instructions, and agent handoff notes.
 - Fixed clean-runner CI by declaring the FastAPI TestClient dependencies used

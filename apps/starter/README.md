@@ -1,16 +1,14 @@
 # esimu Starter App
 
-`apps/starter/` is the first minimal non-ZJU app shape. It exists to prove that
-a new simulator can start from `esimu-core` and a theme pack without importing
-or editing `apps/zju-reference/`.
+`apps/starter/` is the canonical Beta application built from `esimu-core` and
+a theme pack, without product-specific dependencies.
 
 Current scope:
 
-- `backend/`: FastAPI adapter with in-memory session state.
-- `frontend/`: tiny Vite/TypeScript skin that consumes generated theme, story,
-  and stat metadata.
+- `backend/`: FastAPI/WebSocket adapter with SQLite persistence by default.
+- `frontend/`: Vue 3/Pinia console driven by generated theme, story, and stat metadata.
 - Default theme: `demo-campus`.
-- Optional local file sessions through `ESIMU_STARTER_SESSION_STORE=file`.
+- Memory sessions for tests and temporary file compatibility for the 0.2 Beta.
 
 The starter deliberately omits Redis, PostgreSQL, SQLAdmin, and production
 Docker. It includes the optional `esimu_core.ai` adapter but stays in local

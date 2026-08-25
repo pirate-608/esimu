@@ -12,8 +12,8 @@ Use `new-project-bootstrap.md` for the step-by-step workflow, and use
 The canonical validation command is:
 
 ```powershell
-cd esimu-lab\simulator-core\backend
-$env:SIMULATOR_THEME='<theme_id>'
+cd esimu\packages\esimu-core
+$env:ESIMU_THEME='<theme_id>'
 python scripts\validate_world_data.py
 ```
 

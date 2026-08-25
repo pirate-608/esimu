@@ -1,18 +1,18 @@
 # Release Policy
 
-`esimu-core` is alpha software. It is suitable for single-theme simulator
-prototypes, but not yet a stable public framework.
+`esimu-core` is Beta software for single-theme simulator projects. Its
+version-one contracts are public, but the framework is not yet stable 1.0.
 
 ## Version And Tag Contract
 
 - Distribution name: `esimu-core`
 - Import namespace: `esimu_core`
-- Version source: `simulator-core/backend/esimu_core/__init__.py`
+- Version source: `packages/esimu-core/esimu_core/__init__.py`
 - Tag format: `esimu-core-v<version>`
 
 The generator pins downstream projects to that exact Git tag. Therefore a
 version is not externally installable until the matching tag exists on
-`pirate-608/esimu-lab` and contains the Starter/core changes being documented.
+`pirate-608/esimu` and contains the Starter/core changes being documented.
 Do not claim a Git-tag release before both branch and tag have been pushed.
 
 The current policy uses Git tags, not PyPI. Reconsider PyPI after a real external
@@ -37,13 +37,13 @@ From a clean checkout and local venv:
 
 ```powershell
 python -m pip install -r requirements-dev.txt
-cd simulator-core\backend
+cd packages\esimu-core
 python -m pytest tests
 python -m ruff check esimu_core scripts tests
 python scripts\validate_world_data.py
-$env:SIMULATOR_THEME='demo-campus'
+$env:ESIMU_THEME='demo-campus'
 python scripts\validate_world_data.py
-Remove-Item Env:SIMULATOR_THEME
+Remove-Item Env:ESIMU_THEME
 ```
 
 Starter backend and frontend:
@@ -61,8 +61,8 @@ corepack pnpm build
 Artifact-to-consumer smoke:
 
 ```powershell
-cd esimu-lab
-python simulator-core\backend\scripts\release_smoke.py
+cd esimu
+python packages\esimu-core\scripts\release_smoke.py
 zensical build
 ```
 
@@ -96,7 +96,7 @@ Tag-triggered CI rejects a tag whose name differs from
 `esimu-core-v<esimu_core.__version__>`. After it passes, generate a project with
 the default dependency and verify `pip install -r
 apps/starter/backend/requirements.txt` from a machine or clean directory that
-does not contain esimu-lab.
+does not contain esimu.
 
 If ZJUers Simulator references this repository as a submodule, update the parent
 pointer only after the independent release is complete.

@@ -1,0 +1,57 @@
+name: release esimu-core
+
+on:
+  push:
+    tags: ["esimu-core-v*"]
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install build tools
+        run: python -m pip install --upgrade pip build twine
+      - name: Verify bundle, tag, distributions, and generated consumer
+        run: |
+          python packages/esimu-core/scripts/sync_scaffold_bundle.py
+          python packages/esimu-core/scripts/release_smoke.py
+          python -m build packages/esimu-core
+          python -m twine check packages/esimu-core/dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: esimu-core-dist
+          path: packages/esimu-core/dist/*
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: esimu-core-dist
+          path: dist
+      - name: Publish to PyPI with trusted publishing
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+
+  github-release:
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: esimu-core-dist
+          path: dist
+      - name: Create GitHub prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${{ github.ref_name }}" dist/* --prerelease --generate-notes

@@ -6,8 +6,8 @@ starter and a standalone generated simulator.
 ## 1. Clone And Install The Lab
 
 ```powershell
-git clone https://github.com/pirate-608/esimu-lab.git
-cd esimu-lab
+git clone https://github.com/pirate-608/esimu.git
+cd esimu
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -U pip
@@ -20,13 +20,13 @@ generated files at a ZJUers Simulator checkout.
 ## 2. Verify Core And Theme Data
 
 ```powershell
-cd simulator-core\backend
+cd packages\esimu-core
 python -m pytest tests
 python -m ruff check esimu_core scripts tests
 python scripts\validate_world_data.py
-$env:SIMULATOR_THEME='demo-campus'
+$env:ESIMU_THEME='demo-campus'
 python scripts\validate_world_data.py
-Remove-Item Env:SIMULATOR_THEME
+Remove-Item Env:ESIMU_THEME
 ```
 
 The repository validator also checks checked-in frontend metadata. Downstream
@@ -85,7 +85,7 @@ empty and route `/api`, `/config`, `/healthz`, and `/ws` to the backend.
 Run the generator from the lab checkout:
 
 ```powershell
-cd simulator-core\backend
+cd packages\esimu-core
 python scripts\new_project.py D:\projects\my-simulator `
   --project-name "My Simulator" `
   --theme-id my-simulator
@@ -117,8 +117,8 @@ Generated projects carry the conservative scaffold helpers locally:
 
 ```powershell
 cd D:\projects\my-simulator
-$env:SIMULATOR_LAB_ROOT=(Get-Location).Path
-$env:SIMULATOR_THEME='my-simulator'
+$env:ESIMU_PROJECT_ROOT=(Get-Location).Path
+$env:ESIMU_THEME='my-simulator'
 python scripts\scaffold_game_stat.py add focus --label 专注 --show-in-hud
 python scripts\scaffold_world_data.py item focus_card --name 专注卡
 python scripts\scaffold_world_data.py achievement first_win --name 第一次胜利
@@ -132,8 +132,8 @@ Review generated JSON before using `--write`.
 Maintainers should run the isolated installation smoke before tagging:
 
 ```powershell
-cd esimu-lab
-python simulator-core\backend\scripts\release_smoke.py
+cd esimu
+python packages\esimu-core\scripts\release_smoke.py
 ```
 
 It builds an sdist and wheel, generates a disposable simulator, creates a new
@@ -145,7 +145,7 @@ builds.
 ## 8. Build The Docs
 
 ```powershell
-cd esimu-lab
+cd esimu
 zensical build
 ```
 

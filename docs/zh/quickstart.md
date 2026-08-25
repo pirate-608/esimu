@@ -5,8 +5,8 @@
 ## 克隆并安装实验仓
 
 ```powershell
-git clone https://github.com/pirate-608/esimu-lab.git
-cd esimu-lab
+git clone https://github.com/pirate-608/esimu.git
+cd esimu
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -U pip
@@ -19,16 +19,16 @@ Simulator 母仓。
 ## 验证 core 与主题
 
 ```powershell
-cd simulator-core\backend
+cd packages\esimu-core
 python -m pytest tests
 python -m ruff check esimu_core scripts tests
 python scripts\validate_world_data.py
-$env:SIMULATOR_THEME='demo-campus'
+$env:ESIMU_THEME='demo-campus'
 python scripts\validate_world_data.py
-Remove-Item Env:SIMULATOR_THEME
+Remove-Item Env:ESIMU_THEME
 ```
 
-生成项目不需要保留 esimu-lab 路径，安装 core 后直接运行：
+生成项目不需要保留 esimu 路径，安装 core 后直接运行：
 
 ```powershell
 esimu-validate-world --root <项目根目录> --theme <主题 ID>
@@ -72,14 +72,14 @@ VITE_ESIMU_WS_BASE=wss://api.example.com
 ## 生成独立项目
 
 ```powershell
-cd simulator-core\backend
+cd packages\esimu-core
 python scripts\new_project.py D:\projects\my-simulator `
   --project-name "My Simulator" `
   --theme-id my-simulator
 ```
 
 生成项目拥有自己的 Starter、主题、资源、scaffold helper、README、环境模板
-和 AGENTS.md。正式标签发布后，可完全离开 esimu-lab 安装运行：
+和 AGENTS.md。正式标签发布后，可完全离开 esimu 安装运行：
 
 ```powershell
 cd D:\projects\my-simulator
@@ -98,8 +98,8 @@ editable 路径或刚构建的 wheel，不要依赖尚未推送的标签。
 
 ```powershell
 cd D:\projects\my-simulator
-$env:SIMULATOR_LAB_ROOT=(Get-Location).Path
-$env:SIMULATOR_THEME='my-simulator'
+$env:ESIMU_PROJECT_ROOT=(Get-Location).Path
+$env:ESIMU_THEME='my-simulator'
 python scripts\scaffold_game_stat.py add focus --label 专注 --show-in-hud
 python scripts\scaffold_world_data.py item focus_card --name 专注卡
 esimu-validate-world --root . --theme my-simulator
@@ -110,8 +110,8 @@ esimu-validate-world --root . --theme my-simulator
 ## 发布候选验收
 
 ```powershell
-cd esimu-lab
-python simulator-core\backend\scripts\release_smoke.py
+cd esimu
+python packages\esimu-core\scripts\release_smoke.py
 ```
 
 该命令会构建 sdist/wheel、生成一次性项目、创建新 venv、从 wheel 安装

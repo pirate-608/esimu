@@ -1,16 +1,16 @@
 # 发布策略
 
-`esimu-core` 当前是 alpha 软件，可用于单主题模拟器原型，但还不是稳定公共框架。
+`esimu-core` 当前是面向单主题模拟器的 Beta 软件，版本 1 契约已经公开，但尚未达到稳定 1.0。
 
 ## 版本与标签契约
 
 - 包名：`esimu-core`
 - 导入命名空间：`esimu_core`
-- 版本来源：`simulator-core/backend/esimu_core/__init__.py`
+- 版本来源：`packages/esimu-core/esimu_core/__init__.py`
 - 标签格式：`esimu-core-v<version>`
 
 生成器会把下游项目固定到这个精确 Git tag。因此，只有对应标签已经推送到
-`pirate-608/esimu-lab`，且包含文档所述的 core/Starter 改动时，该版本才真正可供
+`pirate-608/esimu`，且包含文档所述的 core/Starter 改动时，该版本才真正可供
 外部安装。在分支和标签都推送前，不应宣称已经发布。
 
 当前使用 Git tag，不发布 PyPI。待真实外部模拟器验证安装和升级后再评估 PyPI。
@@ -28,13 +28,13 @@ HTTP/WebSocket 表面。
 
 ```powershell
 python -m pip install -r requirements-dev.txt
-cd simulator-core\backend
+cd packages\esimu-core
 python -m pytest tests
 python -m ruff check esimu_core scripts tests
 python scripts\validate_world_data.py
-$env:SIMULATOR_THEME='demo-campus'
+$env:ESIMU_THEME='demo-campus'
 python scripts\validate_world_data.py
-Remove-Item Env:SIMULATOR_THEME
+Remove-Item Env:ESIMU_THEME
 
 cd ..\..\apps\starter\backend
 python -m pytest tests
@@ -45,7 +45,7 @@ corepack pnpm typecheck
 corepack pnpm build
 
 cd ..\..\..
-python simulator-core\backend\scripts\release_smoke.py
+python packages\esimu-core\scripts\release_smoke.py
 zensical build
 ```
 
@@ -72,5 +72,5 @@ git push origin esimu-core-v0.1.0
 ```
 
 标签 CI 会拒绝与 `esimu-core-v<esimu_core.__version__>` 不一致的名称。通过后，
-还应在不含 esimu-lab 的干净目录或另一台机器上，用生成项目的默认 requirements
+还应在不含 esimu 的干净目录或另一台机器上，用生成项目的默认 requirements
 完成一次安装。

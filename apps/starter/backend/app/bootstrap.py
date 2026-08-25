@@ -19,5 +19,5 @@ def configure_project_environment(default_theme: str = "demo-campus") -> None:
     """Set path and theme defaults before any eager world loader imports."""
     project_root = discover_project_root()
     if project_root is not None:
-        os.environ.setdefault("SIMULATOR_LAB_ROOT", str(project_root))
-    os.environ.setdefault("SIMULATOR_THEME", default_theme)
+        os.environ.setdefault("ESIMU_PROJECT_ROOT", str(project_root))
+    os.environ.setdefault("ESIMU_THEME", default_theme)

@@ -6,10 +6,10 @@ ZJU reference product.
 
 ## Generate The Project
 
-From an esimu-lab checkout:
+From an esimu checkout:
 
 ```powershell
-cd simulator-core\backend
+cd packages\esimu-core
 python scripts\new_project.py D:\projects\my-simulator `
   --project-name "My Simulator" `
   --theme-id my-simulator `
@@ -37,7 +37,7 @@ can install it. For unreleased development, pass an explicit dependency:
 
 ```powershell
 python scripts\new_project.py D:\projects\my-simulator `
-  --core-dependency "-e D:\projects\esimu-lab\simulator-core\backend[ai]"
+  --core-dependency "-e D:\projects\esimu\packages\esimu-core[ai]"
 ```
 
 A wheel URL is preferred when testing the exact release artifact.
@@ -55,7 +55,7 @@ esimu-validate-world --root . --theme my-simulator
 ```
 
 The installed command resolves the generated project's own `themes/` directory.
-It does not need `validate_world_data.py` or any path back to esimu-lab.
+It does not need `validate_world_data.py` or any path back to esimu.
 
 ## Run The App
 
@@ -106,8 +106,8 @@ and `prompts.json` for model-facing context.
 
 ```powershell
 cd D:\projects\my-simulator
-$env:SIMULATOR_LAB_ROOT=(Get-Location).Path
-$env:SIMULATOR_THEME='my-simulator'
+$env:ESIMU_PROJECT_ROOT=(Get-Location).Path
+$env:ESIMU_THEME='my-simulator'
 python scripts\scaffold_game_stat.py add focus --label Focus --show-in-hud
 python scripts\scaffold_world_data.py item focus_card --name "Focus Card"
 python scripts\scaffold_world_data.py achievement first_win --name "First Win"
@@ -126,5 +126,5 @@ shared caches, credentials, billing, and telemetry remain adapter concerns.
 Enable the optional `esimu_core.ai` transport only after reviewing
 `ai-integration.md` and filling the generated `.env.example` values.
 
-Use `apps/zju-reference/` only as a compatibility reference when a project
-immediately needs its heavier production shape. It is not a required dependency.
+Add production identity or distributed persistence as project-owned adapters;
+they are intentionally not copied by the Beta generator.

@@ -19,6 +19,26 @@
     "credits": 2,
     "difficulty": 0.9,
     "semester": 1
+  },
+  {
+    "id": "systems",
+    "name": "系统思考",
+    "credits": 4,
+    "difficulty": 1.2,
+    "semester": 2
+  },
+  {
+    "id": "collaboration",
+    "name": "协作实践",
+    "credits": 3,
+    "difficulty": 1.0,
+    "semester": 2
+  },
+  {
+    "id": "fieldwork",
+    "name": "校园田野调查",
+    "credits": 2,
+    "difficulty": 0.9,
+    "semester": 2
   }
 ]
-

@@ -1,4 +1,5 @@
--e ../../../simulator-core/backend[ai]
+-e ../../../packages/esimu-core[ai]
+aiosqlite>=0.20
 fastapi>=0.115
 uvicorn[standard]>=0.30
 pydantic>=2
