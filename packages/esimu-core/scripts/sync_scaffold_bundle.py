@@ -66,7 +66,8 @@ def build_bundle() -> bytes:
             if any(part in SKIP_PARTS for part in relative.parts):
                 continue
             info = zipfile.ZipInfo(_archive_name(path), ARCHIVE_TIMESTAMP)
-            info.create_system = 3`r`n            info.compress_type = zipfile.ZIP_STORED
+            info.create_system = 3
+            info.compress_type = zipfile.ZIP_STORED
             info.external_attr = 0o644 << 16
             payload = path.read_bytes()
             if path.suffix.lower() in TEXT_SUFFIXES:
