@@ -47,7 +47,12 @@ def test_new_project_generates_valid_standalone_project(tmp_path: Path) -> None:
     session = (
         target / "apps" / "starter" / "backend" / "app" / "session.py"
     ).read_text(encoding="utf-8")
-    assert 'theme_id: str = "star-lab"' in session
+    assert "field(default_factory=active_theme_id)" in session
+    assert 'or "demo-campus"' not in session
+    ai_adapter = (
+        target / "apps" / "starter" / "backend" / "app" / "ai.py"
+    ).read_text(encoding="utf-8")
+    assert 'theme_id: str = "demo-campus"' not in ai_adapter
     bootstrap = (
         target / "apps" / "starter" / "backend" / "app" / "bootstrap.py"
     ).read_text(encoding="utf-8")
@@ -58,6 +63,11 @@ def test_new_project_generates_valid_standalone_project(tmp_path: Path) -> None:
     assert "ESIMU_CONTENT_MODE=library" in env_example
     assert "ESIMU_RP_MODEL=M2-her" in env_example
     assert "ESIMU_CORS_ORIGINS=" in env_example
+    backend_env = (
+        target / "apps" / "starter" / "backend" / ".env.example"
+    ).read_text(encoding="utf-8")
+    assert "ESIMU_THEME=star-lab" in backend_env
+    assert "ESIMU_THEME=demo-campus" not in backend_env
 
     requirements = (
         target / "apps" / "starter" / "backend" / "requirements.txt"
@@ -72,6 +82,10 @@ def test_new_project_generates_valid_standalone_project(tmp_path: Path) -> None:
     generated_agent = (target / "AGENTS.md").read_text(encoding="utf-8")
     assert "<project-name>" not in generated_agent
     assert "path-to-esimu" not in generated_agent
+    starter_readme = (target / "apps" / "starter" / "README.md").read_text(
+        encoding="utf-8"
+    )
+    assert "`star-lab`" in starter_readme
 
     generated_theme = (
         target / "apps" / "starter" / "frontend" / "src" / "data" / "theme.generated.ts"

@@ -8,7 +8,7 @@ import { useGameStore } from './stores/game'
 import type { ConfigPayload } from './types'
 
 const config: ConfigPayload = {
-  core_version: '0.3.0b1',
+  core_version: '0.3.0b2',
   protocol_version: 2,
   state_version: 2,
   theme: {

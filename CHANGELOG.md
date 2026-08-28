@@ -10,8 +10,11 @@ This project follows a lightweight Semantic Versioning policy for `esimu-core`:
 - `PATCH`: bug fixes, documentation clarifications, and validation improvements
   that do not break existing valid themes.
 
-## 0.3.0b1 - Unreleased
+## 0.3.0b2 - Unreleased
 
+- Superseded the TestPyPI-only `0.3.0b1` candidate after external generation
+  exposed hardcoded `demo-campus` defaults in AI and backend environment setup;
+  generated projects now resolve their active theme consistently.
 - Updated the documentation toolchain to Zensical 0.0.57 and synchronized the
   bilingual site with the current runtime, CLI, persistence, and release state.
 - Added persistent relax cooldowns, automatic event/messenger scheduling,

@@ -49,7 +49,7 @@ describe('useGameSocket protocol v2', () => {
     const store = useGameStore()
     store.token = 'token'
     store.config = {
-      core_version: '0.3.0b1', protocol_version: 2, state_version: 2,
+      core_version: '0.3.0b2', protocol_version: 2, state_version: 2,
       theme: { themeId: 'demo-campus', displayName: 'Demo', locale: 'zh-CN', terms: {}, storage: { prefix: 'demo' } },
       story: {}, stats: { initialBudget: 0, stats: [] }, items: { items: [] },
       relax_actions: [], achievements: {}, content_modes: ['library', 'hybrid', 'ai'],

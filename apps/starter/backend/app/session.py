@@ -61,6 +61,7 @@ from esimu_core.world.items import ItemCatalog  # noqa: E402
 from esimu_core.world.stat_definitions import StatDefinitions  # noqa: E402
 from esimu_core.world.story import ThemeStory  # noqa: E402
 from esimu_core.world.theme import ThemeManifest  # noqa: E402
+from esimu_core.world.theme_paths import active_theme_id  # noqa: E402
 
 
 @dataclass
@@ -68,7 +69,7 @@ class StarterGameSession:
     """One in-memory player session for starter smoke runs."""
 
     username: str = "Starter Player"
-    theme_id: str = "demo-campus"
+    theme_id: str = field(default_factory=active_theme_id)
     catalog: WorldCatalog = field(init=False)
     stats_registry: StatDefinitions = field(init=False)
     balance: GameBalance = field(init=False)
@@ -213,7 +214,7 @@ class StarterGameSession:
         """Restore a starter session from an adapter-owned state mapping."""
         session = cls(
             username=str(state.get("username") or "Starter Player"),
-            theme_id=str(state.get("theme_id") or "demo-campus"),
+            theme_id=str(state.get("theme_id") or active_theme_id()),
         )
         session.stats = dict(state.get("stats") or {})
         session.courses = {

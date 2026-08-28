@@ -218,9 +218,6 @@ def _patch_starter_files(target: Path, theme_id: str, core_dependency: str) -> N
         'os.environ.setdefault("ESIMU_THEME", "demo-campus")',
         f'os.environ.setdefault("ESIMU_THEME", "{theme_id}")',
     )
-    session = session.replace(
-        'theme_id: str = "demo-campus"', f'theme_id: str = "{theme_id}"'
-    )
     session_path.write_text(session, encoding="utf-8")
 
     bootstrap_path = target / "apps" / "starter" / "backend" / "app" / "bootstrap.py"
@@ -230,6 +227,27 @@ def _patch_starter_files(target: Path, theme_id: str, core_dependency: str) -> N
         f'default_theme: str = "{theme_id}"',
     )
     bootstrap_path.write_text(bootstrap, encoding="utf-8")
+
+    backend_env = target / "apps" / "starter" / "backend" / ".env.example"
+    backend_env.write_text(
+        backend_env.read_text(encoding="utf-8").replace(
+            "ESIMU_THEME=demo-campus",
+            f"ESIMU_THEME={theme_id}",
+        ),
+        encoding="utf-8",
+    )
+
+    for readme_path in (
+        target / "apps" / "starter" / "README.md",
+        target / "apps" / "starter" / "backend" / "README.md",
+    ):
+        readme_path.write_text(
+            readme_path.read_text(encoding="utf-8").replace(
+                "`demo-campus`",
+                f"`{theme_id}`",
+            ),
+            encoding="utf-8",
+        )
 
     backend_tests = (
         target / "apps" / "starter" / "backend" / "tests" / "test_starter_smoke.py"

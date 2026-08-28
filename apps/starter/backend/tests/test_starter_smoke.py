@@ -392,6 +392,15 @@ class FakeAITransport:
         return None
 
 
+def test_ai_adapter_default_theme_follows_environment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("ESIMU_THEME", "external-theme")
+    monkeypatch.setenv("ESIMU_CONTENT_MODE", "library")
+    adapter = StarterAIAdapter.from_env()
+    assert adapter.theme_id == "external-theme"
+
+
 def test_starter_ai_adapter_drives_generated_content() -> None:
     async def run() -> None:
         transport = FakeAITransport(

@@ -2,7 +2,7 @@
 
 esimu publishes pre-release versions of `esimu-core` for single-theme
 narrative simulator projects. The current public baseline is `0.2.0b5`; the
-next source candidate is `0.3.0b1`.
+next source candidate is `0.3.0b2`.
 
 ## Version And Contract
 

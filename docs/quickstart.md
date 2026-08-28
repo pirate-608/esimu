@@ -86,7 +86,7 @@ empty and route `/api`, `/config`, `/healthz`, and `/ws` to the backend.
 
 ## 5. Generate A Standalone Simulator
 
-During unreleased `0.3.0b1` development, install the candidate with
+During unreleased `0.3.0b2` development, install the candidate with
 `python -m pip install -e ".\packages\esimu-core[ai]"`, then run:
 
 ```powershell

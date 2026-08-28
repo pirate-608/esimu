@@ -75,7 +75,7 @@ VITE_ESIMU_WS_BASE=wss://api.example.com
 
 ## 生成独立项目
 
-`0.3.0b1` 尚未发布时，先执行
+`0.3.0b2` 尚未发布时，先执行
 `python -m pip install -e ".\packages\esimu-core[ai]"`，然后：
 
 ```powershell

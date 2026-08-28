@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import logging
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Awaitable, Callable, TypeVar
 
 from esimu_core.ai import (
@@ -21,6 +21,7 @@ from esimu_core.ai import (
     roleplay_model_config_from_env,
 )
 from esimu_core.ai.policy import ContentMode
+from esimu_core.world.theme_paths import active_theme_id
 
 from app.session import StarterGameSession
 
@@ -40,17 +41,19 @@ class StarterAIAdapter:
     service: AIContentService | None
     mode: ContentMode = "library"
     hybrid_ai_probability: float = 0.35
+    theme_id: str = field(default_factory=active_theme_id)
 
     @classmethod
-    def from_env(cls, theme_id: str = "demo-campus") -> "StarterAIAdapter":
+    def from_env(cls, theme_id: str | None = None) -> "StarterAIAdapter":
         """Build transports only when the environment configures a model."""
+        selected_theme = theme_id or active_theme_id()
         mode = _content_mode()
         generic_config = generic_model_config_from_env()
         roleplay_config = roleplay_model_config_from_env()
         if mode == "library" or not (
             generic_config.is_configured or roleplay_config.is_configured
         ):
-            return cls(service=None, mode="library")
+            return cls(service=None, mode="library", theme_id=selected_theme)
         generic = (
             OpenAICompatibleTransport(generic_config)
             if generic_config.is_configured
@@ -69,11 +72,12 @@ class StarterAIAdapter:
         return cls(
             service=AIContentService.for_theme(
                 generic,
-                theme_id,
+                selected_theme,
                 roleplay_transport=roleplay,
             ),
             mode=mode,
             hybrid_ai_probability=max(0.0, min(1.0, probability)),
+            theme_id=selected_theme,
         )
 
     @property

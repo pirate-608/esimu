@@ -38,7 +38,7 @@ hide:
 
 <p>
   Published projects should pin an exact Beta. <code>0.2.0b5</code> is the
-  current public package; <code>0.3.0b1</code> is the source candidate that adds
+  current public package; <code>0.3.0b2</code> is the source candidate that adds
   the closed runtime loop and installed authoring commands.
 </p>
 

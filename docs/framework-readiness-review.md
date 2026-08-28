@@ -1,6 +1,6 @@
 # Beta Readiness Review
 
-esimu `0.3.0b1` is the next source candidate. Published `0.2.0b5` already
+esimu `0.3.0b2` is the next source candidate. Published `0.2.0b5` already
 passed TestPyPI and external-example gates; 0.3 adds the runtime closure and
 installed authoring commands before its own release gate.
 
