@@ -50,7 +50,7 @@ class StarterAIAdapter:
         if mode == "library" or not (
             generic_config.is_configured or roleplay_config.is_configured
         ):
-            return cls(service=None, mode=mode)
+            return cls(service=None, mode="library")
         generic = (
             OpenAICompatibleTransport(generic_config)
             if generic_config.is_configured
@@ -90,9 +90,11 @@ class StarterAIAdapter:
         self,
         ai_factory: Callable[[], T | Awaitable[T] | None],
         library_factory: Callable[[], T | Awaitable[T] | None],
+        *,
+        mode: ContentMode | None = None,
     ) -> ResolvedContent[T]:
         result = await resolve_content(
-            self.mode,
+            mode or self.mode,
             ai_factory=ai_factory if self.service is not None else None,
             library_factory=library_factory,
             hybrid_ai_probability=self.hybrid_ai_probability,
@@ -102,7 +104,7 @@ class StarterAIAdapter:
         return result
 
     async def event(self, session: StarterGameSession) -> dict[str, Any]:
-        """Resolve one AI/local event and update the session's active event."""
+        """Resolve one AI/local event without mutating session state."""
         service = self.service
 
         async def generate() -> dict[str, Any] | None:
@@ -110,11 +112,13 @@ class StarterAIAdapter:
                 return None
             return await service.generate_random_event(session.stats)
 
-        result = await self._resolve(generate, session.event)
+        result = await self._resolve(
+            generate,
+            session.local_event,
+            mode=session.content_mode,  # type: ignore[arg-type]
+        )
         if result.value is None:
-            return session.event()
-        if result.source == "ai":
-            return session.accept_event(result.value)
+            return session.local_event()
         return result.value
 
     async def forum_post(self, session: StarterGameSession) -> dict[str, str]:
@@ -130,25 +134,77 @@ class StarterAIAdapter:
                 trigger="campus life",
             )
 
-        result = await self._resolve(generate, session.forum_post)
-        return result.value or session.forum_post()
+        result = await self._resolve(
+            generate,
+            session.local_forum_post,
+            mode=session.content_mode,  # type: ignore[arg-type]
+        )
+        return result.value or session.local_forum_post()
 
-    async def messenger_round(self, session: StarterGameSession) -> dict[str, Any]:
-        """Resolve one AI/local messenger opening and store its contact state."""
+    async def messenger_round(
+        self,
+        session: StarterGameSession,
+        character: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Resolve one AI/local messenger opening without mutating state."""
         service = self.service
-        character = session.first_character()
+        character = character or session.next_messenger_character()
+        if character is None:
+            raise ValueError("no closed messenger contact is currently available")
 
         async def generate() -> dict[str, Any] | None:
             if service is None:
                 return None
             return await service.generate_message_opening(character, session.stats)
 
-        result = await self._resolve(generate, session.messenger_round)
+        result = await self._resolve(
+            generate,
+            lambda: session.local_messenger_opening(character),
+            mode=session.content_mode,  # type: ignore[arg-type]
+        )
         if result.value is None:
-            return session.messenger_round()
-        if result.source == "ai":
-            return session.accept_messenger_round(result.value)
+            return session.local_messenger_opening(character)
         return result.value
+
+    async def messenger_reply(
+        self,
+        session: StarterGameSession,
+        pending: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Resolve one NPC reply after the player message has been persisted."""
+        service = self.service
+
+        async def generate() -> dict[str, Any] | None:
+            if service is None:
+                return None
+            return await service.generate_message_reply(
+                pending["character"],
+                session.stats,
+                pending["history"],
+                pending["player_message"],
+                reply_count=int(pending["reply_count"]),
+            )
+
+        def fallback() -> dict[str, Any]:
+            third = int(pending["reply_count"]) >= 3
+            result: dict[str, Any] = {
+                "content": "收到，我明白你的意思了。",
+            }
+            if third:
+                result["settlement"] = {
+                    "desc": "这一轮对话平静地结束了。",
+                    "effects": {},
+                }
+            else:
+                result["reply_options"] = ["继续聊聊", "稍后再说"]
+            return result
+
+        result = await self._resolve(
+            generate,
+            fallback,
+            mode=session.content_mode,  # type: ignore[arg-type]
+        )
+        return result.value or fallback()
 
     async def graduation_summary(self, session: StarterGameSession) -> str:
         """Generate a final summary or return the theme-owned fallback prose."""
@@ -160,5 +216,9 @@ class StarterAIAdapter:
                 return None
             return await service.generate_graduation_summary(session.stats)
 
-        result = await self._resolve(generate, lambda: fallback)
+        result = await self._resolve(
+            generate,
+            lambda: fallback,
+            mode=session.content_mode,  # type: ignore[arg-type]
+        )
         return result.value or fallback

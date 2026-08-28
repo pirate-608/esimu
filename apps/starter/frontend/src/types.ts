@@ -27,6 +27,13 @@ export interface ItemInfo {
   effects: Record<string, number>
 }
 
+export interface AchievementInfo {
+  code: string
+  name: string
+  desc: string
+  icon: string
+}
+
 export interface ConfigPayload {
   core_version: string
   protocol_version: number
@@ -42,6 +49,10 @@ export interface ConfigPayload {
   stats: { initialBudget: number; stats: StatMeta[] }
   items: { items: ItemInfo[] }
   relax_actions: string[]
+  achievements: Record<string, AchievementInfo>
+  content_modes: Array<'library' | 'hybrid' | 'ai'>
+  llm_available: boolean
+  default_content_mode: 'library' | 'hybrid' | 'ai'
 }
 
 export interface RuntimePayload {
@@ -51,6 +62,12 @@ export interface RuntimePayload {
   course_states?: Record<string, number>
   items_state?: Record<string, unknown>
   messenger_state?: Record<string, unknown>
+  relax_cooldowns?: Record<string, number>
+  achievements?: AchievementInfo[]
+  content_mode?: 'library' | 'hybrid' | 'ai'
+  ending_kind?: 'graduation' | 'game_over' | null
+  ending_reason?: string | null
+  current_event?: Record<string, unknown> | null
   semester_time_left?: number
   is_running?: boolean
   speed_multiplier?: number

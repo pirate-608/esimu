@@ -9,18 +9,19 @@ Its Beta shape is:
 esimu-core + generated Starter app + one theme pack
 ```
 
-`esimu-core 0.2.0b5` provides typed world loaders, theme validation, gameplay
+`esimu-core 0.3.0b1` provides typed world loaders, theme validation, gameplay
 rules, runtime payload helpers, optional AI generation, and a self-contained
 project CLI. The generated Starter includes a Vue 3/Pinia console, FastAPI and
 WebSocket adapter, real-time ticks, events, forum and messenger flows, items,
-semester settlement, endings, and SQLite persistence.
+semester settlement, cooldowns, declarative achievements, automatic content,
+distinct endings, and SQLite persistence.
 
 ## Quick Start
 
-After the Beta is published:
+Until `0.3.0b1` is published, install the candidate from a source checkout:
 
 ```powershell
-python -m pip install "esimu-core[ai]==0.2.0b5"
+python -m pip install -e ".\packages\esimu-core[ai]"
 esimu new D:\projects\my-simulator `
   --project-name "My Simulator" `
   --theme-id my-simulator `
@@ -28,6 +29,7 @@ esimu new D:\projects\my-simulator `
 cd D:\projects\my-simulator
 python -m pip install -r apps\starter\backend\requirements.txt
 esimu validate --root . --theme my-simulator
+esimu doctor --root . --theme my-simulator
 ```
 
 Run the backend:
@@ -91,10 +93,10 @@ and [release policy](docs/release-policy.md).
 
 - Distribution: `esimu-core`
 - Import namespace: `esimu_core`
-- CLI: `esimu new`, `esimu validate`, `esimu version`
+- CLI: `esimu new`, `validate`, `doctor`, `inspect`, `sync`, `add`, and `version`
 - Theme schema: version `1`
-- Starter state schema: version `1`
-- Starter WebSocket protocol: version `1`
+- Starter state schema: version `2` with automatic v1 migration
+- Starter WebSocket protocol: version `2` with v1 client compatibility
 - License: MIT
 
 The Beta intentionally does not provide runtime multi-theme switching,

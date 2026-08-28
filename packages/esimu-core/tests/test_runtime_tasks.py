@@ -50,3 +50,22 @@ async def test_target_task_registry_clears_target_on_failure() -> None:
     assert registry.is_inflight("dingtalk") is False
     assert len(errors) == 1
     assert isinstance(errors[0], RuntimeError)
+
+
+@pytest.mark.asyncio
+async def test_cancel_and_wait_drains_tasks_and_targets() -> None:
+    registry = TargetTaskRegistry()
+    started = asyncio.Event()
+
+    async def wait_forever() -> None:
+        started.set()
+        await asyncio.Event().wait()
+
+    task = registry.track(wait_forever(), target="messenger:a")
+    assert task is not None
+    await started.wait()
+    await registry.cancel_and_wait()
+
+    assert task.cancelled()
+    assert registry.tasks == set()
+    assert registry.targets == set()

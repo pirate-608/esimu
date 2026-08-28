@@ -72,16 +72,14 @@ hide:
 <p>生成一个新项目：</p>
 
 <pre><code class="language-powershell">
-cd esimu\packages\esimu-core
-python scripts\new_project.py <target-project> --project-name "My Simulator" --theme-id my-simulator
+esimu new <target-project> --project-name "My Simulator" --theme-id my-simulator
 </code></pre>
 
 <p>验证生成的主题：</p>
 
 <pre><code class="language-powershell">
-$env:ESIMU_PROJECT_ROOT='<target-project>'
-$env:ESIMU_THEME='my-simulator'
-python scripts\validate_world_data.py
+esimu validate --root <target-project> --theme my-simulator
+esimu doctor --root <target-project> --theme my-simulator
 </code></pre>
 
 <p>

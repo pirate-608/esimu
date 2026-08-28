@@ -16,6 +16,9 @@ describe('game store', () => {
       semester_time_left: 120,
       is_running: true,
       speed_multiplier: 1.5,
+      relax_cooldowns: { walk: 9 },
+      content_mode: 'hybrid',
+      achievements: [{ code: 'first', name: 'First', desc: 'Done', icon: '🏅' }],
     })
 
     expect(store.stats.energy).toBe(88)
@@ -24,5 +27,23 @@ describe('game store', () => {
     expect(store.ownedItems.has('planner')).toBe(true)
     expect(store.running).toBe(true)
     expect(store.speed).toBe(1.5)
+    expect(store.cooldowns.walk).toBe(9)
+    expect(store.contentMode).toBe('hybrid')
+    expect(store.achievements[0].code).toBe('first')
+  })
+
+  it('deduplicates achievements and totals unread contacts', () => {
+    const store = useGameStore()
+    const achievement = { code: 'first', name: 'First', desc: 'Done', icon: '🏅' }
+    store.addAchievement(achievement)
+    store.addAchievement(achievement)
+    store.messenger = {
+      contacts: {
+        a: { unread_count: 2 },
+        b: { unread_count: 1 },
+      },
+    }
+    expect(store.achievements).toHaveLength(1)
+    expect(store.unreadMessages).toBe(3)
   })
 })

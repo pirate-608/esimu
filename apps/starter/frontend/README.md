@@ -2,6 +2,8 @@
 
 This deliberately small Vite/TypeScript skin consumes generated theme, story,
 and stat metadata and calls the Starter HTTP/WebSocket contract.
+It renders cooldowns, unread messenger contacts, achievements, content modes,
+save status, and distinct failure/graduation outcomes from protocol v2.
 
 ## Local Development
 
@@ -28,5 +30,6 @@ origin in backend `ESIMU_CORS_ORIGINS`.
 
 ```powershell
 corepack pnpm typecheck
+corepack pnpm test
 corepack pnpm build
 ```

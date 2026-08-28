@@ -17,7 +17,7 @@ themes/<theme_id>/
     majors.json
     achievements.json
     event_library.json
-    cc98_library.json
+    forum_library.json
     characters.json
     graduation_comments.json
     courses/
@@ -81,7 +81,7 @@ python scripts\validate_world_data.py
 - 玩家身份模板。
 - 毕业总结说明。
 
-它不会重命名 `cc98` 和 `dingtalk` 这类兼容 ID。
+它不负责修改 Starter 的中性 `forum`、`messenger` 协议 ID。
 
 ## world 数据
 
@@ -93,7 +93,13 @@ python scripts\validate_world_data.py
 
 `majors.json` 中每个专业/角色都应有对应的 `courses/<abbr>.json`。
 
-`cc98_library.json` 暂时保留兼容文件名，但主题可通过 `theme.json` 把可见名改成任何论坛/社区名称。
+`forum_library.json` 是中性的本地论坛内容库，主题可通过 `theme.json` 修改可见名称。
+
+`achievements.json` 中的 `condition` 可自动解锁成就。条件必须只包含一个非空
+`all` 或 `any` 数组；谓词格式为 `scope/key/op/value`。scope 支持
+`stat/action/session`，op 支持 `gte/gt/lte/lt/eq`。session 指标支持
+`semester_idx`、`completed_terms`、`failed_count`、`term_gpa` 和
+`cumulative_gpa`。没有 condition 的旧条目只展示或由下游手动解锁。
 
 ## 新主题清单
 
@@ -103,5 +109,6 @@ python scripts\validate_world_data.py
 4. 修改 `prompts.json`。
 5. 替换 `majors.json` 和 `courses/*.json`。
 6. 替换属性、道具、成就、事件、论坛、角色和毕业评价。
-7. 运行 `validate_world_data.py`。
-8. 如需驱动前端，重新生成 theme/story/stat metadata。
+7. 运行 `esimu validate --root . --theme <theme_id>` 和 `esimu doctor`。
+8. 运行 `esimu sync --root . --theme <theme_id> --write` 更新前端 metadata。
+9. 使用 `esimu add ...` 预览内容；显式 `--write` 才写入，验证失败自动回滚。

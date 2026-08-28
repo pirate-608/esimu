@@ -2,6 +2,8 @@
 
 This is the Beta FastAPI/WebSocket adapter. SQLite is the default persistence,
 `demo-campus` is the default theme, and reusable rules come from `esimu-core`.
+The v2 runtime persists cooldowns, achievements, content mode, ending state,
+and messenger rounds while loading v1 state automatically.
 
 Run locally:
 
@@ -29,6 +31,10 @@ python -m uvicorn app.main:app --reload --port 18001
 
 The file store writes JSON state per token and is meant as an extension point,
 not as production storage.
+
+Event, forum, and messenger AI calls use target-deduplicated background tasks.
+Player messages are persisted before the NPC reply starts generating, so Tick
+and unrelated actions stay responsive.
 
 Optional AI example:
 

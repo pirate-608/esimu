@@ -6,11 +6,10 @@ ZJU reference product.
 
 ## Generate The Project
 
-From an esimu checkout:
+With the candidate installed:
 
 ```powershell
-cd packages\esimu-core
-python scripts\new_project.py D:\projects\my-simulator `
+esimu new D:\projects\my-simulator `
   --project-name "My Simulator" `
   --theme-id my-simulator `
   --institution "Star Academy" `
@@ -23,20 +22,22 @@ Generated shape:
 apps/starter/backend/
 apps/starter/frontend/
 themes/my-simulator/
-scripts/scaffold_game_stat.py
-scripts/scaffold_world_data.py
+scripts/
 docs/scaffold-checklist.md
 .env.example
 AGENTS.md
 README.md
 ```
 
+The generated scripts are Beta compatibility wrappers. Prefer installed
+`esimu add` and `esimu sync` commands for new automation.
+
 The backend requirement defaults to the Git tag matching the generator's
 `esimu_core.__version__`. That tag must exist remotely before another developer
 can install it. For unreleased development, pass an explicit dependency:
 
 ```powershell
-python scripts\new_project.py D:\projects\my-simulator `
+esimu new D:\projects\my-simulator `
   --core-dependency "-e D:\projects\esimu\packages\esimu-core[ai]"
 ```
 
@@ -51,7 +52,8 @@ cd D:\projects\my-simulator
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r apps\starter\backend\requirements.txt
-esimu-validate-world --root . --theme my-simulator
+esimu validate --root . --theme my-simulator
+esimu doctor --root . --theme my-simulator
 ```
 
 The installed command resolves the generated project's own `themes/` directory.
@@ -108,18 +110,19 @@ and `prompts.json` for model-facing context.
 cd D:\projects\my-simulator
 $env:ESIMU_PROJECT_ROOT=(Get-Location).Path
 $env:ESIMU_THEME='my-simulator'
-python scripts\scaffold_game_stat.py add focus --label Focus --show-in-hud
-python scripts\scaffold_world_data.py item focus_card --name "Focus Card"
-python scripts\scaffold_world_data.py achievement first_win --name "First Win"
-python scripts\scaffold_world_data.py event campus_moment --title "Campus Moment"
-esimu-validate-world --root . --theme my-simulator
+esimu add stat focus --root . --theme my-simulator --label Focus --show-in-hud
+esimu add item focus_card --root . --theme my-simulator --name "Focus Card"
+esimu add achievement first_win --root . --theme my-simulator --name "First Win"
+esimu add event campus_moment --root . --theme my-simulator --title "Campus Moment"
+esimu sync --root . --theme my-simulator
+esimu validate --root . --theme my-simulator
 ```
 
 Review output before adding `--write`.
 
 ## Choose Persistence And AI Deliberately
 
-Starter defaults to memory persistence and library content. File persistence is
+Starter defaults to SQLite persistence and library content. File persistence is
 available for local development. Production Redis/PostgreSQL, admin editors,
 shared caches, credentials, billing, and telemetry remain adapter concerns.
 

@@ -1,7 +1,7 @@
 # Starter Contract
 
 `apps/starter/` is the default app base for new esimu simulator prototypes. It
-is intentionally smaller than the ZJU reference adapter and should remain easy
+is intentionally smaller than production-specific downstream adapters and should remain easy
 to copy, delete, or replace.
 
 ## Scope
@@ -9,19 +9,21 @@ to copy, delete, or replace.
 The starter promises:
 
 - a minimal FastAPI backend,
-- a tiny Vite/TypeScript frontend,
-- in-memory sessions by default,
-- optional local JSON-file sessions for development,
+- a Vue 3/Pinia Vite/TypeScript console,
+- SQLite sessions by default, with memory sessions for tests,
+- local JSON-file sessions as a temporary Beta compatibility adapter,
 - theme/story/stat metadata generated from a theme pack,
 - neutral public actions for forum and messenger surfaces,
+- persistent cooldowns, achievements, content modes, and ending state,
+- automatic event/messenger scheduling and non-blocking model work,
 - no Redis, PostgreSQL, SQLAdmin, production Docker, or mandatory LLM client.
 
 The starter installs the optional AI transport and exposes it through
 environment configuration, but defaults to `ESIMU_CONTENT_MODE=library`.
 See `ai-integration.md` for model providers, M2-her, and degradation behavior.
 
-Use the ZJU reference adapter only when a project needs those heavier features
-immediately.
+Downstream projects can replace the adapter when they need distributed storage,
+production identity, or an operational admin surface.
 
 ## Backend HTTP Surface
 
@@ -31,7 +33,7 @@ The starter backend exposes a deliberately small surface:
 | --- | --- |
 | `GET /healthz` | Return dependency-light process readiness. |
 | `GET /config` | Return active theme, story, and stat metadata. |
-| `POST /api/auth` | Create a placeholder in-memory session token. |
+| `POST /api/auth` | Create or restore an opaque local-profile token. |
 | `GET /api/majors` | Return active-theme majors. |
 | `POST /api/init_character` | Initialize one in-memory character. |
 | `WS /ws` | Run a small action protocol for smoke flows. |
@@ -58,26 +60,43 @@ The starter uses neutral action names:
 | Action | Response |
 | --- | --- |
 | `start` / `get_state` | `tick` |
+| `ping` | `pong` |
+| `pause` / `resume` / `set_speed` | `tick` |
+| `set_mode` | `mode_changed` |
 | `relax` | `feedback` |
 | `event` | `event` |
 | `event_choice` | `feedback` |
 | `forum` | `forum_post` |
-| `messenger` | `messenger_round` |
+| `messenger` | `messenger_update` (`messenger_round` for protocol v1) |
+| `messenger_reply` | immediate player `messenger_update`, then background NPC update |
+| `messenger_mark_read` | `messenger_update` |
 | `item_buy` | `items_state` |
 | `item_sell` | `items_state` |
 | `exam` | `semester_summary` |
+| `next_semester` | `new_semester` |
 | `ending` | `ending` |
+| `save_game` | `save_result` |
+| `save_and_exit` | `save_result`, `exit_confirmed`, close code 1000 |
+| `exit_without_save` | `exit_confirmed`, close code 1000 |
 
-Legacy IDs such as `cc98` and `dingtalk` belong in the ZJU reference adapter or
-compatibility mappers, not in starter public naming.
+Protocol v2 is current. Protocol-v1 clients are accepted and receive legacy
+`messenger_round`/`messenger_reply` response names. Legacy product IDs such as
+`cc98` and `dingtalk` do not appear in Starter public naming.
 
 ## Persistence
 
-Default:
+Default single-node store:
 
 ```text
-ESIMU_STARTER_SESSION_STORE=memory
+ESIMU_STARTER_SESSION_STORE=sqlite
+ESIMU_STARTER_DATABASE_PATH=data/esimu.sqlite3
 ```
+
+SQLite uses WAL, transaction writes, hashed token lookup, and JSON state v2.
+State-v1 payloads receive additive defaults during load; the SQLite schema
+remains at user_version 1 because state is stored as a versioned JSON document.
+
+Tests can select `ESIMU_STARTER_SESSION_STORE=memory`.
 
 Development file store:
 
@@ -86,9 +105,21 @@ ESIMU_STARTER_SESSION_STORE=file
 ESIMU_STARTER_DATA_DIR=data/starter-sessions
 ```
 
-The file store writes one JSON file per token and exists only as a local
-development extension point. Production projects should replace the
-`SessionStore` protocol with their chosen persistence layer.
+The file store writes one JSON file per hashed token and remains only for the
+0.3 Beta compatibility window. Distributed deployments should implement the
+asynchronous `SessionStore` protocol in the downstream application.
+
+## Runtime Behavior
+
+- Relax cooldown timestamps persist and remaining seconds are included in
+  `init` and `tick`.
+- Event and messenger checks use the interval/probability values in
+  `game_balance.json`; they stop while paused, settling, or ended.
+- A messenger round settles after three player replies. Player messages are
+  saved and emitted before optional AI generation starts.
+- Achievement conditions are theme-owned declarative `all`/`any` predicates.
+- Game Over thresholds come from `game_balance.json`; graduation and failure
+  share the theme-owned ending copy but remain distinct outcomes.
 
 ## Frontend Dependencies
 

@@ -2,14 +2,25 @@
   {
     "code": "first_step",
     "name": "迈出第一步",
-    "desc": "完成一次最小主题验证。",
-    "icon": "🌱"
+    "desc": "完成一次校园休闲行动。",
+    "icon": "🌱",
+    "condition": {
+      "all": [
+        { "scope": "action", "key": "relax", "op": "gte", "value": 1 }
+      ]
+    }
   },
   {
     "code": "steady_graduate",
     "name": "稳稳毕业",
     "desc": "在 demo-campus 中保持良好 GPA。",
-    "icon": "🎓"
+    "icon": "🎓",
+    "condition": {
+      "all": [
+        { "scope": "session", "key": "completed_terms", "op": "gte", "value": 2 },
+        { "scope": "session", "key": "cumulative_gpa", "op": "gte", "value": 3.0 }
+      ]
+    }
   }
 ]
 

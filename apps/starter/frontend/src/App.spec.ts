@@ -1,13 +1,16 @@
 import { createPinia } from 'pinia'
 import { flushPromises, mount } from '@vue/test-utils'
+import { nextTick } from 'vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import App from './App.vue'
+import { useGameStore } from './stores/game'
+import type { ConfigPayload } from './types'
 
-const config = {
-  core_version: '0.2.0b5',
-  protocol_version: 1,
-  state_version: 1,
+const config: ConfigPayload = {
+  core_version: '0.3.0b1',
+  protocol_version: 2,
+  state_version: 2,
   theme: {
     themeId: 'demo-campus',
     displayName: 'Demo Campus Simulator',
@@ -18,10 +21,14 @@ const config = {
     },
     storage: { prefix: 'esimu_demo' },
   },
-  story: {},
+  story: { endings: {} },
   stats: { initialBudget: 300, stats: [] },
   items: { items: [] },
   relax_actions: ['walk'],
+  achievements: {},
+  content_modes: ['library', 'hybrid', 'ai'],
+  llm_available: false,
+  default_content_mode: 'library',
 }
 
 describe('Starter App', () => {
@@ -48,5 +55,29 @@ describe('Starter App', () => {
     expect(wrapper.text()).toContain('星桥学院')
     expect(wrapper.text()).toContain('本地玩家名称')
     expect(websocket).not.toHaveBeenCalled()
+  })
+
+  it('renders cooldowns, unread contacts, save controls, and content modes', async () => {
+    vi.stubGlobal('WebSocket', vi.fn())
+    const pinia = createPinia()
+    const wrapper = mount(App, { global: { plugins: [pinia] } })
+    await flushPromises()
+    const store = useGameStore(pinia)
+    store.config = config
+    store.phase = 'playing'
+    store.running = true
+    store.stats = { semester: '第一学期', course_info_json: '[]', gold: 100 }
+    store.cooldowns = { walk: 9 }
+    store.messenger = {
+      contacts: {
+        a: { contact_id: 'a', sender: 'A', unread_count: 2, messages: [], pending_options: [] },
+      },
+    }
+    await nextTick()
+
+    expect(wrapper.text()).toContain('9s')
+    expect(wrapper.text()).toContain('校内信 · 2')
+    expect(wrapper.text()).toContain('保存')
+    expect(wrapper.find('select[aria-label="内容模式"]').exists()).toBe(true)
   })
 })

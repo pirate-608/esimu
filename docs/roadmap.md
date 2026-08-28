@@ -3,6 +3,24 @@
 For setup and handoff, start with `quickstart.md` and `agent-handoff.md`. For
 new simulator projects, use `new-project-bootstrap.md`.
 
+## Phase 15: Runtime Closure And Installed Authoring CLI
+
+Status: implemented on `main` for the unpublished `0.3.0b1` candidate.
+
+- Starter state/protocol advance to v2 while loading state v1 and accepting
+  protocol-v1 clients.
+- Persistent cooldowns, automatic content, declarative achievements, Game Over,
+  session content modes, and ordered save/exit close the runtime loop.
+- Messenger replies are two-phase and non-blocking, with unread state, contact
+  diversity/reuse, and three-reply settlement.
+- Installed `doctor`, `inspect`, `sync`, and `add` commands replace source-path
+  authoring scripts; compatibility wrappers remain for one Beta cycle.
+- Remaining gate: wheel-only generated-project smoke and an external trial
+  before tagging or publishing `0.3.0b1`.
+
+The extraction phases below are retained as project history. Archived reference
+app paths are not part of the current formal branch.
+
 ## Phase 0: Lab Bootstrap
 
 - Create this isolated workspace.

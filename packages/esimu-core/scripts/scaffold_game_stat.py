@@ -18,7 +18,12 @@ BACKEND_ROOT = Path(__file__).resolve().parents[1]
 if str(BACKEND_ROOT) not in sys.path:
     sys.path.insert(0, str(BACKEND_ROOT))
 
-from esimu_core.world.theme_paths import world_file  # noqa: E402
+from esimu_core.authoring import add_world_entry  # noqa: E402
+from esimu_core.world.theme_paths import (  # noqa: E402
+    active_theme_id,
+    project_root,
+    world_file,
+)
 
 WORLD_PATH = world_file("stat_definitions.json")
 
@@ -71,27 +76,20 @@ def _print_checklist(stat_id: str) -> None:
 
 def add_stat(args: argparse.Namespace) -> int:
     """Draft or append one stat definition and print the follow-up checklist."""
-    config = _load_config()
-    stats = config.get("stats")
-    if not isinstance(stats, list):
-        raise ValueError("stat_definitions.json must contain a stats array")
-    stat = _template(args)
-    exists = any(
-        existing.get("id") == stat["id"]
-        for existing in stats
-        if isinstance(existing, dict)
+    result = add_world_entry(
+        project_root(),
+        active_theme_id(),
+        "stat",
+        args.stat_id,
+        vars(args),
+        write=args.write,
     )
-    if exists:
-        raise ValueError(f"stat already exists: {stat['id']}")
-
-    if args.write:
-        stats.append(stat)
-        _write_config(config)
-        print(f"added {stat['id']} to {WORLD_PATH}")
-    else:
-        print(json.dumps(stat, ensure_ascii=False, indent=2))
-        print("\nDry run only. Add --write to update stat_definitions.json.")
-    _print_checklist(stat["id"])
+    print(json.dumps(result["entry"], ensure_ascii=False, indent=2))
+    print(
+        "NOTE: prefer `esimu add stat`; this script is a Beta compatibility wrapper.",
+        file=sys.stderr,
+    )
+    _print_checklist(args.stat_id)
     return 0
 
 

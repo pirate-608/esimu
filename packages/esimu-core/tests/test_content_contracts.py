@@ -1,6 +1,8 @@
 """Tests for theme-neutral content and message contracts."""
 
 from esimu_core.content import (
+    build_message_contact_id,
+    compact_message_contacts,
     coerce_reply_options,
     framework_concept_for_legacy,
     legacy_id_for_concept,
@@ -8,6 +10,7 @@ from esimu_core.content import (
     sanitize_effects,
     select_local_event,
     select_local_forum_post,
+    select_message_character,
     theme_term_for_concept,
 )
 
@@ -119,3 +122,48 @@ def test_reply_options_and_effects_are_safely_clamped() -> None:
 
     assert result.desc == "聊完之后你振作了一些。"
     assert result.effects == {"sanity": 5, "stress": -3}
+
+
+def test_character_selection_balances_new_and_reusable_contacts() -> None:
+    characters = [
+        {"name": "A", "role": "friend"},
+        {"name": "B", "role": "classmate"},
+    ]
+    contacts = {
+        build_message_contact_id("A", "friend"): {
+            "sender": "A",
+            "role": "friend",
+            "round_open": False,
+            "last_active_at": 1,
+        }
+    }
+    new_character = select_message_character(
+        characters,
+        contacts,
+        max_contacts=2,
+        reuse_probability=0,
+        random_value=lambda: 0.9,
+        choose=lambda values: values[0],
+    )
+    reused = select_message_character(
+        characters,
+        contacts,
+        max_contacts=1,
+        reuse_probability=0,
+        random_value=lambda: 0.9,
+        choose=lambda values: values[0],
+    )
+    assert new_character and new_character["name"] == "B"
+    assert reused and reused["name"] == "A"
+
+
+def test_contact_compaction_keeps_open_rounds() -> None:
+    compacted = compact_message_contacts(
+        {
+            "open": {"round_open": True, "last_active_at": 0},
+            "old": {"round_open": False, "last_active_at": 1},
+            "new": {"round_open": False, "last_active_at": 2},
+        },
+        max_contacts=2,
+    )
+    assert set(compacted) == {"open", "new"}

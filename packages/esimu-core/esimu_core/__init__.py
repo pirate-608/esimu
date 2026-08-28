@@ -3,11 +3,11 @@
 Copyright (c) 2026 pirate-608. Licensed under the MIT License.
 """
 
-__version__ = "0.2.0b5"
+__version__ = "0.3.0b1"
 
 THEME_SCHEMA_VERSION = 1
-STATE_VERSION = 1
-PROTOCOL_VERSION = 1
+STATE_VERSION = 2
+PROTOCOL_VERSION = 2
 
 __all__ = [
     "PROTOCOL_VERSION",

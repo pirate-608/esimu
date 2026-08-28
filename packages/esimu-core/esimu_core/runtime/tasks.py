@@ -60,3 +60,13 @@ class TargetTaskRegistry:
         self.tasks.clear()
         self.targets.clear()
 
+    async def cancel_and_wait(self) -> None:
+        """Cancel all tracked tasks and wait for their cleanup callbacks."""
+        tasks = list(self.tasks)
+        for task in tasks:
+            task.cancel()
+        if tasks:
+            await asyncio.gather(*tasks, return_exceptions=True)
+        self.tasks.clear()
+        self.targets.clear()
+

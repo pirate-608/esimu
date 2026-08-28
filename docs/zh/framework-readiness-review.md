@@ -1,7 +1,7 @@
 # Beta 就绪审查
 
-esimu `0.2.0b5` 已完成本地 Beta 门槛；TestPyPI 和独立示例仓验证通过后即可
-公开发布。
+esimu `0.3.0b1` 是下一版源码候选。已发布的 `0.2.0b5` 已通过 TestPyPI 和独立
+示例仓验收；0.3 在下一次发布门禁前补齐运行时闭环和安装后作者命令。
 
 当前已具备强类型 core、版本化主题/状态/协议、自包含 `esimu new`、严格主题
 校验、可选 AI、Vue/Pinia Starter、实时 WebSocket、SQLite 重启恢复、两学期

@@ -58,9 +58,26 @@ def _restore_state(raw: str) -> StarterGameSession:
         raise SessionStateVersionError(
             f"session state version {version} is newer than supported {STATE_VERSION}"
         )
-    if version == 0:
-        state["state_version"] = STATE_VERSION
+    if version < STATE_VERSION:
+        state = _migrate_state(state, version)
     return StarterGameSession.from_state(state)
+
+
+def _migrate_state(state: dict[str, object], version: int) -> dict[str, object]:
+    """Upgrade Beta JSON state without changing the SQLite table schema."""
+    migrated = dict(state)
+    if version <= 1:
+        migrated.setdefault("tick_count", 0)
+        migrated.setdefault("cooldown_timestamps", {})
+        migrated.setdefault("action_counts", {})
+        migrated.setdefault("achievements", [])
+        migrated.setdefault("completed_terms", 0)
+        migrated.setdefault("last_exam", {})
+        migrated.setdefault("content_mode", "library")
+        migrated.setdefault("ending_kind", None)
+        migrated.setdefault("ending_reason", None)
+    migrated["state_version"] = STATE_VERSION
+    return migrated
 
 
 class MemorySessionStore:

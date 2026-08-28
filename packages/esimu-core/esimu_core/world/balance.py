@@ -149,7 +149,8 @@ class GameBalance:
 
     def get_cooldown(self, action: str) -> int:
         """Return relax-action cooldown in seconds."""
-        return self.relax_actions.get(action, {}).get("cooldown_seconds", 0)
+        config = self.relax_actions.get(action, {})
+        return int(config.get("cooldown_seconds", config.get("cooldown", 0)) or 0)
 
     @property
     def events(self) -> Dict:
@@ -162,7 +163,7 @@ class GameBalance:
 
     def get_dingtalk_config(self) -> Dict:
         """DingTalk trigger and contact-limit configuration."""
-        return self.events.get("dingtalk", {})
+        return self.events.get("messenger") or self.events.get("dingtalk", {})
 
     @property
     def dingtalk_max_contacts(self) -> int:
@@ -199,12 +200,18 @@ class GameBalance:
     @property
     def fail_sanity_penalty(self) -> int:
         """Sanity penalty applied per failed course."""
-        return self.exam_config.get("fail_sanity_penalty_per_course", -10)
+        return self.exam_config.get(
+            "fail_sanity_penalty_per_course",
+            self.exam_config.get("fail_sanity_penalty", -10),
+        )
 
     @property
     def pass_all_bonus(self) -> int:
         """Sanity bonus when all courses pass."""
-        return self.exam_config.get("pass_all_sanity_bonus", 10)
+        return self.exam_config.get(
+            "pass_all_sanity_bonus",
+            self.exam_config.get("pass_all_bonus", 10),
+        )
 
     @property
     def game_over_config(self) -> Dict:

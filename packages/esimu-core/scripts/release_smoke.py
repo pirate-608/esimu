@@ -124,6 +124,24 @@ def main() -> int:
             ],
             cwd=temp,
         )
+        for command in (
+            ["doctor", "--root", str(project), "--theme", "release-smoke"],
+            ["inspect", "--root", str(project), "--theme", "release-smoke", "--json"],
+            ["sync", "--root", str(project), "--theme", "release-smoke"],
+            [
+                "add",
+                "item",
+                "smoke_preview",
+                "--root",
+                str(project),
+                "--theme",
+                "release-smoke",
+            ],
+        ):
+            _run(
+                [str(python), "-m", "esimu_core.cli", *command],
+                cwd=temp,
+            )
 
         clean_env = {
             key: value
@@ -137,10 +155,18 @@ def main() -> int:
                 "SIMULATOR_THEME",
             }
         }
-        clean_env["ESIMU_STARTER_SESSION_STORE"] = "memory"
+        clean_env["ESIMU_STARTER_SESSION_STORE"] = "sqlite"
+        clean_env["ESIMU_STARTER_DATABASE_PATH"] = str(temp / "smoke.sqlite3")
         smoke_code = """
 from fastapi.testclient import TestClient
 from app.main import app
+
+def receive_type(websocket, expected):
+    for _ in range(30):
+        message = websocket.receive_json()
+        if message['type'] == expected:
+            return message
+    raise AssertionError(expected)
 
 with TestClient(app) as client:
     assert client.get('/healthz').json() == {
@@ -155,6 +181,24 @@ with TestClient(app) as client:
         json={'token': token, 'username': 'Release', 'major': 'GEN'},
     )
     assert response.status_code == 200
+    with client.websocket_connect('/ws') as websocket:
+        websocket.send_json({'token': token, 'protocol_version': 2})
+        receive_type(websocket, 'auth_ok')
+        receive_type(websocket, 'init')
+        websocket.send_json({'action': 'exam'})
+        assert receive_type(websocket, 'semester_summary')['data']['ended'] is False
+        websocket.send_json({'action': 'next_semester'})
+        receive_type(websocket, 'new_semester')
+        websocket.send_json({'action': 'exam'})
+        assert receive_type(websocket, 'semester_summary')['data']['ended'] is True
+        websocket.send_json({'action': 'ending'})
+        assert receive_type(websocket, 'ending')['data']['outcome'] == 'graduation'
+        websocket.send_json({'action': 'save_game'})
+        assert receive_type(websocket, 'save_result')['success'] is True
+
+with TestClient(app) as client:
+    resumed = client.post('/api/auth', json={'username': 'Release', 'token': token})
+    assert resumed.json()['status'] == 'returning'
 """
         _run(
             [str(python), "-c", smoke_code],

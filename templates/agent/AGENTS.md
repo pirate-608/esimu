@@ -79,7 +79,9 @@ Installed core and theme checks:
 
 ```powershell
 <python> -c "import esimu_core; print(esimu_core.__version__)"
-<python> <validate-world-data-script>
+esimu validate --root . --theme <theme-id>
+esimu doctor --root . --theme <theme-id>
+esimu sync --root . --theme <theme-id>
 ```
 
 Backend checks:

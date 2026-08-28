@@ -26,7 +26,8 @@ python -m pip install -e ".[ai]"
 
 ## Starter 配置
 
-starter 默认完全使用本地内容库：
+starter 默认完全使用本地内容库。环境变量决定初始模式和可用 transport；每个持久化
+session 可通过 `set_mode` 独立切换，不会修改其他玩家的模式：
 
 ```text
 ESIMU_CONTENT_MODE=library
@@ -75,6 +76,9 @@ M2-her 会保留 `user_system`、`group` 和 sample-message 等角色类型，�
 模型生成的事件和私信 effects 会经过 `world/stat_definitions.json` 白名单；未知字段
 被丢弃，合法数值在进入 session 前限幅。
 
+私聊回复采用两阶段流程：玩家消息立即保存和推送，NPC/AI 生成进入按联系人去重的
+后台任务；每三次玩家回复关闭并结算一轮。
+
 ## Adapter 责任
 
 core 不负责 Redis/数据库内容池、浏览器玩家提交的 API key、计费配额、内容审核、
@@ -82,5 +86,5 @@ pgvector 检索、WebSocket 推送或存档 schema。部署密钥可使用
 `OpenAITransportRegistry.shared()`；玩家密钥应使用 `session()`，结束后关闭，且禁止
 把其生成内容写入全局共享池。
 
-ZJU reference 继续拥有 Redis 内容池和 pgvector 角色选择，但已复用 core 的
-provider 元数据、JSON 解析和 M2-her 角色合同。
+生产专用 adapter 可增加 Redis 内容池或向量检索，同时继续复用这些 transport、
+解析和角色合同。

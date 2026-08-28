@@ -8,7 +8,10 @@ Current scope:
 - `backend/`: FastAPI/WebSocket adapter with SQLite persistence by default.
 - `frontend/`: Vue 3/Pinia console driven by generated theme, story, and stat metadata.
 - Default theme: `demo-campus`.
-- Memory sessions for tests and temporary file compatibility for the 0.2 Beta.
+- State/protocol v2 with state-v1 and protocol-v1 compatibility.
+- Persistent cooldowns, achievements, automatic content, two-phase messenger
+  replies, save/exit lifecycle, and distinct failure/graduation outcomes.
+- Memory sessions for tests and temporary file compatibility through the 0.3 Beta.
 
 The starter deliberately omits Redis, PostgreSQL, SQLAdmin, and production
 Docker. It includes the optional `esimu_core.ai` adapter but stays in local
@@ -20,7 +23,7 @@ See `docs/starter-contract.md` for the public starter surface.
 Backend smoke:
 
 ```powershell
-cd esimu-lab\apps\starter\backend
+cd esimu\apps\starter\backend
 python -m pytest tests
 ```
 
@@ -33,7 +36,7 @@ python -m uvicorn app.main:app --reload --port 18001
 Frontend dev server:
 
 ```powershell
-cd esimu-lab\apps\starter\frontend
+cd esimu\apps\starter\frontend
 corepack pnpm install --frozen-lockfile
 corepack pnpm dev
 ```
@@ -42,5 +45,6 @@ Frontend checks:
 
 ```powershell
 corepack pnpm typecheck
+corepack pnpm test
 corepack pnpm build
 ```

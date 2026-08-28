@@ -3,7 +3,7 @@
 This is the shortest verified path from a fresh clone to a running esimu
 starter and a standalone generated simulator.
 
-## 1. Clone And Install The Lab
+## 1. Clone And Install esimu
 
 ```powershell
 git clone https://github.com/pirate-608/esimu.git
@@ -30,10 +30,13 @@ Remove-Item Env:ESIMU_THEME
 ```
 
 The repository validator also checks checked-in frontend metadata. Downstream
-projects use the installed, project-local command instead:
+projects use the installed project-local commands:
 
 ```powershell
-esimu-validate-world --root <project-root> --theme <theme-id>
+esimu validate --root <project-root> --theme <theme-id>
+esimu doctor --root <project-root> --theme <theme-id>
+esimu inspect --root <project-root> --theme <theme-id>
+esimu sync --root <project-root> --theme <theme-id>
 ```
 
 ## 3. Run The Starter Backend
@@ -46,7 +49,8 @@ python -m uvicorn app.main:app --reload --port 18001
 ```
 
 Readiness is available at `http://127.0.0.1:18001/healthz`. The starter defaults
-to memory sessions and the `demo-campus` theme.
+to SQLite at `data/esimu.sqlite3` and the `demo-campus` theme; tests select the
+memory adapter explicitly.
 
 ## 4. Run The Starter Frontend
 
@@ -82,11 +86,11 @@ empty and route `/api`, `/config`, `/healthz`, and `/ws` to the backend.
 
 ## 5. Generate A Standalone Simulator
 
-Run the generator from the lab checkout:
+During unreleased `0.3.0b1` development, install the candidate with
+`python -m pip install -e ".\packages\esimu-core[ai]"`, then run:
 
 ```powershell
-cd packages\esimu-core
-python scripts\new_project.py D:\projects\my-simulator `
+esimu new D:\projects\my-simulator `
   --project-name "My Simulator" `
   --theme-id my-simulator
 ```
@@ -103,7 +107,8 @@ cd D:\projects\my-simulator
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r apps\starter\backend\requirements.txt
-esimu-validate-world --root . --theme my-simulator
+esimu validate --root . --theme my-simulator
+esimu doctor --root . --theme my-simulator
 cd apps\starter\backend
 python -m uvicorn app.main:app --reload --port 18001
 ```
@@ -113,19 +118,20 @@ editable path or wheel URL instead of relying on a tag that has not been pushed.
 
 ## 6. Scaffold World Data
 
-Generated projects carry the conservative scaffold helpers locally:
+Installed authoring commands default to read-only previews and checks:
 
 ```powershell
 cd D:\projects\my-simulator
-$env:ESIMU_PROJECT_ROOT=(Get-Location).Path
-$env:ESIMU_THEME='my-simulator'
-python scripts\scaffold_game_stat.py add focus --label 专注 --show-in-hud
-python scripts\scaffold_world_data.py item focus_card --name 专注卡
-python scripts\scaffold_world_data.py achievement first_win --name 第一次胜利
-esimu-validate-world --root . --theme my-simulator
+esimu add stat focus --root . --theme my-simulator --label 专注 --show-in-hud
+esimu add item focus_card --root . --theme my-simulator --name 专注卡
+esimu add achievement first_win --root . --theme my-simulator --name 第一次胜利
+esimu sync --root . --theme my-simulator
+esimu validate --root . --theme my-simulator
 ```
 
-Review generated JSON before using `--write`.
+Review generated JSON before repeating a command with `--write`. Writes are
+atomic, synchronize frontend metadata, validate the theme, and roll back on
+failure.
 
 ## 7. Run The Release-Candidate Gate
 
@@ -151,17 +157,3 @@ zensical build
 
 Use `zensical serve` for local browsing. The generated `site/` directory is
 ignored.
-
-## 9. Optional Reference Compatibility
-
-The ZJU reference adapter is not part of the default install path. Run it only
-when changing compatibility behavior:
-
-```powershell
-cd apps\zju-reference\zjus-backend
-python -m pytest tests\unit\test_demo_campus_reference_smoke.py `
-  tests\unit\test_game_state.py tests\unit\test_dingtalk_state.py
-python -m ruff check app tests\unit
-```
-
-See `reference-compatibility.md` for the full boundary.

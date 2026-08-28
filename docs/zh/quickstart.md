@@ -2,7 +2,7 @@
 
 这是从全新 clone 到运行 esimu Starter、再到生成独立模拟器的最短验收路径。
 
-## 克隆并安装实验仓
+## 克隆并安装 esimu
 
 ```powershell
 git clone https://github.com/pirate-608/esimu.git
@@ -31,7 +31,10 @@ Remove-Item Env:ESIMU_THEME
 生成项目不需要保留 esimu 路径，安装 core 后直接运行：
 
 ```powershell
-esimu-validate-world --root <项目根目录> --theme <主题 ID>
+esimu validate --root <项目根目录> --theme <主题 ID>
+esimu doctor --root <项目根目录> --theme <主题 ID>
+esimu inspect --root <项目根目录> --theme <主题 ID>
+esimu sync --root <项目根目录> --theme <主题 ID>
 ```
 
 ## 运行 Starter
@@ -45,7 +48,8 @@ python -m ruff check app tests
 python -m uvicorn app.main:app --reload --port 18001
 ```
 
-健康检查位于 `http://127.0.0.1:18001/healthz`。
+健康检查位于 `http://127.0.0.1:18001/healthz`。默认持久化是
+`data/esimu.sqlite3`，测试显式使用内存 adapter。
 
 前端在第二个终端运行：
 
@@ -71,9 +75,11 @@ VITE_ESIMU_WS_BASE=wss://api.example.com
 
 ## 生成独立项目
 
+`0.3.0b1` 尚未发布时，先执行
+`python -m pip install -e ".\packages\esimu-core[ai]"`，然后：
+
 ```powershell
-cd packages\esimu-core
-python scripts\new_project.py D:\projects\my-simulator `
+esimu new D:\projects\my-simulator `
   --project-name "My Simulator" `
   --theme-id my-simulator
 ```
@@ -86,26 +92,28 @@ cd D:\projects\my-simulator
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r apps\starter\backend\requirements.txt
-esimu-validate-world --root . --theme my-simulator
+esimu validate --root . --theme my-simulator
+esimu doctor --root . --theme my-simulator
 cd apps\starter\backend
 python -m uvicorn app.main:app --reload --port 18001
 ```
 
-开发未发布 core 时，给 `new_project.py` 传入 `--core-dependency`，使用本地
+开发未发布 core 时，给 `esimu new` 传入 `--core-dependency`，使用本地
 editable 路径或刚构建的 wheel，不要依赖尚未推送的标签。
 
 ## 编辑和校验世界数据
 
 ```powershell
 cd D:\projects\my-simulator
-$env:ESIMU_PROJECT_ROOT=(Get-Location).Path
-$env:ESIMU_THEME='my-simulator'
-python scripts\scaffold_game_stat.py add focus --label 专注 --show-in-hud
-python scripts\scaffold_world_data.py item focus_card --name 专注卡
-esimu-validate-world --root . --theme my-simulator
+esimu add stat focus --root . --theme my-simulator --label 专注 --show-in-hud
+esimu add item focus_card --root . --theme my-simulator --name 专注卡
+esimu add achievement first_win --root . --theme my-simulator --name 第一次胜利
+esimu sync --root . --theme my-simulator
+esimu validate --root . --theme my-simulator
 ```
 
-使用 `--write` 前先审查生成的 JSON。
+默认只预览或检查。审查 JSON 后显式加入 `--write`；写入会原子发布、同步前端
+metadata、执行主题校验，并在失败时回滚。
 
 ## 发布候选验收
 
@@ -123,5 +131,3 @@ python packages\esimu-core\scripts\release_smoke.py
 ```powershell
 zensical build
 ```
-
-ZJU reference adapter 仅用于兼容性回归，不属于默认安装路径。

@@ -1,7 +1,8 @@
 # Beta Readiness Review
 
-esimu `0.2.0b5` is ready for public Beta validation when its TestPyPI and
-external-example gates pass.
+esimu `0.3.0b1` is the next source candidate. Published `0.2.0b5` already
+passed TestPyPI and external-example gates; 0.3 adds the runtime closure and
+installed authoring commands before its own release gate.
 
 Ready locally: typed core, versioned theme/state/protocol contracts, wheel-owned
 `esimu new`, strict theme validation, optional AI, Vue/Pinia Starter, real-time

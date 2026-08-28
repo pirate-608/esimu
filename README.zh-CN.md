@@ -8,17 +8,17 @@ esimu 是面向校园、职业和人生叙事模拟器的主题驱动框架。Be
 esimu-core + 生成的 Starter 应用 + 单一主题包
 ```
 
-`esimu-core 0.2.0b5` 提供强类型世界数据加载、主题校验、游戏规则、运行时
+`esimu-core 0.3.0b1` 提供强类型世界数据加载、主题校验、游戏规则、运行时
 payload、可选 AI 生成和自包含项目 CLI。生成的 Starter 包含 Vue 3/Pinia
 控制台、FastAPI/WebSocket、实时 Tick、事件、论坛、私聊、道具、学期结算、
-结局和 SQLite 持久化。
+冷却、声明式成就、自动内容、区分失败/毕业的结局和 SQLite 持久化。
 
 ## 快速开始
 
-Beta 发布后执行：
+`0.3.0b1` 发布前，从源码工作区安装候选版本：
 
 ```powershell
-python -m pip install "esimu-core[ai]==0.2.0b5"
+python -m pip install -e ".\packages\esimu-core[ai]"
 esimu new D:\projects\my-simulator `
   --project-name "My Simulator" `
   --theme-id my-simulator `
@@ -26,6 +26,7 @@ esimu new D:\projects\my-simulator `
 cd D:\projects\my-simulator
 python -m pip install -r apps\starter\backend\requirements.txt
 esimu validate --root . --theme my-simulator
+esimu doctor --root . --theme my-simulator
 ```
 
 后端：
@@ -78,8 +79,9 @@ zensical build
 
 - 包名：`esimu-core`
 - Python 命名空间：`esimu_core`
-- CLI：`esimu new`、`esimu validate`、`esimu version`
-- 主题、Starter 状态和 WebSocket 协议版本：`1`
+- CLI：`esimu new/validate/doctor/inspect/sync/add/version`
+- 主题契约版本：`1`
+- Starter 状态与 WebSocket 协议版本：`2`；旧状态自动迁移并兼容 v1 客户端
 - 许可证：MIT
 
 本 Beta 不承诺运行时多主题、生产账号系统、Redis/PostgreSQL adapter 或独立

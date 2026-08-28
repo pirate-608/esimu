@@ -192,8 +192,17 @@ Each achievement needs:
 - `name`,
 - `desc` or `description`.
 
-Condition expressions remain reference-adapter behavior for now; later phases
-may move achievement evaluation into core.
+An optional `condition` enables automatic unlocking. It contains exactly one
+non-empty `all` or `any` array. Each predicate uses:
+
+```json
+{"scope":"action","key":"messenger_round","op":"gte","value":3}
+```
+
+Scopes are `stat`, `action`, or `session`; operators are `gte`, `gt`, `lte`,
+`lt`, and `eq`. Supported session metrics are `semester_idx`,
+`completed_terms`, `failed_count`, `term_gpa`, and `cumulative_gpa`.
+Achievements without conditions remain display-only/manual entries.
 
 ### Events And Forum
 
@@ -204,9 +213,8 @@ may move achievement evaluation into core.
 - non-empty `options` array,
 - each option needs `text` and `effects` object.
 
-`world/cc98_library.json` is still the compatibility filename for the local
-forum library. Each forum entry needs `content`; `effect`, `trigger`, and
-`topic` are optional.
+`world/forum_library.json` is the neutral local forum library. Each entry needs
+`content`; `effect`, `trigger`, and `topic` are optional.
 
 ### Characters
 
@@ -239,25 +247,22 @@ Optional `min_gpa` and `max_gpa` fields define GPA branches.
 5. Replace `world/majors.json` and `world/courses/*.json`.
 6. Replace stats, items, achievements, events, forum posts, characters, and
    graduation comments.
-7. Run `validate_world_data.py`.
-8. If the reference frontend should run this theme, regenerate metadata:
+7. Run the installed authoring checks:
 
 ```powershell
-python scripts\sync_theme_metadata.py --write
-python scripts\sync_story_metadata.py --write
-python scripts\sync_stat_definitions.py --write
+esimu validate --root . --theme <theme_id>
+esimu doctor --root . --theme <theme_id>
+esimu sync --root . --theme <theme_id> --write
 ```
 
-9. Run validation again.
-10. Run the relevant reference backend/frontend smoke checks.
+8. Use `esimu add ...` for reviewable stat/item/achievement/event/course/prompt
+   drafts; writes require `--write` and roll back if validation fails.
+9. Run the Starter backend/frontend smoke checks.
 
 ## Compatibility Notes
 
-- `cc98` and `dingtalk` are legacy internal IDs in the reference app.
-- Theme authors should change visible labels through `forum` and `messenger`
-  terms rather than renaming protocol IDs.
-- `cc98_library.json` keeps its compatibility filename until the protocol/data
-  migration phase explicitly renames it.
+- Starter public actions use neutral `forum` and `messenger` IDs.
+- Theme authors change visible labels through `forum` and `messenger` terms.
 - Runtime multi-theme switching is out of scope; esimu uses startup/build-time
   theme selection.
 

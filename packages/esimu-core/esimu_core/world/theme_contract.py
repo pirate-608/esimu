@@ -15,6 +15,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
+from esimu_core.domain.achievements import achievement_condition_issues
 from esimu_core.world.prompts import PromptConfig
 from esimu_core.world.stat_definitions import StatDefinitionsConfig
 from esimu_core.world.story import StoryConfig
@@ -105,7 +106,13 @@ def validate_theme_pack(theme_path: str | Path) -> list[ContractIssue]:
     _validate_items(world, issues)
     major_ids = _validate_majors(world, issues)
     _validate_courses(world, major_ids, issues)
-    _validate_achievements(world, issues)
+    stat_entries = stats_raw.get("stats", []) if isinstance(stats_raw, Mapping) else []
+    stat_ids = {
+        str(item.get("id") or "").strip()
+        for item in stat_entries
+        if isinstance(item, Mapping)
+    }
+    _validate_achievements(world, issues, stat_ids=stat_ids)
     _validate_event_library(world, issues)
     _validate_forum_library(world, issues)
     _validate_characters(world, issues)
@@ -249,7 +256,12 @@ def _validate_courses(
                 )
 
 
-def _validate_achievements(world: Path, issues: list[ContractIssue]) -> None:
+def _validate_achievements(
+    world: Path,
+    issues: list[ContractIssue],
+    *,
+    stat_ids: set[str],
+) -> None:
     raw = _load_json(world, "achievements.json", issues)
     entries = _achievement_entries(raw)
     if not entries:
@@ -286,6 +298,19 @@ def _validate_achievements(world: Path, issues: list[ContractIssue]) -> None:
                     f"{location}.desc or description is required",
                 )
             )
+        condition = achievement.get("condition")
+        if condition is not None:
+            for message in achievement_condition_issues(
+                condition,
+                stat_ids=stat_ids,
+            ):
+                issues.append(
+                    _issue(
+                        world,
+                        "achievements.json",
+                        f"{location}.{message}",
+                    )
+                )
 
 
 def _validate_event_library(world: Path, issues: list[ContractIssue]) -> None:
@@ -314,12 +339,12 @@ def _validate_event_library(world: Path, issues: list[ContractIssue]) -> None:
                 )
             )
         options = event.get("options")
-        if not isinstance(options, list) or not options:
+        if not isinstance(options, list) or len(options) < 2:
             issues.append(
                 _issue(
                     world,
                     "event_library.json",
-                    f"{location}.options must be a non-empty array",
+                    f"{location}.options must contain at least two choices",
                 )
             )
             continue

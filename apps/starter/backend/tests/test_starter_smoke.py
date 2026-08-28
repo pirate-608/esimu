@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import os
 from pathlib import Path
 from typing import Mapping, Sequence
@@ -16,13 +17,23 @@ from esimu_core import PROTOCOL_VERSION, STATE_VERSION
 from esimu_core.ai import AIContentService
 
 from app.ai import StarterAIAdapter
+from app import main as main_module
 from app.main import app
 from app.session import StarterGameSession
 from app.store import (
     FileSessionStore,
     SQLiteSessionStore,
     SessionStateVersionError,
+    _restore_state,
 )
+
+
+def _receive_type(websocket, expected: str, limit: int = 20) -> dict:
+    for _ in range(limit):
+        message = websocket.receive_json()
+        if message["type"] == expected:
+            return message
+    raise AssertionError(f"did not receive {expected}")
 
 
 def test_starter_session_runs_two_term_game_loop() -> None:
@@ -107,7 +118,7 @@ def test_starter_websocket_runs_neutral_actions() -> None:
                 ({"action": "event"}, "event"),
                 ({"action": "event_choice", "option_index": 0}, "feedback"),
                 ({"action": "forum"}, "forum_post"),
-                ({"action": "messenger"}, "messenger_round"),
+                ({"action": "messenger"}, "messenger_update"),
                 ({"action": "item_buy", "item_id": "planner"}, "items_state"),
                 ({"action": "item_sell", "item_id": "planner"}, "items_state"),
                 ({"action": "exam"}, "semester_summary"),
@@ -116,9 +127,81 @@ def test_starter_websocket_runs_neutral_actions() -> None:
                 ({"action": "resume"}, "tick"),
             ):
                 websocket.send_json(request)
-                response = websocket.receive_json()
+                response = _receive_type(websocket, response_type)
                 assert response["type"] == response_type
                 assert response["protocol_version"] == PROTOCOL_VERSION
+
+
+def test_websocket_save_and_exit_is_ordered() -> None:
+    with TestClient(app) as client:
+        with client.websocket_connect("/ws") as websocket:
+            websocket.send_json(
+                {"token": "save_exit_test", "protocol_version": PROTOCOL_VERSION}
+            )
+            _receive_type(websocket, "auth_ok")
+            _receive_type(websocket, "init")
+            websocket.send_json({"action": "save_and_exit"})
+            assert _receive_type(websocket, "save_result")["success"] is True
+            assert _receive_type(websocket, "exit_confirmed")["type"] == "exit_confirmed"
+
+
+def test_save_failure_returns_save_result(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    async def fail_save(_token, _session):
+        raise OSError("disk full")
+
+    with TestClient(app) as client:
+        with client.websocket_connect("/ws") as websocket:
+            websocket.send_json({"token": "save_failure", "protocol_version": 2})
+            _receive_type(websocket, "auth_ok")
+            _receive_type(websocket, "init")
+            monkeypatch.setattr(main_module._session_store, "set", fail_save)
+            websocket.send_json({"action": "save_game"})
+            result = _receive_type(websocket, "save_result")
+            assert result["success"] is False
+            assert "disk full" in result["message"]
+
+
+def test_protocol_v1_keeps_legacy_messenger_response() -> None:
+    with TestClient(app) as client:
+        with client.websocket_connect("/ws") as websocket:
+            websocket.send_json({"token": "legacy_protocol", "protocol_version": 1})
+            _receive_type(websocket, "auth_ok")
+            _receive_type(websocket, "init")
+            websocket.send_json({"action": "messenger"})
+            assert _receive_type(websocket, "messenger_round")["protocol_version"] == 2
+
+
+def test_messenger_ai_wait_does_not_block_other_actions(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    async def delayed_reply(_session, _pending):
+        await asyncio.sleep(0.05)
+        return {"content": "later", "reply_options": ["continue"]}
+
+    monkeypatch.setattr(main_module._ai, "messenger_reply", delayed_reply)
+    with TestClient(app) as client:
+        with client.websocket_connect("/ws") as websocket:
+            websocket.send_json({"token": "nonblocking_reply", "protocol_version": 2})
+            _receive_type(websocket, "auth_ok")
+            _receive_type(websocket, "init")
+            websocket.send_json({"action": "messenger"})
+            opening = _receive_type(websocket, "messenger_update")
+            contact = opening["data"]["contact"]
+            option = opening["data"]["reply_options"][0]
+            websocket.send_json(
+                {
+                    "action": "messenger_reply",
+                    "contact_id": contact["contact_id"],
+                    "option_id": option["option_id"],
+                }
+            )
+            immediate = _receive_type(websocket, "messenger_update")
+            assert immediate["phase"] == "player"
+            websocket.send_json({"action": "get_state"})
+            assert _receive_type(websocket, "tick")["type"] == "tick"
+            assert _receive_type(websocket, "messenger_update")["phase"] == "npc"
 
 
 @pytest.mark.asyncio
@@ -134,6 +217,117 @@ async def test_file_session_store_round_trips_legacy_state(tmp_path: Path) -> No
     assert restored is not None
     assert restored.username == "Alex"
     assert "planner" in restored.items_state["owned"]
+
+
+def test_v1_state_migrates_runtime_fields() -> None:
+    state = StarterGameSession(username="Legacy")
+    state.initialize(username="Legacy")
+    raw = state.export_state()
+    raw["state_version"] = 1
+    for key in (
+        "tick_count",
+        "cooldown_timestamps",
+        "action_counts",
+        "achievements",
+        "completed_terms",
+        "last_exam",
+        "content_mode",
+        "ending_kind",
+        "ending_reason",
+    ):
+        raw.pop(key, None)
+    restored = _restore_state(json.dumps(raw))
+    assert restored.state_version == STATE_VERSION
+    assert restored.content_mode == "library"
+    assert restored.action_counts == {}
+
+
+def test_cooldown_achievement_and_game_over_are_session_state() -> None:
+    session = StarterGameSession()
+    session.initialize()
+    session.relax("walk")
+    assert session.relax_cooldowns()["walk"] > 0
+    with pytest.raises(ValueError, match="cooling down"):
+        session.relax("walk")
+    unlocked = session.check_achievements()
+    assert [item["code"] for item in unlocked] == ["first_step"]
+    session.stats["sanity"] = 0
+    game_over = session.check_game_over()
+    assert game_over and session.ending_kind == "game_over"
+    assert session.is_running is False
+
+
+def test_content_mode_is_scoped_to_one_session() -> None:
+    first = StarterGameSession()
+    second = StarterGameSession()
+    first.set_content_mode("hybrid", ai_available=True)
+    assert first.content_mode == "hybrid"
+    assert second.content_mode == "library"
+
+
+def test_messenger_reply_is_two_phase_and_settles_every_third_reply() -> None:
+    session = StarterGameSession()
+    session.initialize()
+    opening = session.messenger_round()
+    contact_id = opening["contact"]["contact_id"]
+
+    for count in range(1, 4):
+        pending = session.begin_messenger_reply(contact_id, content=f"reply {count}")
+        contact = session.messenger_state["contacts"][contact_id]
+        assert contact["messages"][-1]["speaker"] == "player"
+        assert contact["awaiting_reply"] is True
+        completed = session.complete_messenger_reply(
+            contact_id,
+            {
+                "content": f"npc {count}",
+                "reply_options": ["continue"],
+                "settlement": {"desc": "round done", "effects": {"sanity": 1}},
+            },
+        )
+        assert pending["reply_count"] == count
+        assert completed["state"]["contacts"][contact_id]["awaiting_reply"] is False
+
+    contact = session.messenger_state["contacts"][contact_id]
+    assert contact["round_open"] is False
+    assert contact["completed_rounds"] == 1
+    assert session.action_counts["messenger_round"] == 1
+
+
+def test_restored_session_recovers_canceled_messenger_reply() -> None:
+    session = StarterGameSession()
+    session.initialize()
+    opening = session.messenger_round()
+    contact_id = opening["contact"]["contact_id"]
+    session.begin_messenger_reply(contact_id, content="hello")
+
+    restored = StarterGameSession.from_state(session.export_state())
+    contact = restored.messenger_state["contacts"][contact_id]
+    assert contact["awaiting_reply"] is False
+    assert contact["round_reply_count"] == 0
+    assert contact["pending_options"]
+
+
+def test_messenger_settlement_does_not_cross_exam_boundary() -> None:
+    session = StarterGameSession()
+    session.initialize()
+    opening = session.messenger_round()
+    contact_id = opening["contact"]["contact_id"]
+    contact = session.messenger_state["contacts"][contact_id]
+    contact["round_reply_count"] = 2
+    pending = session.begin_messenger_reply(contact_id, content="third reply")
+    session.final_exam()
+    sanity_after_exam = session.stats["sanity"]
+
+    result = session.complete_messenger_reply(
+        contact_id,
+        {
+            "content": "late reply",
+            "settlement": {"desc": "late", "effects": {"sanity": 10}},
+        },
+        expected_semester_idx=pending["semester_idx"],
+    )
+    assert session.stats["sanity"] == sanity_after_exam
+    assert result["feedback"]["changes"] == []
 
 
 @pytest.mark.asyncio
@@ -212,6 +406,7 @@ def test_starter_ai_adapter_drives_generated_content() -> None:
         adapter = StarterAIAdapter(service=service, mode="ai")
         session = StarterGameSession()
         session.initialize(username="Alex")
+        session.content_mode = "ai"
 
         event = await adapter.event(session)
         forum = await adapter.forum_post(session)

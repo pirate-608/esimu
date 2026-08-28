@@ -11,12 +11,13 @@ dependencies. The historical extraction is preserved by `esimu-lab-final`.
 ## Current Beta State
 
 - Package: `packages/esimu-core`, distribution `esimu-core`, import
-  `esimu_core`, current version `0.2.0b5`.
+  `esimu_core`, current candidate version `0.3.0b1`.
 - Starter: `apps/starter`, FastAPI/WebSocket backend plus Vue 3/Pinia frontend.
 - Default theme: `themes/demo-campus`.
 - Persistence: SQLite by default, memory for tests, JSON file as a temporary
   Beta compatibility adapter.
-- Contracts: theme schema, state schema, and WebSocket protocol are version 1.
+- Contracts: theme schema is version 1; state and WebSocket protocol are version 2.
+  State v1 is migrated on load and protocol-v1 clients remain accepted.
 - Docs: Zensical under `docs/`, published at `https://esimu.67656.fun/`.
 
 ## Architecture Boundaries
@@ -34,18 +35,37 @@ dependencies. The historical extraction is preserved by `esimu-lab-final`.
 ## Environment And CLI
 
 Use `ESIMU_PROJECT_ROOT`, `ESIMU_THEME`, `ESIMU_WORLD_DIR`, and
-`ESIMU_FRONTEND_*_OUTPUT`. Old `SIMULATOR_*` names are read only for the 0.2
-Beta compatibility window and must not appear in new docs or generated files.
+`ESIMU_FRONTEND_*_OUTPUT`. Old `SIMULATOR_*` names remain read-only compatibility
+inputs through the 0.3 Beta and must not appear in new docs or generated files.
 
 Public CLI:
 
 ```powershell
 esimu new <target>
 esimu validate --root . --theme <theme-id>
+esimu doctor --root . --theme <theme-id>
+esimu inspect --root . --theme <theme-id>
+esimu sync --root . --theme <theme-id>
+esimu add <stat|item|achievement|event|course|prompt> <id> --root . --theme <theme-id>
 esimu version
 ```
 
 `esimu-validate-world` remains a temporary compatibility alias.
+
+## Runtime Contracts
+
+- Relax cooldowns, action counts, achievements, content mode, ending state, and
+  complete messenger contacts persist in state v2.
+- Achievement conditions are theme-owned `all`/`any` predicates over
+  `stat/action/session`; never evaluate arbitrary expression strings.
+- Automatic event/messenger work uses balance intervals/probabilities and must
+  stop while paused, settling, or ended.
+- Player messenger replies are saved/emitted before AI work. Model calls run
+  outside the session lock through per-target deduplicated tasks.
+- `save_and_exit` sends `save_result`, then `exit_confirmed`, then closes with
+  code 1000. Do not reorder this lifecycle.
+- `esimu add` and `sync` are check/preview-only without `--write`; writes are
+  atomic and validation failures must restore source and generated files.
 
 ## Required Checks
 
@@ -79,7 +99,7 @@ both demo semesters without an esimu source checkout.
 - TestPyPI uses `.github/workflows/release-candidate.yml`.
 - PyPI and GitHub prerelease use `.github/workflows/release.yml` with trusted
   publishing; never add a long-lived PyPI token.
-- Run the external `esimu-beta-example` trial before publishing `0.2.0b5`.
+- Run an external generated-project trial before publishing `0.3.0b1`.
 
 Preserve unrelated dirty files. Do not reset or delete work that you did not
 create. Update this file and relevant bilingual docs when contracts, layout,

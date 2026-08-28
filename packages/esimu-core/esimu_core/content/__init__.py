@@ -289,6 +289,94 @@ def build_message_contact_id(sender: str, role: str, *, prefix: str = "msg") -> 
     return f"{prefix}_{digest}"
 
 
+def select_message_character(
+    characters: Sequence[Mapping[str, Any]],
+    contacts: Mapping[str, Mapping[str, Any]],
+    *,
+    max_contacts: int,
+    reuse_probability: float,
+    random_value: Callable[[], float] = random.random,
+    choose: Callable[[Sequence[Mapping[str, Any]]], Mapping[str, Any]] = random.choice,
+) -> Mapping[str, Any] | None:
+    """Balance new-character diversity against reusable closed contacts."""
+    available = [item for item in characters if isinstance(item, Mapping)]
+    if not available:
+        return None
+    reusable_contacts = [
+        contact
+        for contact in contacts.values()
+        if isinstance(contact, Mapping) and not bool(contact.get("round_open"))
+    ]
+    reusable_contacts.sort(key=lambda item: float(item.get("last_active_at", 0) or 0))
+    existing_ids = set(contacts)
+    unused = [
+        character
+        for character in available
+        if build_message_contact_id(
+            str(character.get("name") or "NPC"),
+            str(character.get("role") or "unknown"),
+        )
+        not in existing_ids
+    ]
+
+    should_reuse = bool(reusable_contacts) and (
+        len(existing_ids) >= max(1, int(max_contacts))
+        or random_value() < max(0.0, min(1.0, float(reuse_probability)))
+    )
+    if should_reuse:
+        contact = reusable_contacts[0]
+        sender = str(contact.get("sender") or "")
+        role = normalize_message_role(str(contact.get("role") or "unknown"))
+        matches = [
+            character
+            for character in available
+            if str(character.get("name") or "") == sender
+            and normalize_message_role(str(character.get("role") or "unknown"))
+            == role
+        ]
+        if matches:
+            return choose(matches)
+    if unused and len(existing_ids) < max(1, int(max_contacts)):
+        return choose(unused)
+    if reusable_contacts:
+        contact = reusable_contacts[0]
+        sender = str(contact.get("sender") or "")
+        return next(
+            (item for item in available if str(item.get("name") or "") == sender),
+            None,
+        )
+    return None
+
+
+def compact_message_contacts(
+    contacts: Mapping[str, Mapping[str, Any]],
+    *,
+    max_contacts: int,
+) -> dict[str, dict[str, Any]]:
+    """Drop the oldest closed contacts while preserving open conversations."""
+    normalized = {
+        str(contact_id): dict(contact)
+        for contact_id, contact in contacts.items()
+        if isinstance(contact, Mapping)
+    }
+    limit = max(1, int(max_contacts))
+    if len(normalized) <= limit:
+        return normalized
+    removable = sorted(
+        (
+            (contact_id, contact)
+            for contact_id, contact in normalized.items()
+            if not bool(contact.get("round_open"))
+        ),
+        key=lambda item: float(item[1].get("last_active_at", 0) or 0),
+    )
+    for contact_id, _contact in removable:
+        if len(normalized) <= limit:
+            break
+        normalized.pop(contact_id, None)
+    return normalized
+
+
 def is_replyable_message_role(role: str) -> bool:
     """Return whether a normalized role supports player replies."""
     return normalize_message_role(role) in REPLYABLE_MESSAGE_ROLES

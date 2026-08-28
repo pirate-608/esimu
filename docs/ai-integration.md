@@ -28,7 +28,9 @@ Applications may instead implement the small `ChatTransport` protocol.
 
 ## Starter Configuration
 
-The starter is local-library-first by default:
+The starter is local-library-first by default. The environment selects the
+initial mode and available transports; each persisted player session may then
+switch its own mode through the `set_mode` action without affecting others.
 
 ```text
 ESIMU_CONTENT_MODE=library
@@ -78,6 +80,10 @@ Generated event and messenger effects are filtered through
 `world/stat_definitions.json`. Unknown fields are discarded and accepted
 deltas are clamped before they reach an application session.
 
+Messenger replies use a two-phase flow: the player message is persisted and
+emitted immediately, then model generation runs in a per-contact deduplicated
+background task. Every third player reply closes and settles one round.
+
 ## Adapter Responsibilities
 
 Core does not own Redis/database content caches, browser-submitted API keys,
@@ -86,5 +92,5 @@ schemas. Use `OpenAITransportRegistry.shared()` only for deployment credentials.
 Use `session()` for player-provided credentials, close it after use, and never
 put that player's generated content into a shared content pool.
 
-The ZJU reference adapter retains Redis pools and pgvector selection while
-reusing core provider metadata, JSON parsing, and M2-her role contracts.
+Production-specific adapters may add Redis pools or vector retrieval while
+retaining the same transport, parsing, and role contracts.

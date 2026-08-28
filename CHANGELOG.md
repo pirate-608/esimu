@@ -10,7 +10,19 @@ This lab follows a lightweight Semantic Versioning policy for `esimu-core`:
 - `PATCH`: bug fixes, documentation clarifications, and validation improvements
   that do not break existing valid themes.
 
-## Unreleased
+## 0.3.0b1 - Unreleased
+
+- Added persistent relax cooldowns, automatic event/messenger scheduling,
+  declarative achievements, configurable Game Over, and richer ending payloads.
+- Added session-scoped library/hybrid/AI modes and non-blocking two-phase
+  messenger replies with unread state, contact reuse, and three-reply rounds.
+- Added protocol v2 save/exit, heartbeat, mode, achievement, messenger-update,
+  and Game Over messages while retaining protocol-v1 client responses.
+- Added state v2 with automatic v1 JSON migration and no SQLite table change.
+- Added installed `esimu doctor`, `inspect`, `sync`, and `add` authoring commands
+  with JSON output, explicit writes, atomic publication, validation, and rollback.
+
+## 0.2.0b5 - 2026-08-26
 
 - Formalized esimu as an independent Beta framework and bumped `esimu-core` to
   `0.2.0b5` with version-one theme, state, and WebSocket contracts.

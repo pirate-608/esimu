@@ -24,6 +24,7 @@ REPOSITORY_ROOT = PACKAGE_ROOT.parents[2]
 
 
 from esimu_core import __version__ as ESIMU_CORE_VERSION  # noqa: E402
+from esimu_core.authoring import metadata_documents  # noqa: E402
 
 DEFAULT_CORE_DEPENDENCY = f"esimu-core[ai]=={ESIMU_CORE_VERSION}"
 
@@ -250,21 +251,9 @@ def _patch_starter_files(target: Path, theme_id: str, core_dependency: str) -> N
 
 
 def _write_generated_frontend_data(target: Path, theme_id: str) -> None:
-    data_dir = target / "apps" / "starter" / "frontend" / "src" / "data"
-    theme_root = target / "themes" / theme_id
-    data_dir.mkdir(parents=True, exist_ok=True)
-    (data_dir / "theme.generated.ts").write_text(
-        _theme_typescript(_read_json(theme_root / "theme.json")),
-        encoding="utf-8",
-    )
-    (data_dir / "story.generated.ts").write_text(
-        _story_typescript(_read_json(theme_root / "story.json")),
-        encoding="utf-8",
-    )
-    (data_dir / "statDefinitions.generated.ts").write_text(
-        _stat_typescript(_read_json(theme_root / "world" / "stat_definitions.json")),
-        encoding="utf-8",
-    )
+    for path, content in metadata_documents(target, theme_id).items():
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content, encoding="utf-8", newline="\n")
 
 
 def _write_project_docs(target: Path, args: argparse.Namespace) -> None:
@@ -280,6 +269,7 @@ python -m venv .venv
 .\\.venv\\Scripts\\Activate.ps1
 python -m pip install -r apps\\starter\\backend\\requirements.txt
 esimu validate --root . --theme {args.theme_id}
+esimu doctor --root . --theme {args.theme_id}
 cd apps\\starter\\backend
 python -m uvicorn app.main:app --reload --port 18001
 ```
@@ -372,10 +362,13 @@ Use this checklist before turning `{args.project_name}` into a real game.
 ```powershell
 cd <project-directory>
 esimu validate --root . --theme {args.theme_id}
-python scripts\\scaffold_game_stat.py add focus --label 专注 --show-in-hud
-python scripts\\scaffold_world_data.py item focus_card --name 专注卡
-python scripts\\scaffold_world_data.py achievement first_win --name 第一次胜利
-python scripts\\scaffold_world_data.py event campus_moment --title 校园一刻
+esimu doctor --root . --theme {args.theme_id}
+esimu inspect --root . --theme {args.theme_id}
+esimu sync --root . --theme {args.theme_id}
+esimu add stat focus --root . --theme {args.theme_id} --label 专注 --show-in-hud
+esimu add item focus_card --root . --theme {args.theme_id} --name 专注卡
+esimu add achievement first_win --root . --theme {args.theme_id} --name 第一次胜利
+esimu add event campus_moment --root . --theme {args.theme_id} --title 校园一刻
 ```
 """,
         encoding="utf-8",

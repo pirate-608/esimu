@@ -37,6 +37,11 @@ ALWAYS_ALLOWED_WHILE_STOPPED = frozenset(
         "restart",
         "set_speed",
         "set_mode",
+        "ping",
+        "save_game",
+        "save_and_exit",
+        "exit_without_save",
+        "ending",
         "messenger_mark_read",
         "dingtalk_mark_read",
     }
@@ -45,6 +50,9 @@ ALWAYS_ALLOWED_WHILE_STOPPED = frozenset(
 GAMEPLAY_MUTATION_ACTIONS = frozenset(
     {
         "relax",
+        "event",
+        "forum",
+        "messenger",
         "exam",
         "event_choice",
         "messenger_reply",
