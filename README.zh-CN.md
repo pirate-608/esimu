@@ -72,8 +72,8 @@ zensical build
 ```
 
 前端执行 `corepack pnpm typecheck`、`corepack pnpm test` 和
-`corepack pnpm build`。更多内容见中文快速开始、主题契约、架构、Beta 支持策略
-和发布策略文档。
+`corepack pnpm build`。更多内容见中文快速开始、CLI 参考、主题契约、架构、
+Beta 支持策略和发布策略文档。
 
 ## 兼容性
 

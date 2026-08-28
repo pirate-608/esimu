@@ -95,12 +95,12 @@ esimu new D:\projects\my-simulator `
   --theme-id my-simulator
 ```
 
-The generated project contains its own Starter app, theme, assets, scaffold
+The generated project contains its own Starter app, theme, assets, compatibility
 helpers, README, environment template, and agent handoff. Its backend dependency
-is pinned to the Git tag matching `esimu_core.__version__`.
+pins the exact `esimu-core` package version matching the generator.
 
-After that tag has been published, install and run entirely from the generated
-project:
+After that package version is published, install and run entirely from the
+generated project:
 
 ```powershell
 cd D:\projects\my-simulator
@@ -114,7 +114,7 @@ python -m uvicorn app.main:app --reload --port 18001
 ```
 
 During unreleased framework development, pass `--core-dependency` with an
-editable path or wheel URL instead of relying on a tag that has not been pushed.
+editable path or wheel URL instead of relying on an unpublished package.
 
 ## 6. Scaffold World Data
 
@@ -157,3 +157,6 @@ zensical build
 
 Use `zensical serve` for local browsing. The generated `site/` directory is
 ignored.
+
+The documentation toolchain is pinned to Zensical 0.0.57 in
+`docs/requirements.txt`.

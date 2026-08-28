@@ -24,18 +24,18 @@ themes/<theme_id>/
       <major_abbr>.json
 ```
 
-`assets/` 可以很小，但 `story.json` 引用的图片必须存在于主题 assets 中。主题校验不再从 ZJU reference frontend 借图片。
+`assets/` 可以很小，但 `story.json` 引用的图片必须存在于主题 assets 中。
 
 ## 校验入口
 
-从 `packages/esimu-core/` 运行：
+下游项目的标准命令：
 
 ```powershell
-$env:ESIMU_THEME='<theme_id>'
-python scripts\validate_world_data.py
+esimu validate --root . --theme <theme_id>
 ```
 
-`validate_world_data.py` 会检查：
+维护者脚本 `packages/esimu-core/scripts/validate_world_data.py` 调用同一校验器。
+校验内容包括：
 
 - 必需文件是否存在。
 - `theme.json`、`story.json`、`prompts.json`、`stat_definitions.json` 的结构。
@@ -81,7 +81,7 @@ python scripts\validate_world_data.py
 - 玩家身份模板。
 - 毕业总结说明。
 
-它不负责修改 Starter 的中性 `forum`、`messenger` 协议 ID。
+Starter 的公开 action 始终使用中性的 `forum`、`messenger` ID。
 
 ## world 数据
 
@@ -90,10 +90,14 @@ python scripts\validate_world_data.py
 `items.json` 的 effects 字段必须被属性注册表的 `allow_item_effect` 允许。
 
 `event_library.json` 的 effects 字段必须被属性注册表的 `allow_event_effect` 允许。
+每个事件至少提供两个选项。
 
 `majors.json` 中每个专业/角色都应有对应的 `courses/<abbr>.json`。
 
 `forum_library.json` 是中性的本地论坛内容库，主题可通过 `theme.json` 修改可见名称。
+
+`characters.json` 的可回复角色使用中性 ID：`roommate`、`classmate`、`friend`、
+`teaching_assistant`、`teacher` 和 `crush`。
 
 `achievements.json` 中的 `condition` 可自动解锁成就。条件必须只包含一个非空
 `all` 或 `any` 数组；谓词格式为 `scope/key/op/value`。scope 支持

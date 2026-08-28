@@ -18,7 +18,8 @@ dependencies. The historical extraction is preserved by `esimu-lab-final`.
   Beta compatibility adapter.
 - Contracts: theme schema is version 1; state and WebSocket protocol are version 2.
   State v1 is migrated on load and protocol-v1 clients remain accepted.
-- Docs: Zensical under `docs/`, published at `https://esimu.67656.fun/`.
+- Docs: Zensical 0.0.57 under `docs/`, published at
+  `https://esimu.67656.fun/`.
 
 ## Architecture Boundaries
 

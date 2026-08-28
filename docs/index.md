@@ -11,9 +11,9 @@ hide:
     <p class="eyebrow">theme-driven simulator framework</p>
     <h1>Build a campus, career, or life simulator from a theme pack.</h1>
     <p class="hero-copy">
-      esimu extracts the reusable rules, runtime helpers, world-data contracts,
-      and starter app shape behind ZJUers Simulator, while keeping each game’s
-      story, nouns, balance, events, items, and prompts in a theme.
+      esimu combines reusable gameplay rules, runtime orchestration, world-data
+      contracts, optional AI, and a complete Starter while keeping each game’s
+      story, nouns, balance, events, items, and prompts in its own theme pack.
     </p>
     <p class="hero-actions">
       <a href="quickstart/" class="hero-button primary">Quickstart</a>
@@ -37,9 +37,9 @@ hide:
 <pre><code>esimu-core + starter app + theme pack</code></pre>
 
 <p>
-  It is not yet a stable public framework. Keep using Git-tagged
-  <code>esimu-core</code> versions until starter frontend packaging, optional
-  persistence adapters, and real external-project feedback are proven.
+  Published projects should pin an exact Beta. <code>0.2.0b5</code> is the
+  current public package; <code>0.3.0b1</code> is the source candidate that adds
+  the closed runtime loop and installed authoring commands.
 </p>
 
 <h2>What You Get</h2>
@@ -48,16 +48,16 @@ hide:
   <article>
     <h3>esimu-core</h3>
     <p>
-      Pure Python package for world loaders, stat/item contracts, semester
-      settlement, runtime snapshots, action gates, lifecycle helpers, and
-      content normalization.
+      Pure Python package for world loaders, stat/item contracts, declarative
+      achievements, semester settlement, runtime scheduling, optional AI,
+      lifecycle helpers, and safe project authoring.
     </p>
   </article>
   <article>
     <h3>Starter App</h3>
     <p>
-      A small FastAPI/WebSocket backend plus Vite/TypeScript frontend skin,
-      using in-memory sessions and the demo-campus theme by default.
+      A FastAPI/WebSocket backend plus Vue 3/Pinia console, using SQLite,
+      versioned state/protocol contracts, and the demo-campus theme by default.
     </p>
   </article>
   <article>
@@ -82,6 +82,8 @@ esimu new <target-project> --project-name "My Simulator" --theme-id my-simulator
 <pre><code class="language-powershell">
 esimu validate --root <target-project> --theme my-simulator
 esimu doctor --root <target-project> --theme my-simulator
+esimu inspect --root <target-project> --theme my-simulator
+esimu sync --root <target-project> --theme my-simulator
 </code></pre>
 
 <p>
@@ -104,6 +106,8 @@ packages/esimu-core/esimu_core/
   runtime/            # tick/snapshot/action/task helpers
   lifecycle/          # setup and transition payload helpers
   content/            # event/forum/messenger payload contracts
+  ai/                 # optional model transport and degradation
+  authoring.py        # doctor/inspect/sync/add operations
 
 apps/starter/
   backend/            # minimal adapter
@@ -114,10 +118,11 @@ apps/starter/
 
 <ul>
   <li><a href="quickstart/">Quickstart</a>: local validation and smoke commands.</li>
+  <li><a href="cli/">CLI reference</a>: project, diagnostics, sync, and safe authoring commands.</li>
   <li><a href="new-project-bootstrap/">Bootstrap a project</a>: generate and customize a new simulator.</li>
   <li><a href="theme-pack-contract/">Theme pack contract</a>: required files and field rules.</li>
   <li><a href="architecture/">Architecture</a>: current core/theme/adapter boundary.</li>
-  <li><a href="framework-readiness-review/">Framework readiness review</a>: Phase 9 verdict and gaps.</li>
+  <li><a href="framework-readiness-review/">Framework readiness review</a>: current Beta verdict and remaining gates.</li>
 </ul>
 
 </div>

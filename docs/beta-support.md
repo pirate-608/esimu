@@ -11,7 +11,7 @@ Supported in this Beta:
 - automatic state-v1 migration and protocol-v1 client acceptance;
 - the generated Vue/Pinia Starter;
 - SQLite for single-node persistence;
-- optional OpenAI-compatible content generation with local fallback.
+- optional OpenAI-compatible content generation with local fallback;
 - installed `new/validate/doctor/inspect/sync/add/version` commands.
 
 Not promised by this Beta:
@@ -20,7 +20,7 @@ Not promised by this Beta:
 - a production identity provider or multi-tenant authorization;
 - Redis/PostgreSQL adapters, distributed locks, or horizontal scaling;
 - a separately versioned npm component package;
-- backward compatibility with arbitrary pre-release lab snapshots.
+- backward compatibility with arbitrary unpublished extraction snapshots.
 
 Breaking Beta changes increment the minor version and include a migration
 guide. Patch releases may reject data that was already invalid under the

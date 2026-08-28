@@ -84,8 +84,8 @@ esimu new D:\projects\my-simulator `
   --theme-id my-simulator
 ```
 
-生成项目拥有自己的 Starter、主题、资源、scaffold helper、README、环境模板
-和 AGENTS.md。正式标签发布后，可完全离开 esimu 安装运行：
+生成项目拥有自己的 Starter、主题、资源、兼容 helper、README、环境模板和
+AGENTS.md。对应包版本发布后，可完全离开 esimu 安装运行：
 
 ```powershell
 cd D:\projects\my-simulator
@@ -99,7 +99,7 @@ python -m uvicorn app.main:app --reload --port 18001
 ```
 
 开发未发布 core 时，给 `esimu new` 传入 `--core-dependency`，使用本地
-editable 路径或刚构建的 wheel，不要依赖尚未推送的标签。
+editable 路径或刚构建的 wheel，不要依赖尚未发布的包版本。
 
 ## 编辑和校验世界数据
 
@@ -131,3 +131,5 @@ python packages\esimu-core\scripts\release_smoke.py
 ```powershell
 zensical build
 ```
+
+文档工具链在 `docs/requirements.txt` 中固定为 Zensical 0.0.57。

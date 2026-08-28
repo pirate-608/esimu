@@ -1,7 +1,7 @@
 # 创建新项目
 
-这份清单用于生成一个离开 esimu 后仍可独立安装运行的模拟器。生成器只复制
-小型 Starter 和一个主题，不复制 ZJU reference 产品代码。
+这份清单用于生成一个离开 esimu 后仍可独立安装运行的模拟器。生成器会复制标准
+Starter 和一个主题，形成独立项目。
 
 ## 生成项目
 
@@ -29,13 +29,13 @@ README.md
 生成的 scripts 只作为 Beta 兼容 wrapper；新自动化优先使用安装后的
 `esimu add` 与 `esimu sync`。
 
-后端依赖默认固定到与 `esimu_core.__version__` 一致的 Git tag。其他开发者安装
-前，该 tag 必须已推送。测试未发布 core 时，使用 `--core-dependency` 传入本地
-editable 路径或刚构建的 wheel URL。
+后端依赖固定到与 `esimu_core.__version__` 一致的精确包版本。其他开发者安装
+前，该版本必须已存在于所选 package index。测试未发布 core 时，使用
+`--core-dependency` 传入本地 editable 路径或刚构建的 wheel URL。
 
 ## 独立安装和校验
 
-正式标签可用后：
+对应包版本可用后：
 
 ```powershell
 cd D:\projects\my-simulator

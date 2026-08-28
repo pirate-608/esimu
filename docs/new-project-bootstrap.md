@@ -1,8 +1,8 @@
 # New Project Bootstrap
 
 This checklist starts a simulator that can run independently after generation.
-The generator copies the small Starter app and one theme; it does not copy the
-ZJU reference product.
+The generator copies the canonical Starter app and one theme into a standalone
+project.
 
 ## Generate The Project
 
@@ -32,9 +32,10 @@ README.md
 The generated scripts are Beta compatibility wrappers. Prefer installed
 `esimu add` and `esimu sync` commands for new automation.
 
-The backend requirement defaults to the Git tag matching the generator's
-`esimu_core.__version__`. That tag must exist remotely before another developer
-can install it. For unreleased development, pass an explicit dependency:
+The backend requirement pins the exact package version matching the generator's
+`esimu_core.__version__`. That version must exist on the selected package index
+before another developer can install it. For unreleased development, pass an
+explicit dependency:
 
 ```powershell
 esimu new D:\projects\my-simulator `
@@ -45,7 +46,7 @@ A wheel URL is preferred when testing the exact release artifact.
 
 ## Install And Validate Independently
 
-After the tagged core is available:
+After the package version is available:
 
 ```powershell
 cd D:\projects\my-simulator

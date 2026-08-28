@@ -1,7 +1,7 @@
 # AI Integration
 
-esimu includes an optional framework AI module extracted from the ZJU reference
-simulator. Model generation is reusable without becoming mandatory for
+esimu includes an optional framework AI module for theme-aware content
+generation. Model access remains reusable without becoming mandatory for
 deterministic or library-mode games.
 
 ## Package Boundary

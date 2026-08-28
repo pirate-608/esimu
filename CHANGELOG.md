@@ -2,7 +2,7 @@
 
 All notable changes to esimu are recorded here.
 
-This lab follows a lightweight Semantic Versioning policy for `esimu-core`:
+This project follows a lightweight Semantic Versioning policy for `esimu-core`:
 
 - `MAJOR`: incompatible Python API or theme/world contract changes.
 - `MINOR`: new reusable core APIs, optional contract fields, or starter
@@ -12,6 +12,8 @@ This lab follows a lightweight Semantic Versioning policy for `esimu-core`:
 
 ## 0.3.0b1 - Unreleased
 
+- Updated the documentation toolchain to Zensical 0.0.57 and synchronized the
+  bilingual site with the current runtime, CLI, persistence, and release state.
 - Added persistent relax cooldowns, automatic event/messenger scheduling,
   declarative achievements, configurable Game Over, and richer ending payloads.
 - Added session-scoped library/hybrid/AI modes and non-blocking two-phase

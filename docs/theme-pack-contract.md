@@ -5,20 +5,18 @@ world, narrative, prompt, and asset data for one simulator deployment; core code
 and adapter code should consume this data instead of hardcoding product nouns.
 
 Use `new-project-bootstrap.md` for the step-by-step workflow, and use
-`starter-app-shape.md` before copying the reference app.
+`starter-app-shape.md` to understand the generated application boundary.
 
 ## Validation Gate
 
-The canonical validation command is:
+The canonical downstream validation command is:
 
 ```powershell
-cd esimu\packages\esimu-core
-$env:ESIMU_THEME='<theme_id>'
-python scripts\validate_world_data.py
+esimu validate --root . --theme <theme_id>
 ```
 
-`validate_world_data.py` now includes the schema-equivalent validator in
-`esimu_core.world.theme_contract`. It validates:
+Maintainers may run `packages/esimu-core/scripts/validate_world_data.py`, which
+delegates to the same `esimu_core.world.theme_contract` validator. It checks:
 
 - required theme files and world files,
 - `theme.json`, `story.json`, `prompts.json`, and `stat_definitions.json`
@@ -29,9 +27,8 @@ python scripts\validate_world_data.py
 - story image availability,
 - generated frontend metadata freshness for the default theme.
 
-For non-default themes, generated frontend metadata freshness is skipped unless
-`SIMULATOR_VALIDATE_GENERATED=1` is set. This prevents demo-theme validation
-from overwriting the reference frontend by accident.
+`esimu sync` checks generated metadata without writing; add `--write` to update
+theme/story/stat modules atomically after the theme validates.
 
 ## Required Directory
 
@@ -48,7 +45,7 @@ themes/<theme_id>/
     majors.json
     achievements.json
     event_library.json
-    cc98_library.json
+    forum_library.json
     characters.json
     graduation_comments.json
     courses/
@@ -56,8 +53,7 @@ themes/<theme_id>/
 ```
 
 `assets/` may be minimal, but images referenced by `story.json` must exist in
-the theme assets directory. Theme validation no longer borrows story images
-from the ZJU reference frontend.
+the theme assets directory.
 
 ## Theme Manifest
 
@@ -114,9 +110,8 @@ subdirectories are rejected.
 - graduation-summary instruction,
 - forum fallback text.
 
-Prompt fragments theme the visible and model-visible context. They do not
-rename legacy internal IDs such as `cc98` and `dingtalk`; those remain adapter
-compatibility IDs until a later protocol migration.
+Prompt fragments theme the visible and model-visible context. Starter public
+actions remain the neutral `forum` and `messenger` IDs.
 
 ## World Data
 
@@ -137,11 +132,11 @@ compatibility IDs until a later protocol migration.
 
 - `tick.interval_seconds`,
 - `events.random_event`,
-- `events.dingtalk`,
+- `events.messenger` (legacy `dingtalk` remains readable during Beta),
 - `game_over`.
 
-The reference adapter may support additional balance fields. Theme validation
-checks only the structural minimum that a starter app can depend on.
+Downstream adapters may support additional balance fields. Theme validation
+checks the structural minimum that Starter depends on.
 
 ### Items
 
@@ -210,7 +205,7 @@ Achievements without conditions remain display-only/manual entries.
 
 - `title`,
 - `desc` or `description`,
-- non-empty `options` array,
+- at least two entries in `options`,
 - each option needs `text` and `effects` object.
 
 `world/forum_library.json` is the neutral local forum library. Each entry needs
@@ -224,9 +219,9 @@ Achievements without conditions remain display-only/manual entries.
 - `role`,
 - `content` or `description`.
 
-The current ZJU reference app still uses DingTalk-compatible role IDs for
-private-message behavior. Theme-visible messenger names come from `theme.json`
-and `prompts.json`.
+Starter recognizes neutral replyable roles such as `roommate`, `classmate`,
+`friend`, `teaching_assistant`, `teacher`, and `crush`. Visible messenger names
+come from `theme.json` and `prompts.json`.
 
 ### Graduation Comments
 
@@ -270,6 +265,6 @@ esimu sync --root . --theme <theme_id> --write
 
 - `quickstart.md`: validation and metadata-generation commands.
 - `new-project-bootstrap.md`: practical new-theme checklist.
-- `starter-app-shape.md`: whether to copy the reference app.
+- `starter-app-shape.md`: generated Starter and downstream adapter boundaries.
 - `agent-handoff.md`: agent rules for keeping theme data out of core logic.
 - `architecture.md`: how theme packs relate to `esimu-core` and adapters.

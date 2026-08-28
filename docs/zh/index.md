@@ -11,9 +11,8 @@ hide:
     <p class="eyebrow">主题驱动的模拟器框架</p>
     <h1>用一个主题包，启动一款校园、职业或人生模拟器。</h1>
     <p class="hero-copy">
-      esimu 从 ZJUers Simulator 中抽取可复用的规则、运行时辅助、世界数据契约
-      和 starter 应用形态；每个游戏自己的故事、名词、数值、事件、道具和 prompt
-      都留在主题包里。
+      esimu 组合可复用游戏规则、运行时编排、世界数据契约、可选 AI 和完整 Starter；
+      每个游戏自己的故事、名词、数值、事件、道具和 prompt 都留在主题包里。
     </p>
     <p class="hero-actions">
       <a href="quickstart/" class="hero-button primary">快速开始</a>
@@ -36,9 +35,8 @@ hide:
 <pre><code>esimu-core + starter app + theme pack</code></pre>
 
 <p>
-  它还不是稳定公共框架。现阶段建议继续使用 Git tag 固定
-  <code>esimu-core</code> 版本，等 starter 前端依赖策略、可选持久化适配器和真实外部项目反馈成熟后，
-  再考虑更正式的发布渠道。
+  下游项目应固定精确 Beta。<code>0.2.0b5</code> 是当前公开包；
+  <code>0.3.0b1</code> 是补齐运行时闭环与安装后作者命令的源码候选。
 </p>
 
 <h2>你会得到什么</h2>
@@ -47,15 +45,15 @@ hide:
   <article>
     <h3>esimu-core</h3>
     <p>
-      Python 核心包，负责世界数据加载、属性/道具契约、学期结算、运行时快照、
-      action gate、生命周期辅助和内容标准化。
+      Python 核心包，负责世界数据加载、属性/道具契约、声明式成就、学期结算、
+      自动调度、可选 AI、生命周期辅助和安全作者工具。
     </p>
   </article>
   <article>
     <h3>Starter App</h3>
     <p>
-      一个很小的 FastAPI/WebSocket 后端与 Vite/TypeScript 前端皮肤，默认使用
-      demo-campus 主题，并以内存状态跑通最小游戏循环。
+      FastAPI/WebSocket 后端与 Vue 3/Pinia 控制台，默认使用 SQLite、版本化
+      状态/协议和 demo-campus 主题。
     </p>
   </article>
   <article>
@@ -80,6 +78,8 @@ esimu new <target-project> --project-name "My Simulator" --theme-id my-simulator
 <pre><code class="language-powershell">
 esimu validate --root <target-project> --theme my-simulator
 esimu doctor --root <target-project> --theme my-simulator
+esimu inspect --root <target-project> --theme my-simulator
+esimu sync --root <target-project> --theme my-simulator
 </code></pre>
 
 <p>
@@ -102,6 +102,8 @@ packages/esimu-core/esimu_core/
   runtime/            # tick、快照、action、后台任务辅助
   lifecycle/          # 开局与状态转换辅助
   content/            # 事件、论坛、私信内容契约
+  ai/                 # 可选模型 transport 与降级
+  authoring.py        # doctor、inspect、sync、add
 
 apps/starter/
   backend/            # 最小适配器
@@ -112,10 +114,11 @@ apps/starter/
 
 <ul>
   <li><a href="quickstart/">快速开始</a>：本地验证与 smoke 命令。</li>
+  <li><a href="cli/">CLI 参考</a>：项目、诊断、同步与安全编辑命令。</li>
   <li><a href="new-project-bootstrap/">创建新项目</a>：生成并定制一个模拟器。</li>
   <li><a href="theme-pack-contract/">主题包契约</a>：必需文件和字段规则。</li>
   <li><a href="architecture/">架构</a>：当前 core/theme/adapter 边界。</li>
-  <li><a href="framework-readiness-review/">框架就绪审查</a>：Phase 9 结论和剩余缺口。</li>
+  <li><a href="framework-readiness-review/">框架就绪审查</a>：当前 Beta 结论与剩余门禁。</li>
 </ul>
 
 </div>

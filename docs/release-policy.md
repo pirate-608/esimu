@@ -1,102 +1,78 @@
 # Release Policy
 
-`esimu-core` is Beta software for single-theme simulator projects. Its
-version-one contracts are public, but the framework is not yet stable 1.0.
+esimu publishes pre-release versions of `esimu-core` for single-theme
+narrative simulator projects. The current public baseline is `0.2.0b5`; the
+next source candidate is `0.3.0b1`.
 
-## Version And Tag Contract
+## Version And Contract
 
-- Distribution name: `esimu-core`
+- Distribution: `esimu-core`
 - Import namespace: `esimu_core`
 - Version source: `packages/esimu-core/esimu_core/__init__.py`
 - Tag format: `esimu-core-v<version>`
+- Theme schema: v1
+- Starter state and WebSocket protocol: v2
 
-The generator pins downstream projects to that exact Git tag. Therefore a
-version is not externally installable until the matching tag exists on
-`pirate-608/esimu` and contains the Starter/core changes being documented.
-Do not claim a Git-tag release before both branch and tag have been pushed.
+State v1 is migrated during load and protocol-v1 clients remain accepted.
+Breaking changes to documented Python APIs, theme/world data, installed CLI,
+or Starter HTTP/WebSocket behavior require a new minor Beta with migration
+notes. Patch releases may reject data that was already invalid.
 
-The current policy uses Git tags, not PyPI. Reconsider PyPI after a real external
-simulator has exercised installation and upgrades.
+## Distribution
 
-## Compatibility
+- `.github/workflows/release-candidate.yml` publishes manual TestPyPI
+  candidates through Trusted Publishing.
+- `.github/workflows/release.yml` builds and publishes PyPI artifacts and a
+  GitHub prerelease when an exact `esimu-core-v<version>` tag is pushed.
+- No long-lived PyPI token belongs in repository secrets.
+- The GitHub Release must attach the wheel and sdist produced by the same job.
 
-Semantic Versioning applies:
+Do not claim a release until its tag workflow, PyPI page, GitHub prerelease,
+and external installation trial all succeed.
 
-- `MAJOR`: breaking Python API or theme/world contract removal.
-- `MINOR`: compatible core APIs, validators, and Starter capabilities.
-- `PATCH`: bug fixes and stricter rejection of already-invalid data.
-
-Because the package is `0.x`, document substantial minor reshaping in
-`CHANGELOG.md`. Public compatibility includes Python APIs documented by core,
-theme/world JSON contracts, installed CLI behavior, and the Starter HTTP/WS
-surface.
-
-## Required Release Gate
+## Required Gate
 
 From a clean checkout and local venv:
 
 ```powershell
 python -m pip install -r requirements-dev.txt
-cd packages\esimu-core
-python -m pytest tests
-python -m ruff check esimu_core scripts tests
-python scripts\validate_world_data.py
-$env:ESIMU_THEME='demo-campus'
-python scripts\validate_world_data.py
-Remove-Item Env:ESIMU_THEME
+python -m pytest packages\esimu-core\tests
+python -m pytest apps\starter\backend\tests
+python -m ruff check packages\esimu-core\esimu_core packages\esimu-core\scripts packages\esimu-core\tests apps\starter\backend\app apps\starter\backend\tests
+python packages\esimu-core\scripts\validate_world_data.py
+python packages\esimu-core\scripts\sync_scaffold_bundle.py
 ```
 
-Starter backend and frontend:
+Frontend and documentation:
 
 ```powershell
-cd apps\starter\backend
-python -m pytest tests
-python -m ruff check app tests
-cd ..\frontend
+cd apps\starter\frontend
 corepack pnpm install --frozen-lockfile
 corepack pnpm typecheck
+corepack pnpm test
 corepack pnpm build
+cd ..\..\..
+zensical build
 ```
 
 Artifact-to-consumer smoke:
 
 ```powershell
-cd esimu
 python packages\esimu-core\scripts\release_smoke.py
-zensical build
 ```
 
-`release_smoke.py` builds sdist/wheel, generates a disposable simulator, creates
-a clean venv, installs `esimu-core[ai]` from the wheel, runs the installed world
-validator, and exercises the generated Starter API. This is mandatory because
-editable source tests cannot catch packaging/import-order failures.
+The smoke builds wheel/sdist, installs the wheel in a disposable environment,
+runs `esimu new/validate/doctor/inspect/sync/add`, starts the generated Starter,
+finishes both demo semesters, and verifies SQLite restart recovery.
 
-## CI And Tagging
+## Candidate And Release Flow
 
-CI runs required core, Starter, frontend, docs, and external-install jobs from a
-clean checkout. Push the release commit first and wait for CI.
+1. Commit and push the candidate to `main`; wait for required CI.
+2. Run the external `esimu-beta-example` trial without a source checkout.
+3. Dispatch the TestPyPI workflow and install the exact candidate externally.
+4. Fix framework issues and increment the immutable Beta suffix if necessary.
+5. Create and push `esimu-core-v<version>` only after external acceptance.
+6. Verify PyPI, GitHub prerelease assets, checksums, Pages, and clean install.
 
-Then confirm:
-
-```powershell
-python -c "import esimu_core; print(esimu_core.__version__)"
-git status --short
-git log -1 --oneline
-```
-
-Create and push the exact matching tag:
-
-```powershell
-git tag esimu-core-v0.1.0
-git push origin main
-git push origin esimu-core-v0.1.0
-```
-
-Tag-triggered CI rejects a tag whose name differs from
-`esimu-core-v<esimu_core.__version__>`. After it passes, generate a project with
-the default dependency and verify `pip install -r
-apps/starter/backend/requirements.txt` from a machine or clean directory that
-does not contain esimu.
-
-If ZJUers Simulator references this repository as a submodule, update the parent
-pointer only after the independent release is complete.
+Zensical is pinned in `docs/requirements.txt`; documentation CI must install
+that exact version and build in strict mode.

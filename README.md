@@ -85,9 +85,9 @@ corepack pnpm test
 corepack pnpm build
 ```
 
-See the [Quickstart](docs/quickstart.md), [theme contract](docs/theme-pack-contract.md),
-[architecture](docs/architecture.md), [Beta support policy](docs/beta-support.md),
-and [release policy](docs/release-policy.md).
+See the [Quickstart](docs/quickstart.md), [CLI reference](docs/cli.md),
+[theme contract](docs/theme-pack-contract.md), [architecture](docs/architecture.md),
+[Beta support policy](docs/beta-support.md), and [release policy](docs/release-policy.md).
 
 ## Compatibility
 
