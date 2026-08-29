@@ -21,8 +21,10 @@ archived extraction task list.
 - Theme schema v1, SQLite persistence, optional AI, strict world validation,
   and an external generated-project trial are established.
 
-### 0.3 Runtime Candidate
+### Public Beta 0.3
 
+- `esimu-core 0.3.0b2` is published on PyPI and GitHub Releases after
+  TestPyPI and independent generated-project Docker validation.
 - State and WebSocket protocol v2 retain v1 migration/client compatibility.
 - Persistent cooldowns, automatic event/messenger scheduling, declarative
   achievements, Game Over, content modes, and ordered save/exit close the
@@ -31,18 +33,18 @@ archived extraction task list.
   diversity/reuse, and three-reply settlement.
 - Installed `doctor`, `inspect`, `sync`, and `add` commands provide project
   diagnostics and atomic theme authoring.
-- The canonical Starter frontend exposes the complete candidate behavior.
+- The canonical Starter frontend exposes the complete runtime behavior.
 
-## Phase 16: Publish 0.3 Beta
+### Phase 16: Publish 0.3 Beta
 
-- Push the candidate commit and pass the clean-checkout matrix.
-- Exercise the wheel in `esimu-beta-example`, including CLI authoring and both
-  desktop/mobile Starter flows.
-- Publish an immutable TestPyPI candidate, fix any external-install findings,
-  then publish the final `0.3.0b*` PyPI/GitHub prerelease.
-- Publish matching Zensical 0.0.57 documentation.
+- Passed the clean-checkout Python, Starter, frontend, and documentation matrix.
+- Exercised the wheel in `esimu-beta-example`, including CLI authoring and
+  Docker Compose startup without an esimu source checkout.
+- Superseded the TestPyPI-only b1 after its generated-theme defect, then
+  validated and published immutable `0.3.0b2` artifacts.
+- Published matching Zensical 0.0.57 documentation.
 
-Completion: an external project can install the package, generate a simulator,
+Completed: an external project can install the package, generate a simulator,
 edit and sync a theme, persist/recover state, and complete the configured game
 without an esimu source checkout.
 

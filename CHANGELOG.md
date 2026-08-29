@@ -10,7 +10,7 @@ This project follows a lightweight Semantic Versioning policy for `esimu-core`:
 - `PATCH`: bug fixes, documentation clarifications, and validation improvements
   that do not break existing valid themes.
 
-## 0.3.0b2 - Unreleased
+## 0.3.0b2 - 2026-08-29
 
 - Superseded the TestPyPI-only `0.3.0b1` candidate after external generation
   exposed hardcoded `demo-campus` defaults in AI and backend environment setup;
@@ -26,6 +26,8 @@ This project follows a lightweight Semantic Versioning policy for `esimu-core`:
 - Added state v2 with automatic v1 JSON migration and no SQLite table change.
 - Added installed `esimu doctor`, `inspect`, `sync`, and `add` authoring commands
   with JSON output, explicit writes, atomic publication, validation, and rollback.
+- Passed the clean-checkout Python/Starter/frontend/docs matrix, TestPyPI
+  installation, and an independent generated-project Docker Compose trial.
 
 ## 0.2.0b5 - 2026-08-26
 

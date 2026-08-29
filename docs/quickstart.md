@@ -86,8 +86,13 @@ empty and route `/api`, `/config`, `/healthz`, and `/ws` to the backend.
 
 ## 5. Generate A Standalone Simulator
 
-During unreleased `0.3.0b2` development, install the candidate with
-`python -m pip install -e ".\packages\esimu-core[ai]"`, then run:
+Install the exact Beta from PyPI, then generate the project:
+
+```powershell
+python -m pip install "esimu-core[ai]==0.3.0b2"
+```
+
+Then run:
 
 ```powershell
 esimu new D:\projects\my-simulator `
@@ -99,8 +104,7 @@ The generated project contains its own Starter app, theme, assets, compatibility
 helpers, README, environment template, and agent handoff. Its backend dependency
 pins the exact `esimu-core` package version matching the generator.
 
-After that package version is published, install and run entirely from the
-generated project:
+Install and run entirely from the generated project:
 
 ```powershell
 cd D:\projects\my-simulator
@@ -113,8 +117,8 @@ cd apps\starter\backend
 python -m uvicorn app.main:app --reload --port 18001
 ```
 
-During unreleased framework development, pass `--core-dependency` with an
-editable path or wheel URL instead of relying on an unpublished package.
+Framework contributors testing an unreleased version can pass
+`--core-dependency` with an editable path or wheel URL.
 
 ## 6. Scaffold World Data
 

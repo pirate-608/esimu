@@ -35,8 +35,8 @@ hide:
 <pre><code>esimu-core + starter app + theme pack</code></pre>
 
 <p>
-  下游项目应固定精确 Beta。<code>0.2.0b5</code> 是当前公开包；
-  <code>0.3.0b2</code> 是补齐运行时闭环与安装后作者命令的源码候选。
+  下游项目应固定精确 Beta。<code>0.3.0b2</code> 是当前公开包，已补齐运行时
+  闭环与安装后作者命令。
 </p>
 
 <h2>你会得到什么</h2>

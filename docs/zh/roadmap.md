@@ -19,24 +19,28 @@ esimu 是面向单主题叙事模拟器的独立主题驱动框架。本页记�
 - wheel 内 `esimu new` 可生成独立 FastAPI + Vue/Pinia 项目。
 - 已建立主题 schema v1、SQLite、可选 AI、严格世界数据校验和外部生成项目验证。
 
-### 0.3 运行时候选
+### 公开 Beta 0.3
 
+- `esimu-core 0.3.0b2` 已在通过 TestPyPI 与独立生成项目 Docker 验收后发布到
+  PyPI 和 GitHub Releases。
 - 状态与 WebSocket 协议升级到 v2，同时迁移 v1 状态并接受 v1 客户端。
 - 持久化冷却、自动事件/私聊、声明式成就、Game Over、内容模式和有序保存退出
   补齐运行时闭环。
 - 私聊采用玩家消息立即显示、NPC 后台生成的两阶段流程，并支持未读、联系人
   多样性/复用和三回复结算。
 - 安装后的 `doctor/inspect/sync/add` 提供项目诊断和原子主题编辑。
-- 标准 Starter 前端已覆盖全部候选行为。
+- 标准 Starter 前端已覆盖完整运行时行为。
 
-## Phase 16：发布 0.3 Beta
+### Phase 16：发布 0.3 Beta
 
-- 推送候选提交并通过 clean-checkout matrix。
-- 在 `esimu-beta-example` 验证 wheel、作者 CLI 和桌面/移动 Starter 流程。
-- 发布不可覆盖的 TestPyPI 候选，修复外部安装问题后发布最终 `0.3.0b*`。
-- 发布与代码一致的 Zensical 0.0.57 文档站。
+- 已通过 clean-checkout Python、Starter、前端和文档 matrix。
+- 已在 `esimu-beta-example` 验证 wheel、作者 CLI 和无源码 checkout 的
+  Docker Compose 启动。
+- TestPyPI-only b1 暴露生成主题缺陷后被替代；修复后的 `0.3.0b2` 已完成不可
+  覆盖制品验收与正式发布。
+- 已发布与代码一致的 Zensical 0.0.57 文档站。
 
-完成标准：外部项目无需 esimu 源码 checkout，即可安装、生成模拟器、编辑和同步
+已达到：外部项目无需 esimu 源码 checkout，即可安装、生成模拟器、编辑和同步
 主题、保存恢复状态并完成主题配置的游戏流程。
 
 ## Phase 17：Adapter 生态

@@ -1,7 +1,7 @@
 # Beta Support Policy
 
-`esimu-core 0.3.0b2` targets single-theme narrative simulator prototypes. It is
-currently prepared on `main` and remains unpublished until the release gate.
+`esimu-core 0.3.0b2` is the current public Beta for single-theme narrative
+simulator prototypes, published through PyPI and GitHub Releases.
 
 Supported in this Beta:
 

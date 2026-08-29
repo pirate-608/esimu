@@ -18,10 +18,10 @@ distinct endings, and SQLite persistence.
 
 ## Quick Start
 
-Until `0.3.0b2` is published, install the candidate from a source checkout:
+Install the exact Beta from PyPI:
 
 ```powershell
-python -m pip install -e ".\packages\esimu-core[ai]"
+python -m pip install "esimu-core[ai]==0.3.0b2"
 esimu new D:\projects\my-simulator `
   --project-name "My Simulator" `
   --theme-id my-simulator `

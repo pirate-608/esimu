@@ -75,8 +75,13 @@ VITE_ESIMU_WS_BASE=wss://api.example.com
 
 ## 生成独立项目
 
-`0.3.0b2` 尚未发布时，先执行
-`python -m pip install -e ".\packages\esimu-core[ai]"`，然后：
+先从 PyPI 安装精确 Beta：
+
+```powershell
+python -m pip install "esimu-core[ai]==0.3.0b2"
+```
+
+然后生成项目：
 
 ```powershell
 esimu new D:\projects\my-simulator `
@@ -85,7 +90,7 @@ esimu new D:\projects\my-simulator `
 ```
 
 生成项目拥有自己的 Starter、主题、资源、兼容 helper、README、环境模板和
-AGENTS.md。对应包版本发布后，可完全离开 esimu 安装运行：
+AGENTS.md，可完全离开 esimu 源码安装运行：
 
 ```powershell
 cd D:\projects\my-simulator
@@ -98,8 +103,8 @@ cd apps\starter\backend
 python -m uvicorn app.main:app --reload --port 18001
 ```
 
-开发未发布 core 时，给 `esimu new` 传入 `--core-dependency`，使用本地
-editable 路径或刚构建的 wheel，不要依赖尚未发布的包版本。
+框架贡献者测试未发布 core 时，可给 `esimu new` 传入 `--core-dependency`，
+使用本地 editable 路径或刚构建的 wheel。
 
 ## 编辑和校验世界数据
 

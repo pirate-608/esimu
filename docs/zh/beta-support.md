@@ -1,7 +1,7 @@
 # Beta 支持策略
 
-`esimu-core 0.3.0b2` 面向单主题叙事模拟器原型。当前仅在 `main` 准备，完成
-独立发布验收前不会推送 PyPI。
+`esimu-core 0.3.0b2` 是当前面向单主题叙事模拟器原型的公开 Beta，已通过
+PyPI 和 GitHub Releases 发布。
 
 本 Beta 支持 Python 3.11–3.13、单部署单主题、主题 schema v1、状态和
 WebSocket 协议 v2、v1 状态迁移与 v1 客户端接入、Vue/Pinia Starter、单机

@@ -15,10 +15,10 @@ payload、可选 AI 生成和自包含项目 CLI。生成的 Starter 包含 Vue 
 
 ## 快速开始
 
-`0.3.0b2` 发布前，从源码工作区安装候选版本：
+从 PyPI 安装精确 Beta 版本：
 
 ```powershell
-python -m pip install -e ".\packages\esimu-core[ai]"
+python -m pip install "esimu-core[ai]==0.3.0b2"
 esimu new D:\projects\my-simulator `
   --project-name "My Simulator" `
   --theme-id my-simulator `

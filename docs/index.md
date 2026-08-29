@@ -37,9 +37,9 @@ hide:
 <pre><code>esimu-core + starter app + theme pack</code></pre>
 
 <p>
-  Published projects should pin an exact Beta. <code>0.2.0b5</code> is the
-  current public package; <code>0.3.0b2</code> is the source candidate that adds
-  the closed runtime loop and installed authoring commands.
+  Published projects should pin an exact Beta. <code>0.3.0b2</code> is the
+  current public package, with the closed runtime loop and installed authoring
+  commands.
 </p>
 
 <h2>What You Get</h2>

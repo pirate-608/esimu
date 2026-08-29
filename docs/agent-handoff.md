@@ -12,7 +12,7 @@ Documentation dependencies are pinned in `docs/requirements.txt`; the current
 toolchain is Zensical 0.0.57. Keep `mkdocs.yml` navigation free of missing or
 archived pages and run the strict build after every docs change.
 
-Current candidate is `0.3.0b2`: theme schema v1, state/protocol v2, additive
+Current release is `0.3.0b2`: theme schema v1, state/protocol v2, additive
 state-v1 migration, and protocol-v1 client compatibility. Prefer installed
 `esimu doctor/inspect/sync/add` commands; source scripts are compatibility
 wrappers. Slow event/forum/messenger AI work must stay outside the session lock
