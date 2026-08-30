@@ -27,6 +27,7 @@ SKIP_PARTS = {
     "node_modules",
     "dist",
     ".vite",
+    "data",
 }
 TEXT_SUFFIXES = {
     ".css",

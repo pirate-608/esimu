@@ -7,11 +7,21 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+import zipfile
 
 from esimu_core import __version__
 
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
 PROJECT_ROOT = BACKEND_ROOT.parents[1]
+
+
+def test_packaged_scaffold_excludes_runtime_data() -> None:
+    archive = BACKEND_ROOT / "esimu_core" / "scaffold" / "esimu-starter.zip"
+
+    with zipfile.ZipFile(archive) as bundle:
+        names = bundle.namelist()
+
+    assert not any("/data/" in name for name in names)
 
 
 def test_new_project_generates_valid_standalone_project(tmp_path: Path) -> None:
