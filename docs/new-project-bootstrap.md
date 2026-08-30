@@ -4,6 +4,10 @@ This checklist starts a simulator that can run independently after generation.
 The generator copies the canonical Starter app and one theme into a standalone
 project.
 
+The default source theme is `zju-simplified`, a compact, self-contained
+adaptation with neutral `forum` and `messenger` protocol IDs. Add
+`--source-theme demo-campus` when starting from fully neutral content.
+
 ## Generate The Project
 
 With the candidate installed:
@@ -60,26 +64,23 @@ esimu doctor --root . --theme my-simulator
 The installed command resolves the generated project's own `themes/` directory.
 It does not need `validate_world_data.py` or any path back to esimu.
 
-## Run The App
-
-Backend:
+## Run And Build The App
 
 ```powershell
-cd apps\starter\backend
-python -m uvicorn app.main:app --reload --port 18001
+esimu dev --root . --theme my-simulator
 ```
 
-Frontend in a second terminal:
+In another terminal:
 
 ```powershell
-cd apps\starter\frontend
-corepack pnpm install --frozen-lockfile
-corepack pnpm dev
+esimu reload --root . --theme my-simulator
+esimu build --root . --theme my-simulator
 ```
 
 Open `http://127.0.0.1:15175`. The checked-in Vite proxy connects both HTTP and
 WebSocket traffic to the backend. See `starter-contract.md` for split-origin and
-reverse-proxy deployment.
+reverse-proxy deployment. `reload` synchronizes metadata and validates the
+theme before restarting both services; `build` produces the frontend `dist/`.
 
 ## Edit The Theme
 

@@ -13,13 +13,14 @@ import sys
 from typing import Any, Sequence
 
 from esimu_core import __version__
+from esimu_core.world.theme_paths import DEFAULT_THEME_ID
 
 
 def _theme_from_environment() -> str:
     return (
         os.environ.get("ESIMU_THEME")
         or os.environ.get("SIMULATOR_THEME")
-        or "demo-campus"
+        or DEFAULT_THEME_ID
     )
 
 
@@ -33,7 +34,7 @@ def _add_validation_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--theme",
         default=_theme_from_environment(),
-        help="theme ID; defaults to ESIMU_THEME or demo-campus",
+        help=f"theme ID; defaults to ESIMU_THEME or {DEFAULT_THEME_ID}",
     )
 
 
@@ -101,6 +102,32 @@ def build_parser() -> argparse.ArgumentParser:
     )
     _add_validation_arguments(inspect_parser)
     _add_json_argument(inspect_parser)
+    dev_parser = subparsers.add_parser(
+        "dev", help="run the Starter backend and frontend development servers"
+    )
+    _add_validation_arguments(dev_parser)
+    dev_parser.add_argument("--backend-host", default="127.0.0.1")
+    dev_parser.add_argument("--backend-port", type=int, default=18001)
+    dev_parser.add_argument("--frontend-host", default="127.0.0.1")
+    dev_parser.add_argument("--frontend-port", type=int, default=15175)
+    dev_parser.add_argument(
+        "--no-install",
+        action="store_true",
+        help="fail instead of installing missing frontend dependencies",
+    )
+    build_project_parser = subparsers.add_parser(
+        "build", help="validate and build a production Starter frontend"
+    )
+    _add_validation_arguments(build_project_parser)
+    build_project_parser.add_argument(
+        "--no-install",
+        action="store_true",
+        help="fail instead of installing missing frontend dependencies",
+    )
+    reload_parser = subparsers.add_parser(
+        "reload", help="synchronize content and restart a running esimu dev session"
+    )
+    _add_validation_arguments(reload_parser)
     _add_authoring_parsers(subparsers)
     subparsers.add_parser("version", help="print the installed core version")
     return parser
@@ -185,7 +212,7 @@ def _add_authoring_parsers(subparsers: Any) -> None:
 def main(argv: Sequence[str] | None = None) -> int:
     """Dispatch the formal CLI while preserving the 0.1 module invocation."""
     raw_args = list(argv) if argv is not None else sys.argv[1:]
-    if raw_args and raw_args[0].startswith("-"):
+    if raw_args and raw_args[0] in {"--root", "--theme"}:
         return validate_world(raw_args)
 
     args = build_parser().parse_args(raw_args)
@@ -200,9 +227,46 @@ def main(argv: Sequence[str] | None = None) -> int:
         from esimu_core.scaffold import main as scaffold_main
 
         return scaffold_main(args.new_args)
+    if args.command in {"dev", "build", "reload"}:
+        return _run_project_command(args)
     if args.command in {"sync", "doctor", "inspect", "add"}:
         return _run_authoring_command(args)
     raise RuntimeError(f"unsupported command: {args.command}")
+
+
+def _run_project_command(args: argparse.Namespace) -> int:
+    from esimu_core.project import (
+        ProjectCommandError,
+        build_project,
+        request_dev_reload,
+        run_dev_project,
+    )
+
+    try:
+        if args.command == "dev":
+            return run_dev_project(
+                args.root,
+                args.theme,
+                backend_host=args.backend_host,
+                backend_port=args.backend_port,
+                frontend_host=args.frontend_host,
+                frontend_port=args.frontend_port,
+                install=not args.no_install,
+            )
+        if args.command == "build":
+            output = build_project(
+                args.root,
+                args.theme,
+                install=not args.no_install,
+            )
+            print(f"production frontend built: {output}")
+            return 0
+        trigger = request_dev_reload(args.root, args.theme)
+        print(f"reload requested: {trigger}")
+        return 0
+    except ProjectCommandError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 1
 
 
 def _run_authoring_command(args: argparse.Namespace) -> int:

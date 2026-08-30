@@ -67,7 +67,7 @@ export const STAT_DEFINITIONS = [
   },
   {
     "id": "iq",
-    "label": "理解力",
+    "label": "智力",
     "icon": "🧠",
     "default": 100,
     "min": 50,
@@ -82,7 +82,7 @@ export const STAT_DEFINITIONS = [
   },
   {
     "id": "eq",
-    "label": "共情力",
+    "label": "情商",
     "icon": "💬",
     "default": 100,
     "min": 50,
@@ -97,7 +97,7 @@ export const STAT_DEFINITIONS = [
   },
   {
     "id": "luck",
-    "label": "机缘",
+    "label": "运气",
     "icon": "🍀",
     "default": 50,
     "min": 50,
@@ -112,7 +112,7 @@ export const STAT_DEFINITIONS = [
   },
   {
     "id": "charm",
-    "label": "亲和力",
+    "label": "魅力",
     "icon": "✨",
     "default": 50,
     "min": 50,
@@ -157,7 +157,7 @@ export const STAT_DEFINITIONS = [
   },
   {
     "id": "gold",
-    "label": "点数",
+    "label": "金币",
     "icon": "💰",
     "default": 0,
     "min": 0,

@@ -43,16 +43,19 @@ def test_new_project_generates_valid_standalone_project(tmp_path: Path) -> None:
     assert theme["theme_id"] == "star-lab"
     assert theme["storage"]["prefix"] == "star_lab"
     assert theme["terms"]["institution"] == "星河学院"
+    assert "CC98" in (
+        target / "themes" / "star-lab" / "prompts.json"
+    ).read_text(encoding="utf-8")
 
     session = (
         target / "apps" / "starter" / "backend" / "app" / "session.py"
     ).read_text(encoding="utf-8")
     assert "field(default_factory=active_theme_id)" in session
-    assert 'or "demo-campus"' not in session
+    assert 'or "zju-simplified"' not in session
     ai_adapter = (
         target / "apps" / "starter" / "backend" / "app" / "ai.py"
     ).read_text(encoding="utf-8")
-    assert 'theme_id: str = "demo-campus"' not in ai_adapter
+    assert 'theme_id: str = "zju-simplified"' not in ai_adapter
     bootstrap = (
         target / "apps" / "starter" / "backend" / "app" / "bootstrap.py"
     ).read_text(encoding="utf-8")
@@ -67,7 +70,7 @@ def test_new_project_generates_valid_standalone_project(tmp_path: Path) -> None:
         target / "apps" / "starter" / "backend" / ".env.example"
     ).read_text(encoding="utf-8")
     assert "ESIMU_THEME=star-lab" in backend_env
-    assert "ESIMU_THEME=demo-campus" not in backend_env
+    assert "ESIMU_THEME=zju-simplified" not in backend_env
 
     requirements = (
         target / "apps" / "starter" / "backend" / "requirements.txt"
@@ -78,6 +81,9 @@ def test_new_project_generates_valid_standalone_project(tmp_path: Path) -> None:
     assert (target / "scripts" / "scaffold_world_data.py").exists()
     generated_readme = (target / "README.md").read_text(encoding="utf-8")
     assert "esimu validate --root . --theme star-lab" in generated_readme
+    assert "esimu dev --root . --theme star-lab" in generated_readme
+    assert "esimu reload --root . --theme star-lab" in generated_readme
+    assert "esimu build --root . --theme star-lab" in generated_readme
     assert "path-to-esimu-lab" not in generated_readme
     generated_agent = (target / "AGENTS.md").read_text(encoding="utf-8")
     assert "<project-name>" not in generated_agent

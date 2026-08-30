@@ -18,12 +18,13 @@ from esimu_core.world.stat_definitions import StatDefinitions
 from esimu_core.world.story import ThemeStory
 from esimu_core.world.theme import ThemeManifest
 from esimu_core.world.theme_contract import validate_theme_pack
+from esimu_core.world.theme_paths import DEFAULT_THEME_ID
 
 
 def configure_project(root: str | Path, theme_id: str) -> tuple[Path, Path]:
     """Set the active project environment and return project/theme paths."""
     project = Path(root).expanduser().resolve()
-    clean_theme = str(theme_id or "demo-campus").strip() or "demo-campus"
+    clean_theme = str(theme_id or DEFAULT_THEME_ID).strip() or DEFAULT_THEME_ID
     os.environ["ESIMU_PROJECT_ROOT"] = str(project)
     os.environ["ESIMU_THEME"] = clean_theme
     return project, project / "themes" / clean_theme

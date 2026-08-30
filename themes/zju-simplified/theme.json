@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "theme_id": "zju-simplified",
+  "display_name": "ZJUers Simulator Lite",
+  "locale": "zh-CN",
+  "terms": {
+    "institution": "浙江大学",
+    "institution_short": "浙大",
+    "campus": "求是园",
+    "feed": "求是园动态",
+    "forum": "CC98",
+    "messenger": "钉钉",
+    "server": "求是园服务器",
+    "player": "学生",
+    "player_nickname": "浙大人",
+    "semester": "学期",
+    "course": "课程",
+    "item": "道具",
+    "action_gym": "健身",
+    "action_game": "打游戏",
+    "action_walk": "启真湖散步",
+    "action_forum_browse": "刷 CC98",
+    "rules": "求是生存手册",
+    "notice": "求是园入学须知"
+  },
+  "storage": {
+    "prefix": "esimu_zju_lite"
+  },
+  "assets": {
+    "hero": "assets/campus_gate.webp",
+    "logo": "assets/campus_gate.webp"
+  },
+  "notes": "Self-contained simplified ZJUers Simulator adaptation using neutral esimu protocols."
+}

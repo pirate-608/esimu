@@ -1,0 +1,39 @@
+{
+  "version": "1.0.0",
+  "economy": {
+    "initial_gold": 120,
+    "exam_income": {
+      "base": 80,
+      "gpa_multiplier": 30,
+      "failed_penalty": 25
+    }
+  },
+  "items": [
+    {
+      "id": "qiushi_planner",
+      "name": "求是计划本",
+      "category": "study",
+      "tags": ["学习", "效率"],
+      "price": 80,
+      "sell_price": 40,
+      "description": "印着求是鹰的小计划本，帮助你安排课程和休息。",
+      "effects": {
+        "efficiency": 8,
+        "stress": -2
+      }
+    },
+    {
+      "id": "society_badge",
+      "name": "社团纪念章",
+      "category": "social",
+      "tags": ["社交"],
+      "price": 60,
+      "description": "文化广场活动留下的纪念章，让新朋友更愿意与你搭话。",
+      "effects": {
+        "charm": 4,
+        "reputation": 3
+      }
+    }
+  ]
+}
+

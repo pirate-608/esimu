@@ -36,7 +36,8 @@ hide:
 
 <p>
   下游项目应固定精确 Beta。<code>0.3.0b2</code> 是当前公开包，已补齐运行时
-  闭环与安装后作者命令。
+  闭环与安装后作者命令。<code>0.4.0b1</code> 是加入生命周期命令与浙大精简
+  默认模板的源码候选。
 </p>
 
 <h2>你会得到什么</h2>
@@ -53,7 +54,7 @@ hide:
     <h3>Starter App</h3>
     <p>
       FastAPI/WebSocket 后端与 Vue 3/Pinia 控制台，默认使用 SQLite、版本化
-      状态/协议和 demo-campus 主题。
+      状态/协议和独立的 zju-simplified 默认主题。
     </p>
   </article>
   <article>
@@ -80,6 +81,9 @@ esimu validate --root <target-project> --theme my-simulator
 esimu doctor --root <target-project> --theme my-simulator
 esimu inspect --root <target-project> --theme my-simulator
 esimu sync --root <target-project> --theme my-simulator
+esimu dev --root <target-project> --theme my-simulator
+esimu reload --root <target-project> --theme my-simulator
+esimu build --root <target-project> --theme my-simulator
 </code></pre>
 
 <p>

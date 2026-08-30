@@ -3,6 +3,9 @@
 安装后的 `esimu` 命令负责项目生成、校验、诊断、metadata 同步和保守的世界数据
 编辑。
 
+`dev/reload/build` 已进入 `main` 上的 `0.4.0b1` 源码候选。最新公开 PyPI
+版本仍是 `0.3.0b2`。
+
 ## 项目命令
 
 ```powershell
@@ -11,6 +14,9 @@ esimu new <target> --project-name "My Simulator" --theme-id my-simulator
 esimu validate --root . --theme my-simulator
 esimu doctor --root . --theme my-simulator
 esimu inspect --root . --theme my-simulator
+esimu dev --root . --theme my-simulator
+esimu reload --root . --theme my-simulator
+esimu build --root . --theme my-simulator
 ```
 
 - `new` 从 wheel 复制 Starter 和源主题，生成独立项目并固定 core 依赖。
@@ -18,6 +24,12 @@ esimu inspect --root . --theme my-simulator
 - `doctor` 检查 Python/core、主题、生成 metadata、Starter 路径、
   Node/corepack/pnpm、SQLite 路径和 AI 配置状态，但不输出 secret。
 - `inspect` 输出契约版本、解析后的路径、生成目标和世界数据数量。
+- `dev` 会同步并校验主题、在缺少时安装前端依赖，然后以前台 supervisor
+  同时运行 Uvicorn 与 Vite。
+- `reload` 先同步并校验主题，再要求正在运行的 dev supervisor 以原端口重启
+  两个服务。
+- `build` 同步 metadata、校验世界数据、编译后端 Python，并生成
+  `apps/starter/frontend/dist`。加入 `--no-install` 可在缺依赖时直接失败。
 
 `doctor`、`inspect` 可加 `--json` 用于自动化。
 
@@ -51,5 +63,5 @@ metadata、校验完整主题，并在失败时回滚源文件和生成文件。
 
 ## 兼容入口
 
-`esimu-validate-world` 在 0.3 Beta 期间仍是 `esimu validate` 的别名。生成项目中的
+`esimu-validate-world` 在 0.4 Beta 期间仍是 `esimu validate` 的别名。生成项目中的
 源码脚本也保留一个 Beta 周期；新的 CI 和 Agent 自动化应调用安装后的 `esimu`。

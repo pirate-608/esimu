@@ -9,7 +9,11 @@ Its Beta shape is:
 esimu-core + generated Starter app + one theme pack
 ```
 
-`esimu-core 0.3.0b2` provides typed world loaders, theme validation, gameplay
+The latest public PyPI release remains `0.3.0b2`; `dev`, `reload`, `build`, and
+the new default template are being prepared on `main` for `0.4.0b1`.
+
+The current source candidate `esimu-core 0.4.0b1` provides typed world loaders,
+theme validation, gameplay
 rules, runtime payload helpers, optional AI generation, and a self-contained
 project CLI. The generated Starter includes a Vue 3/Pinia console, FastAPI and
 WebSocket adapter, real-time ticks, events, forum and messenger flows, items,
@@ -18,36 +22,38 @@ distinct endings, and SQLite persistence.
 
 ## Quick Start
 
-Install the exact Beta from PyPI:
+Clone the source candidate to use the new lifecycle commands:
 
 ```powershell
-python -m pip install "esimu-core[ai]==0.3.0b2"
-esimu new D:\projects\my-simulator `
-  --project-name "My Simulator" `
-  --theme-id my-simulator `
-  --institution "Star Academy"
-cd D:\projects\my-simulator
+git clone https://github.com/pirate-608/esimu.git
+cd esimu
+python -m pip install -e ".\packages\esimu-core[ai]"
+esimu new D:\projects\zju-lite `
+  --project-name "ZJUers Simulator Lite" `
+  --theme-id zju-lite `
+  --institution "Zhejiang University"
+cd D:\projects\zju-lite
 python -m pip install -r apps\starter\backend\requirements.txt
-esimu validate --root . --theme my-simulator
-esimu doctor --root . --theme my-simulator
+esimu validate --root . --theme zju-lite
+esimu doctor --root . --theme zju-lite
+esimu dev --root . --theme zju-lite
 ```
 
-Run the backend:
+From another terminal, request a synchronized full restart:
 
 ```powershell
-cd apps\starter\backend
-python -m uvicorn app.main:app --reload --port 18001
+esimu reload --root . --theme zju-lite
 ```
 
-Run the frontend in another terminal:
+Build a production frontend:
 
 ```powershell
-cd apps\starter\frontend
-corepack pnpm install --frozen-lockfile
-corepack pnpm dev
+esimu build --root . --theme zju-lite
 ```
 
 Open `http://127.0.0.1:15175`.
+
+Pass `--source-theme demo-campus` to `esimu new` for a fully neutral template.
 
 ## Repository
 
@@ -55,6 +61,7 @@ Open `http://127.0.0.1:15175`.
 packages/esimu-core/    Installable Python core and CLI
 apps/starter/           Canonical FastAPI + Vue Starter
 themes/demo-campus/     Neutral two-semester example theme
+themes/zju-simplified/  Default compact ZJU adaptation
 templates/              Generated-project handoff templates
 docs/                   English and Chinese Zensical documentation
 ```
@@ -93,7 +100,8 @@ See the [Quickstart](docs/quickstart.md), [CLI reference](docs/cli.md),
 
 - Distribution: `esimu-core`
 - Import namespace: `esimu_core`
-- CLI: `esimu new`, `validate`, `doctor`, `inspect`, `sync`, `add`, and `version`
+- CLI: `esimu new`, `validate`, `doctor`, `inspect`, `sync`, `add`, `dev`,
+  `reload`, `build`, and `version`
 - Theme schema: version `1`
 - Starter state schema: version `2` with automatic v1 migration
 - Starter WebSocket protocol: version `2` with v1 client compatibility

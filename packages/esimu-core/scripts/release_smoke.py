@@ -176,9 +176,10 @@ with TestClient(app) as client:
     token = client.post(
         '/api/auth', json={'username': 'Release'}
     ).json()['token']
+    major = client.get('/api/majors').json()[0]['abbr']
     response = client.post(
         '/api/init_character',
-        json={'token': token, 'username': 'Release', 'major': 'GEN'},
+        json={'token': token, 'username': 'Release', 'major': major},
     )
     assert response.status_code == 200
     with client.websocket_connect('/ws') as websocket:

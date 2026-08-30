@@ -22,10 +22,14 @@ graduation text. One deployment selects one theme through `ESIMU_THEME`.
 - `lifecycle`: character and semester state construction;
 - `content`: neutral event, forum, and messenger contracts;
 - `ai`: optional provider configuration, transport, parsing, and degradation;
-- `scaffold`: the wheel-owned Starter template used by `esimu new`.
-- `authoring`: installed doctor/inspect/sync/add operations and atomic writes.
+- `scaffold`: the wheel-owned Starter template used by `esimu new`;
+- `authoring`: installed doctor/inspect/sync/add operations and atomic writes;
+- `project`: standard-library dev supervision, reload triggers, and validated
+  build orchestration. It executes adapter tools without importing them.
 
 Core does not import FastAPI, SQLite, Redis, SQLAlchemy, WebSocket, or Vue.
+Visible ZJU copy in the default template belongs to `themes/zju-simplified`
+and generated metadata, never reusable protocol or application logic.
 
 ## Starter Adapter
 

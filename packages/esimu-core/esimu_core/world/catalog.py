@@ -177,14 +177,14 @@ class WorldCatalog:
         return raw if isinstance(raw, list) else []
 
     def forum_library_path(self) -> Path:
-        """Path to the local forum/CC98-compatible post library."""
+        """Path to the local forum-compatible post library."""
         neutral_path = self.path("forum_library.json")
         if neutral_path.exists():
             return neutral_path
         return self.path("cc98_library.json")
 
     def forum_library(self) -> list[dict[str, Any]]:
-        """Return local forum/CC98-compatible post entries."""
+        """Return local forum-compatible post entries."""
         raw = self.load_json(self.forum_library_path(), [])
         return raw if isinstance(raw, list) else []
 

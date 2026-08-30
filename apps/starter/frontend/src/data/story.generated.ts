@@ -3,26 +3,26 @@
 
 export const STORY_CONTENT = {
   "prologue": {
-    "diary_title": "湖边手记",
+    "diary_title": "启真湖畔手记",
     "dedication_lines": [
-      "谨以此模拟器献给每一位认真生活的人。",
+      "谨以此游戏献给每一位灿若星辰的浙大人。",
       "这是一个关于你，我，和他们的故事。"
     ],
     "diary_pages": [
       [
-        "清晨，我在陌生校园的窗边醒来。",
+        "清晨，我在紫金港的阳光里醒来。",
         "课表、消息和未完成的计划一起涌进脑海。",
-        "我忽然意识到，这一次或许可以重新选择。"
+        "这一次，我想认真选择自己的大学生活。"
       ],
       [
-        "黄昏时，我沿着湖边慢慢走。",
+        "黄昏时，我沿着启真湖慢慢走。",
         "水面映着灯光，也映着一个仍不甘心的自己。",
-        "如果还有另一个明天，我想亲手试一试。"
+        "如果明天可以更好，我想亲手试一试。"
       ],
       [
-        "醒过来时，阳光亮得让我睁不开眼。",
         "十八岁的我背着包，走到了那扇门前。",
-        "“欢迎来到新的校园！”"
+        "新的课程、新的朋友和新的故事正在等我。",
+        "“求是园欢迎您！”"
       ]
     ],
     "scenes": [
@@ -32,12 +32,12 @@ export const STORY_CONTENT = {
         "tone": "night"
       },
       {
-        "from_line": 2,
+        "from_line": 3,
         "image": "campus_autumn.jpg",
         "tone": "morning"
       },
       {
-        "from_line": 5,
+        "from_line": 6,
         "image": "campus_lake.jpg",
         "tone": "lake"
       },
@@ -54,14 +54,14 @@ export const STORY_CONTENT = {
       "很多年后，我才明白，",
       "有些选择会在沉默里变成遗憾。"
     ],
-    "failure_default_reason": "你在校园生活中迷失了自我",
+    "failure_default_reason": "你暂时没能走完这段求是园旅程",
     "failure_note": "这页日记被雨水泡得发皱。可如果还能再来一次，我想把没有写完的明天亲手写完。",
     "graduation_kicker": "Graduation Ceremony",
     "graduation_title": "毕业典礼",
     "graduation_line_low_gpa": "虽然仍旧平凡，但这一次我问心无愧",
     "graduation_line_high_gpa": "这一世，我活出了更好的自己",
-    "graduation_summary_label": "校史记录",
-    "graduation_fallback_summary": "此行四年，虽有跌撞，却也认真走过。愿你带着这份答案，去往更远的明天。",
+    "graduation_summary_label": "求是园记忆",
+    "graduation_fallback_summary": "此行虽有跌撞，却也认真走过。愿你带着求是的答案，去往更远的明天。",
     "graduation_background_images": [
       "campus_gate.webp",
       "campus_night.jpeg",

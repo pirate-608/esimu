@@ -10,6 +10,16 @@ This project follows a lightweight Semantic Versioning policy for `esimu-core`:
 - `PATCH`: bug fixes, documentation clarifications, and validation improvements
   that do not break existing valid themes.
 
+## 0.4.0b1 - Unreleased
+
+- Added installed `esimu dev`, `esimu build`, and `esimu reload` project
+  lifecycle commands with synchronized theme validation and supervised local
+  backend/frontend processes.
+- Added the self-contained `zju-simplified` theme as the default Starter and
+  scaffold source while retaining `demo-campus` as the neutral alternative.
+- Kept public runtime action IDs neutral (`forum` and `messenger`) and avoided
+  any runtime dependency on the ZJUers Simulator repository.
+
 ## 0.3.0b2 - 2026-08-29
 
 - Superseded the TestPyPI-only `0.3.0b1` candidate after external generation

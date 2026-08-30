@@ -1,0 +1,26 @@
+[
+  {
+    "code": "first_step",
+    "name": "求是第一步",
+    "desc": "完成一次求是园休闲行动。",
+    "icon": "🌱",
+    "condition": {
+      "all": [
+        { "scope": "action", "key": "relax", "op": "gte", "value": 1 }
+      ]
+    }
+  },
+  {
+    "code": "steady_graduate",
+    "name": "求是鹰飞",
+    "desc": "完成两个学期并保持良好 GPA。",
+    "icon": "🎓",
+    "condition": {
+      "all": [
+        { "scope": "session", "key": "completed_terms", "op": "gte", "value": 2 },
+        { "scope": "session", "key": "cumulative_gpa", "op": "gte", "value": 3.0 }
+      ]
+    }
+  }
+]
+

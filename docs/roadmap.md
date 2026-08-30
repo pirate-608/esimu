@@ -11,8 +11,8 @@ archived extraction task list.
 - The original ZJU extraction is preserved by `esimu-lab-final`.
 - esimu has an independent repository, package, docs site, license, CI, and
   release workflows; ZJUers Simulator is not a runtime dependency.
-- `packages/esimu-core`, `apps/starter`, and `themes/demo-campus` are the
-  canonical framework/core/app/theme boundaries.
+- `packages/esimu-core`, `apps/starter`, `themes/zju-simplified`, and
+  `themes/demo-campus` are the canonical core/app/default/neutral boundaries.
 
 ### Public Beta 0.2
 
@@ -48,6 +48,16 @@ Completed: an external project can install the package, generate a simulator,
 edit and sync a theme, persist/recover state, and complete the configured game
 without an esimu source checkout.
 
+## 0.4 Developer Experience Candidate
+
+- Add installed `dev`, `reload`, and `build` commands for one-command local
+  startup, synchronized full restarts, and validated production bundles.
+- Make the compact, self-contained `zju-simplified` adaptation the default
+  source while retaining `demo-campus` as a neutral opt-in template.
+- Keep reusable core and Starter logic theme-neutral; visible CC98/DingTalk/ZJU
+  copy is allowed only in theme data and generated metadata.
+- Repeat wheel-only and external-project validation before publishing 0.4.
+
 ## Phase 17: Adapter Ecosystem
 
 - Specify optional production identity and multi-save extension contracts.
@@ -69,4 +79,5 @@ without an esimu source checkout.
 
 - Runtime multi-theme switching in one deployment.
 - Redis, PostgreSQL, production identity, or admin dependencies in core.
-- Reintroducing ZJU-specific protocol IDs or product copy into Starter.
+- Introducing ZJU-specific protocol IDs or hardcoded product copy into reusable
+  Starter/core logic; theme-owned and generated copy remains supported.

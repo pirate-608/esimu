@@ -10,8 +10,8 @@ esimu 是面向单主题叙事模拟器的独立主题驱动框架。本页记�
 - 原始 ZJU 提取基线保存在 `esimu-lab-final`。
 - esimu 已拥有独立仓库、包、文档站、许可证、CI 和发布 workflow；运行时不依赖
   ZJUers Simulator。
-- `packages/esimu-core`、`apps/starter`、`themes/demo-campus` 分别是标准
-  core、应用和主题边界。
+- `packages/esimu-core`、`apps/starter`、`themes/zju-simplified` 与
+  `themes/demo-campus` 分别是 core、应用、默认主题和中性主题边界。
 
 ### 公开 Beta 0.2
 
@@ -43,6 +43,16 @@ esimu 是面向单主题叙事模拟器的独立主题驱动框架。本页记�
 已达到：外部项目无需 esimu 源码 checkout，即可安装、生成模拟器、编辑和同步
 主题、保存恢复状态并完成主题配置的游戏流程。
 
+## 0.4 开发体验候选
+
+- 增加安装后的 `dev/reload/build`，用于一条命令启动本地服务、同步完整重启和
+  经过校验的生产构建。
+- 将独立、精简的 `zju-simplified` 适配设为默认 source，同时保留中性的
+  `demo-campus` 可选模板。
+- Core 与 Starter 可复用逻辑继续主题中立；CC98、钉钉和浙大可见文案只能存在于
+  主题数据和生成 metadata 中。
+- 发布 0.4 前重新完成 wheel-only 与外部项目验证。
+
 ## Phase 17：Adapter 生态
 
 - 定义可选生产身份和多存档扩展契约。
@@ -61,4 +71,5 @@ esimu 是面向单主题叙事模拟器的独立主题驱动框架。本页记�
 
 - 单部署运行时多主题切换。
 - 在 core 中引入 Redis、PostgreSQL、生产身份或 Admin 依赖。
-- 把 ZJU 专有协议 ID 或产品文案重新带回 Starter。
+- 把 ZJU 专有协议 ID 或硬编码产品文案带入可复用 Starter/core 逻辑；主题拥有和
+  生成的文案不受此限制。

@@ -39,7 +39,8 @@ hide:
 <p>
   Published projects should pin an exact Beta. <code>0.3.0b2</code> is the
   current public package, with the closed runtime loop and installed authoring
-  commands.
+  commands. <code>0.4.0b1</code> is the source candidate adding lifecycle
+  commands and the ZJU simplified default template.
 </p>
 
 <h2>What You Get</h2>
@@ -57,7 +58,8 @@ hide:
     <h3>Starter App</h3>
     <p>
       A FastAPI/WebSocket backend plus Vue 3/Pinia console, using SQLite,
-      versioned state/protocol contracts, and the demo-campus theme by default.
+      versioned state/protocol contracts, and the self-contained
+      zju-simplified theme by default.
     </p>
   </article>
   <article>
@@ -84,6 +86,9 @@ esimu validate --root <target-project> --theme my-simulator
 esimu doctor --root <target-project> --theme my-simulator
 esimu inspect --root <target-project> --theme my-simulator
 esimu sync --root <target-project> --theme my-simulator
+esimu dev --root <target-project> --theme my-simulator
+esimu reload --root <target-project> --theme my-simulator
+esimu build --root <target-project> --theme my-simulator
 </code></pre>
 
 <p>

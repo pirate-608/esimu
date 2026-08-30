@@ -1,0 +1,27 @@
+[
+  {
+    "title": "文化广场的招新摊位",
+    "desc": "午后经过文化广场，你被一个学生社团邀请参加体验活动。",
+    "tags": ["social"],
+    "options": [
+      {
+        "text": "加入体验课",
+        "effects": {
+          "sanity": 4,
+          "stress": -2,
+          "reputation": 2,
+          "desc": "你认识了几个来自不同学院的新朋友。"
+        }
+      },
+      {
+        "text": "先回去自习",
+        "effects": {
+          "energy": -3,
+          "stress": 2,
+          "desc": "你保持了计划，但略有疲惫。"
+        }
+      }
+    ]
+  }
+]
+

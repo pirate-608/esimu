@@ -13,6 +13,7 @@ PROJECT_ROOT = PACKAGE_ROOT.parents[1]
 OUTPUT = PACKAGE_ROOT / "esimu_core" / "scaffold" / "esimu-starter.zip"
 SOURCES = (
     PROJECT_ROOT / "apps" / "starter",
+    PROJECT_ROOT / "themes" / "zju-simplified",
     PROJECT_ROOT / "themes" / "demo-campus",
     PROJECT_ROOT / "templates" / "agent" / "AGENTS.md",
     PACKAGE_ROOT / "scripts" / "scaffold_game_stat.py",

@@ -12,9 +12,13 @@ esimu 分为三个明确层次：
 
 `packages/esimu-core/esimu_core` 只包含可复用 Python 逻辑：world loader 与
 校验、domain 成就/效果/学期规则、runtime 自动调度与任务编排、lifecycle 状态
-构造、中性的 content 契约、可选 AI、安装后 authoring CLI 和 wheel 内项目脚手架。
+构造、中性的 content 契约、可选 AI、安装后 authoring CLI、标准库实现的
+dev/reload/build 项目编排，以及 wheel 内项目脚手架。
 Core 不依赖 FastAPI、SQLite、Redis、
 SQLAlchemy、WebSocket 或 Vue。
+
+默认模板中的浙大可见文案只属于 `themes/zju-simplified` 和生成 metadata，不能
+进入可复用协议或应用逻辑。
 
 `apps/starter/backend` 负责 FastAPI、WebSocket、实时 Tick、串行发送和异步
 SQLite 持久化；慢内容生成在 session lock 外按 target 去重执行。

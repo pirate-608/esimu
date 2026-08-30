@@ -235,7 +235,8 @@ Optional `min_gpa` and `max_gpa` fields define GPA branches.
 
 ## New Theme Checklist
 
-1. Copy `themes/demo-campus/` to `themes/<theme_id>/`.
+1. Copy `themes/zju-simplified/` for the default compact ZJU adaptation, or
+   `themes/demo-campus/` for neutral content, to `themes/<theme_id>/`.
 2. Update `theme.json`, especially `theme_id` and `storage.prefix`.
 3. Update `story.json` and referenced images.
 4. Update `prompts.json`.

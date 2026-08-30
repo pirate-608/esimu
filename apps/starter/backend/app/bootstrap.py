@@ -15,7 +15,7 @@ def discover_project_root(start: Path | None = None) -> Path | None:
     return None
 
 
-def configure_project_environment(default_theme: str = "demo-campus") -> None:
+def configure_project_environment(default_theme: str = "zju-simplified") -> None:
     """Set path and theme defaults before any eager world loader imports."""
     project_root = discover_project_root()
     if project_root is not None:

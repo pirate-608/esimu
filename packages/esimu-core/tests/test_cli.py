@@ -5,7 +5,10 @@ from pathlib import Path
 import subprocess
 import sys
 
+import pytest
+
 from esimu_core.cli import main
+from esimu_core.cli import build_parser
 
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
 LAB_ROOT = BACKEND_ROOT.parents[1]
@@ -63,3 +66,22 @@ def test_add_command_is_dry_run_without_write(capsys) -> None:
     assert result == 0
     assert '"write": false' in output
     assert "dry run only" in output
+
+
+def test_project_lifecycle_commands_are_public() -> None:
+    parser = build_parser()
+
+    assert parser.parse_args(["dev"]).command == "dev"
+    assert parser.parse_args(["build"]).command == "build"
+    assert parser.parse_args(["reload"]).command == "reload"
+
+
+def test_top_level_help_lists_project_lifecycle_commands(capsys) -> None:
+    with pytest.raises(SystemExit) as exit_info:
+        main(["--help"])
+
+    output = capsys.readouterr().out
+    assert exit_info.value.code == 0
+    assert "dev" in output
+    assert "build" in output
+    assert "reload" in output

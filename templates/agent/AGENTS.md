@@ -82,6 +82,9 @@ Installed core and theme checks:
 esimu validate --root . --theme <theme-id>
 esimu doctor --root . --theme <theme-id>
 esimu sync --root . --theme <theme-id>
+esimu dev --root . --theme <theme-id>
+esimu reload --root . --theme <theme-id>
+esimu build --root . --theme <theme-id>
 ```
 
 Backend checks:

@@ -44,18 +44,18 @@ def test_starter_session_runs_two_term_game_loop() -> None:
     forum_post = session.forum_post()
     messenger = session.messenger_round()
     reply = session.messenger_reply(messenger["contact"]["contact_id"])
-    items_state = session.buy_item("planner")
-    sold_state = session.sell_item("planner")
+    items_state = session.buy_item("qiushi_planner")
+    sold_state = session.sell_item("qiushi_planner")
     exam = session.final_exam()
     next_term = session.next_semester()
 
-    assert summary["major_abbr"] == "GEN"
+    assert summary["major_abbr"] == "CS"
     assert session.tick_payload()["protocol_version"] == PROTOCOL_VERSION
-    assert event["title"] == "社团摊位前"
-    assert "校园笑话" in forum_post["content"]
+    assert event["title"] == "文化广场的招新摊位"
+    assert "CC98" in forum_post["content"]
     assert reply["npc_message"]
-    assert "planner" in items_state["owned"]
-    assert "planner" not in sold_state["owned"]
+    assert "qiushi_planner" in items_state["owned"]
+    assert "qiushi_planner" not in sold_state["owned"]
     assert exam["cgpa"] >= 0
     assert next_term["ended"] is False
     assert session.stats["semester_idx"] == 2
@@ -70,7 +70,7 @@ def test_starter_http_routes_expose_config_and_resume() -> None:
         token = auth.json()["token"]
         init = client.post(
             "/api/init_character",
-            json={"token": token, "username": "Alex", "major": "GEN"},
+            json={"token": token, "username": "Alex", "major": "CS"},
         )
         resumed = client.post(
             "/api/auth", json={"username": "Alex", "token": token}
@@ -79,9 +79,9 @@ def test_starter_http_routes_expose_config_and_resume() -> None:
     assert health.json() == {"status": "ok", "storage": "ready"}
     assert config.json()["protocol_version"] == PROTOCOL_VERSION
     assert config.json()["state_version"] == STATE_VERSION
-    assert config.json()["theme"]["themeId"] == "demo-campus"
-    assert majors.json()[0]["abbr"] == "GEN"
-    assert init.json()["init"]["data"]["major_abbr"] == "GEN"
+    assert config.json()["theme"]["themeId"] == "zju-simplified"
+    assert majors.json()[0]["abbr"] == "CS"
+    assert init.json()["init"]["data"]["major_abbr"] == "CS"
     assert resumed.json()["status"] == "returning"
 
 
@@ -119,8 +119,14 @@ def test_starter_websocket_runs_neutral_actions() -> None:
                 ({"action": "event_choice", "option_index": 0}, "feedback"),
                 ({"action": "forum"}, "forum_post"),
                 ({"action": "messenger"}, "messenger_update"),
-                ({"action": "item_buy", "item_id": "planner"}, "items_state"),
-                ({"action": "item_sell", "item_id": "planner"}, "items_state"),
+                (
+                    {"action": "item_buy", "item_id": "qiushi_planner"},
+                    "items_state",
+                ),
+                (
+                    {"action": "item_sell", "item_id": "qiushi_planner"},
+                    "items_state",
+                ),
                 ({"action": "exam"}, "semester_summary"),
                 ({"action": "next_semester"}, "new_semester"),
                 ({"action": "pause"}, "tick"),
@@ -209,14 +215,14 @@ async def test_file_session_store_round_trips_legacy_state(tmp_path: Path) -> No
     store = FileSessionStore(tmp_path)
     session = StarterGameSession(username="Alex")
     session.initialize(username="Alex")
-    session.buy_item("planner")
+    session.buy_item("qiushi_planner")
 
     await store.set("token/with unsafe chars", session)
     restored = await store.get("token/with unsafe chars")
 
     assert restored is not None
     assert restored.username == "Alex"
-    assert "planner" in restored.items_state["owned"]
+    assert "qiushi_planner" in restored.items_state["owned"]
 
 
 def test_v1_state_migrates_runtime_fields() -> None:

@@ -25,6 +25,7 @@ REPOSITORY_ROOT = PACKAGE_ROOT.parents[2]
 
 from esimu_core import __version__ as ESIMU_CORE_VERSION  # noqa: E402
 from esimu_core.authoring import metadata_documents  # noqa: E402
+from esimu_core.world.theme_paths import DEFAULT_THEME_ID  # noqa: E402
 
 DEFAULT_CORE_DEPENDENCY = f"esimu-core[ai]=={ESIMU_CORE_VERSION}"
 
@@ -215,7 +216,7 @@ def _patch_starter_files(target: Path, theme_id: str, core_dependency: str) -> N
     session_path = target / "apps" / "starter" / "backend" / "app" / "session.py"
     session = session_path.read_text(encoding="utf-8")
     session = session.replace(
-        'os.environ.setdefault("ESIMU_THEME", "demo-campus")',
+        f'os.environ.setdefault("ESIMU_THEME", "{DEFAULT_THEME_ID}")',
         f'os.environ.setdefault("ESIMU_THEME", "{theme_id}")',
     )
     session_path.write_text(session, encoding="utf-8")
@@ -223,7 +224,7 @@ def _patch_starter_files(target: Path, theme_id: str, core_dependency: str) -> N
     bootstrap_path = target / "apps" / "starter" / "backend" / "app" / "bootstrap.py"
     bootstrap = bootstrap_path.read_text(encoding="utf-8")
     bootstrap = bootstrap.replace(
-        'default_theme: str = "demo-campus"',
+        f'default_theme: str = "{DEFAULT_THEME_ID}"',
         f'default_theme: str = "{theme_id}"',
     )
     bootstrap_path.write_text(bootstrap, encoding="utf-8")
@@ -231,7 +232,7 @@ def _patch_starter_files(target: Path, theme_id: str, core_dependency: str) -> N
     backend_env = target / "apps" / "starter" / "backend" / ".env.example"
     backend_env.write_text(
         backend_env.read_text(encoding="utf-8").replace(
-            "ESIMU_THEME=demo-campus",
+            f"ESIMU_THEME={DEFAULT_THEME_ID}",
             f"ESIMU_THEME={theme_id}",
         ),
         encoding="utf-8",
@@ -243,7 +244,7 @@ def _patch_starter_files(target: Path, theme_id: str, core_dependency: str) -> N
     ):
         readme_path.write_text(
             readme_path.read_text(encoding="utf-8").replace(
-                "`demo-campus`",
+                f"`{DEFAULT_THEME_ID}`",
                 f"`{theme_id}`",
             ),
             encoding="utf-8",
@@ -254,7 +255,9 @@ def _patch_starter_files(target: Path, theme_id: str, core_dependency: str) -> N
     )
     test_text = backend_tests.read_text(encoding="utf-8")
     backend_tests.write_text(
-        test_text.replace('"demo-campus"', f'"{theme_id}"'),
+        test_text.replace(
+            f'"{DEFAULT_THEME_ID}"', f'"{theme_id}"'
+        ).replace('"demo-campus"', f'"{theme_id}"'),
         encoding="utf-8",
     )
     requirements = target / "apps" / "starter" / "backend" / "requirements.txt"
@@ -288,21 +291,24 @@ python -m venv .venv
 python -m pip install -r apps\\starter\\backend\\requirements.txt
 esimu validate --root . --theme {args.theme_id}
 esimu doctor --root . --theme {args.theme_id}
-cd apps\\starter\\backend
-python -m uvicorn app.main:app --reload --port 18001
+esimu dev --root . --theme {args.theme_id}
 ```
 
-Frontend (in a second terminal):
+Request a full development restart from a second terminal:
 
 ```powershell
-cd <project-directory>\\apps\\starter\\frontend
-corepack pnpm install --frozen-lockfile
-corepack pnpm dev
+esimu reload --root . --theme {args.theme_id}
 ```
 
 Open `http://127.0.0.1:15175`. Vite proxies `/api`, `/config`, `/healthz`, and
 `/ws` to the starter backend. For split-origin deployment, copy
 `apps/starter/frontend/.env.example` to `.env` and set the public API/WS bases.
+
+Create a production frontend bundle with:
+
+```powershell
+esimu build --root . --theme {args.theme_id}
+```
 
 ## Theme
 
@@ -344,6 +350,7 @@ Start by editing `themes/{args.theme_id}/theme.json`, `story.json`,
                 "node_modules/",
                 "dist/",
                 ".vite/",
+                ".esimu/",
                 "data/",
                 "!apps/starter/frontend/src/data/",
                 "!apps/starter/frontend/src/data/*.generated.ts",
@@ -383,6 +390,9 @@ esimu validate --root . --theme {args.theme_id}
 esimu doctor --root . --theme {args.theme_id}
 esimu inspect --root . --theme {args.theme_id}
 esimu sync --root . --theme {args.theme_id}
+esimu dev --root . --theme {args.theme_id}
+esimu reload --root . --theme {args.theme_id}
+esimu build --root . --theme {args.theme_id}
 esimu add stat focus --root . --theme {args.theme_id} --label 专注 --show-in-hud
 esimu add item focus_card --root . --theme {args.theme_id} --name 专注卡
 esimu add achievement first_win --root . --theme {args.theme_id} --name 第一次胜利
@@ -484,7 +494,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--storage-prefix", default="", help="browser storage key prefix"
     )
-    parser.add_argument("--source-theme", default="demo-campus", help="theme to copy")
+    parser.add_argument(
+        "--source-theme",
+        default=DEFAULT_THEME_ID,
+        help=(
+            f"theme to copy; defaults to {DEFAULT_THEME_ID}; "
+            "use demo-campus for the neutral template"
+        ),
+    )
     parser.add_argument(
         "--core-dependency",
         default=DEFAULT_CORE_DEPENDENCY,

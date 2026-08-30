@@ -39,33 +39,28 @@ esimu inspect --root <project-root> --theme <theme-id>
 esimu sync --root <project-root> --theme <theme-id>
 ```
 
-## 3. Run The Starter Backend
+The default validation now targets `zju-simplified`; the explicit second run
+keeps the neutral `demo-campus` template covered.
+
+## 3. Run The Starter Development Stack
 
 ```powershell
-cd apps\starter\backend
-python -m pytest tests
-python -m ruff check app tests
-python -m uvicorn app.main:app --reload --port 18001
+cd <esimu-repository-root>
+esimu dev --root . --theme zju-simplified
 ```
 
 Readiness is available at `http://127.0.0.1:18001/healthz`. The starter defaults
-to SQLite at `data/esimu.sqlite3` and the `demo-campus` theme; tests select the
-memory adapter explicitly.
+to SQLite at `data/esimu.sqlite3` and the `zju-simplified` theme. Vite is served
+at `http://127.0.0.1:15175` and proxies HTTP/WebSocket traffic to the backend.
 
-## 4. Run The Starter Frontend
-
-In a second terminal:
+In a second terminal, request a synchronized full restart or production build:
 
 ```powershell
-cd apps\starter\frontend
-corepack pnpm install --frozen-lockfile
-corepack pnpm typecheck
-corepack pnpm dev
+esimu reload --root . --theme zju-simplified
+esimu build --root . --theme zju-simplified
 ```
 
-Open `http://127.0.0.1:15175`. During development, Vite proxies `/api`,
-`/config`, `/healthz`, and `/ws` to `http://127.0.0.1:18001`, so browser HTTP
-and WebSocket traffic remain same-origin.
+Press Ctrl+C in the `dev` terminal to stop both services.
 
 For a split-origin deployment, create `apps/starter/frontend/.env` from its
 `.env.example` and set:
@@ -84,21 +79,21 @@ ESIMU_CORS_ORIGINS=https://game.example.com
 For same-origin production behind a reverse proxy, leave both `VITE_*` values
 empty and route `/api`, `/config`, `/healthz`, and `/ws` to the backend.
 
-## 5. Generate A Standalone Simulator
+## 4. Generate A Standalone Simulator
 
-Install the exact Beta from PyPI, then generate the project:
-
-```powershell
-python -m pip install "esimu-core[ai]==0.3.0b2"
-```
-
-Then run:
+The editable source installation above provides the `0.4.0b1` candidate. Pass
+the same editable dependency into the generated project until that version is
+published:
 
 ```powershell
 esimu new D:\projects\my-simulator `
   --project-name "My Simulator" `
-  --theme-id my-simulator
+  --theme-id my-simulator `
+  --core-dependency "-e D:\projects\esimu\packages\esimu-core[ai]"
 ```
+
+The default source is the compact `zju-simplified` adaptation. Add
+`--source-theme demo-campus` for a neutral project.
 
 The generated project contains its own Starter app, theme, assets, compatibility
 helpers, README, environment template, and agent handoff. Its backend dependency
@@ -113,14 +108,13 @@ python -m venv .venv
 python -m pip install -r apps\starter\backend\requirements.txt
 esimu validate --root . --theme my-simulator
 esimu doctor --root . --theme my-simulator
-cd apps\starter\backend
-python -m uvicorn app.main:app --reload --port 18001
+esimu dev --root . --theme my-simulator
 ```
 
 Framework contributors testing an unreleased version can pass
 `--core-dependency` with an editable path or wheel URL.
 
-## 6. Scaffold World Data
+## 5. Scaffold World Data
 
 Installed authoring commands default to read-only previews and checks:
 
@@ -137,7 +131,7 @@ Review generated JSON before repeating a command with `--write`. Writes are
 atomic, synchronize frontend metadata, validate the theme, and roll back on
 failure.
 
-## 7. Run The Release-Candidate Gate
+## 6. Run The Release-Candidate Gate
 
 Maintainers should run the isolated installation smoke before tagging:
 
@@ -152,7 +146,7 @@ exercises the generated FastAPI starter. CI runs the same gate from a clean
 checkout and checks that `esimu-core-v<version>` matches package metadata on tag
 builds.
 
-## 8. Build The Docs
+## 7. Build The Docs
 
 ```powershell
 cd esimu

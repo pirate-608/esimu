@@ -3,6 +3,9 @@
 这份清单用于生成一个离开 esimu 后仍可独立安装运行的模拟器。生成器会复制标准
 Starter 和一个主题，形成独立项目。
 
+默认 source theme 是独立的浙大精简适配 `zju-simplified`，协议 ID 仍使用中性的
+`forum/messenger`。需要完全中性内容时增加 `--source-theme demo-campus`。
+
 ## 生成项目
 
 ```powershell
@@ -48,22 +51,21 @@ esimu doctor --root . --theme my-simulator
 
 校验命令来自已安装的 `esimu-core`，读取当前项目自己的 `themes/`，不再需要回到 esimu 查找脚本。
 
-## 运行 Starter
+## 运行与构建 Starter
 
 ```powershell
-cd apps\starter\backend
-python -m uvicorn app.main:app --reload --port 18001
+esimu dev --root . --theme my-simulator
 ```
 
 第二个终端：
 
 ```powershell
-cd apps\starter\frontend
-corepack pnpm install --frozen-lockfile
-corepack pnpm dev
+esimu reload --root . --theme my-simulator
+esimu build --root . --theme my-simulator
 ```
 
-打开 `http://127.0.0.1:15175`。Vite 会代理 HTTP 与 WebSocket。
+打开 `http://127.0.0.1:15175`。Vite 会代理 HTTP 与 WebSocket。`reload` 会先同步
+metadata、校验主题再重启两个服务；`build` 输出前端 `dist/`。
 
 ## 编辑主题与世界数据
 

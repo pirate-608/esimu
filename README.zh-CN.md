@@ -8,43 +8,48 @@ esimu 是面向校园、职业和人生叙事模拟器的主题驱动框架。Be
 esimu-core + 生成的 Starter 应用 + 单一主题包
 ```
 
-`esimu-core 0.3.0b2` 提供强类型世界数据加载、主题校验、游戏规则、运行时
+最新公开 PyPI 版本仍是 `0.3.0b2`；`dev/reload/build` 与新的默认模板正在
+`main` 上作为 `0.4.0b1` 候选准备。
+
+当前源码候选 `esimu-core 0.4.0b1` 提供强类型世界数据加载、主题校验、游戏规则、运行时
 payload、可选 AI 生成和自包含项目 CLI。生成的 Starter 包含 Vue 3/Pinia
 控制台、FastAPI/WebSocket、实时 Tick、事件、论坛、私聊、道具、学期结算、
 冷却、声明式成就、自动内容、区分失败/毕业的结局和 SQLite 持久化。
 
 ## 快速开始
 
-从 PyPI 安装精确 Beta 版本：
+克隆源码候选以使用新的生命周期命令：
 
 ```powershell
-python -m pip install "esimu-core[ai]==0.3.0b2"
-esimu new D:\projects\my-simulator `
-  --project-name "My Simulator" `
-  --theme-id my-simulator `
-  --institution "星辰学院"
-cd D:\projects\my-simulator
+git clone https://github.com/pirate-608/esimu.git
+cd esimu
+python -m pip install -e ".\packages\esimu-core[ai]"
+esimu new D:\projects\zju-lite `
+  --project-name "ZJUers Simulator Lite" `
+  --theme-id zju-lite `
+  --institution "浙江大学"
+cd D:\projects\zju-lite
 python -m pip install -r apps\starter\backend\requirements.txt
-esimu validate --root . --theme my-simulator
-esimu doctor --root . --theme my-simulator
+esimu validate --root . --theme zju-lite
+esimu doctor --root . --theme zju-lite
+esimu dev --root . --theme zju-lite
 ```
 
-后端：
+在另一个终端请求同步并完整重启：
 
 ```powershell
-cd apps\starter\backend
-python -m uvicorn app.main:app --reload --port 18001
+esimu reload --root . --theme zju-lite
 ```
 
-另一个终端启动前端：
+构建生产前端：
 
 ```powershell
-cd apps\starter\frontend
-corepack pnpm install --frozen-lockfile
-corepack pnpm dev
+esimu build --root . --theme zju-lite
 ```
 
 访问 `http://127.0.0.1:15175`。
+
+需要完全中性的模板时，给 `esimu new` 增加 `--source-theme demo-campus`。
 
 ## 仓库结构
 
@@ -52,6 +57,7 @@ corepack pnpm dev
 packages/esimu-core/    可安装 Python 核心与 CLI
 apps/starter/           标准 FastAPI + Vue Starter
 themes/demo-campus/     中性的两学期示例主题
+themes/zju-simplified/  默认的浙大模拟器精简适配主题
 templates/              生成项目的交接模板
 docs/                   中英文 Zensical 文档站
 ```
@@ -79,7 +85,7 @@ Beta 支持策略和发布策略文档。
 
 - 包名：`esimu-core`
 - Python 命名空间：`esimu_core`
-- CLI：`esimu new/validate/doctor/inspect/sync/add/version`
+- CLI：`esimu new/validate/doctor/inspect/sync/add/dev/reload/build/version`
 - 主题契约版本：`1`
 - Starter 状态与 WebSocket 协议版本：`2`；旧状态自动迁移并兼容 v1 客户端
 - 许可证：MIT

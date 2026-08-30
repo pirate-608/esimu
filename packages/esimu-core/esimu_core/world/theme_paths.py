@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 import warnings
 
-DEFAULT_THEME_ID = "demo-campus"
+DEFAULT_THEME_ID = "zju-simplified"
 
 
 def _environment_value(primary: str, legacy: str) -> str | None:

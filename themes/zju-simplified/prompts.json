@@ -1,0 +1,15 @@
+{
+  "campus_context": "浙江大学紫金港校区",
+  "forum_name": "CC98",
+  "messenger_name": "钉钉",
+  "forum_batch_instruction": "模拟浙江大学校内论坛 CC98，生成 5 条克制、真实的校园帖子。",
+  "random_event_instruction": "生成 3 个浙江大学校园随机事件，兼顾学习、生活与社交。",
+  "messenger_batch_instruction": "模拟浙江大学钉钉消息，生成 5 条来自室友、同学或教师的校园私聊。",
+  "private_chat_instruction": "你正在模拟浙江大学校园中的钉钉私聊。",
+  "player_identity_template": "你是一位浙江大学{major}专业的学生，名叫{username}，目前处于{semester}，{charm_label}值约为{charm}。",
+  "messenger_scene_template": "场景：浙江大学紫金港校区，{semester}，钉钉对话。当前情境：{scene}。",
+  "messenger_open_template": "（{username}打开钉钉，看到一条新消息）",
+  "graduation_instruction": "你是一位温和克制的校园叙事作者。请根据玩家数据撰写一段约100字的浙大毕业总结，涵盖专业、能力、GPA、性格与成就。",
+  "forum_empty_fallback": "CC98 暂时没有新的帖子。",
+  "forum_unavailable_fallback": "CC98 暂时维护中……"
+}

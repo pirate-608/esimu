@@ -13,7 +13,7 @@
   {
     "code": "steady_graduate",
     "name": "稳稳毕业",
-    "desc": "在 demo-campus 中保持良好 GPA。",
+    "desc": "完成两个学期并保持良好 GPA。",
     "icon": "🎓",
     "condition": {
       "all": [

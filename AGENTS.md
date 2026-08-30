@@ -11,9 +11,11 @@ dependencies. The historical extraction is preserved by `esimu-lab-final`.
 ## Current Beta State
 
 - Package: `packages/esimu-core`, distribution `esimu-core`, import
-  `esimu_core`, current released Beta version `0.3.0b2`.
+  `esimu_core`, current source candidate `0.4.0b1`; latest released Beta
+  `0.3.0b2`.
 - Starter: `apps/starter`, FastAPI/WebSocket backend plus Vue 3/Pinia frontend.
-- Default theme: `themes/demo-campus`.
+- Default theme: `themes/zju-simplified`; `themes/demo-campus` remains the
+  neutral scaffold alternative.
 - Persistence: SQLite by default, memory for tests, JSON file as a temporary
   Beta compatibility adapter.
 - Contracts: theme schema is version 1; state and WebSocket protocol are version 2.
@@ -37,7 +39,7 @@ dependencies. The historical extraction is preserved by `esimu-lab-final`.
 
 Use `ESIMU_PROJECT_ROOT`, `ESIMU_THEME`, `ESIMU_WORLD_DIR`, and
 `ESIMU_FRONTEND_*_OUTPUT`. Old `SIMULATOR_*` names remain read-only compatibility
-inputs through the 0.3 Beta and must not appear in new docs or generated files.
+inputs through the 0.4 Beta and must not appear in new docs or generated files.
 
 Public CLI:
 
@@ -48,6 +50,9 @@ esimu doctor --root . --theme <theme-id>
 esimu inspect --root . --theme <theme-id>
 esimu sync --root . --theme <theme-id>
 esimu add <stat|item|achievement|event|course|prompt> <id> --root . --theme <theme-id>
+esimu dev --root . --theme <theme-id>
+esimu reload --root . --theme <theme-id>
+esimu build --root . --theme <theme-id>
 esimu version
 ```
 
@@ -67,6 +72,9 @@ esimu version
   code 1000. Do not reorder this lifecycle.
 - `esimu add` and `sync` are check/preview-only without `--write`; writes are
   atomic and validation failures must restore source and generated files.
+- `esimu dev` supervises backend/frontend children in the foreground;
+  `reload` synchronizes and validates the active theme before requesting a full
+  restart, and `build` writes metadata before creating the frontend bundle.
 
 ## Required Checks
 

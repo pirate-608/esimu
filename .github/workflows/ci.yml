@@ -115,24 +115,30 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r docs/requirements.txt
-      - name: Guard default docs and starter against ZJU-specific visible names
+      - name: Guard reusable code against hardcoded theme copy
         run: |
           python - <<'PY'
           from pathlib import Path
 
           needles = ("浙江大学", "折姜", "折大", "钉钉", "CC98")
-          roots = [Path("apps/starter"), Path("docs/index.md"), Path("docs/zh/index.md")]
+          roots = [
+              Path("packages/esimu-core/esimu_core"),
+              Path("apps/starter/backend/app"),
+              Path("apps/starter/frontend/src"),
+          ]
           hits = []
           for root in roots:
               files = root.rglob("*") if root.is_dir() else [root]
               for path in files:
+                  if "data" in path.parts and path.name.endswith(".generated.ts"):
+                      continue
                   if path.is_file() and path.suffix in {".py", ".ts", ".tsx", ".vue", ".js", ".md", ".html"}:
                       text = path.read_text(encoding="utf-8", errors="ignore")
                       for needle in needles:
                           if needle in text:
                               hits.append(f"{path}: {needle}")
           if hits:
-              print("Default starter/docs path should not expose ZJU reference names.")
+              print("Reusable code must read visible ZJU names from theme data.")
               print("\n".join(hits))
               raise SystemExit(1)
           PY

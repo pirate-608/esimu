@@ -7,11 +7,11 @@ Current scope:
 
 - `backend/`: FastAPI/WebSocket adapter with SQLite persistence by default.
 - `frontend/`: Vue 3/Pinia console driven by generated theme, story, and stat metadata.
-- Default theme: `demo-campus`.
+- Default theme: `zju-simplified`; use `demo-campus` for a neutral example.
 - State/protocol v2 with state-v1 and protocol-v1 compatibility.
 - Persistent cooldowns, achievements, automatic content, two-phase messenger
   replies, save/exit lifecycle, and distinct failure/graduation outcomes.
-- Memory sessions for tests and temporary file compatibility through the 0.3 Beta.
+- Memory sessions for tests and temporary file compatibility through the 0.4 Beta.
 
 The starter deliberately omits Redis, PostgreSQL, SQLAdmin, and production
 Docker. It includes the optional `esimu_core.ai` adapter but stays in local
@@ -27,24 +27,20 @@ cd esimu\apps\starter\backend
 python -m pytest tests
 ```
 
-Backend dev server:
+Run both development servers from the project root:
 
 ```powershell
-python -m uvicorn app.main:app --reload --port 18001
+esimu dev --root . --theme zju-simplified
 ```
 
-Frontend dev server:
+Request a synchronized full restart from another terminal:
 
 ```powershell
-cd esimu\apps\starter\frontend
-corepack pnpm install --frozen-lockfile
-corepack pnpm dev
+esimu reload --root . --theme zju-simplified
 ```
 
-Frontend checks:
+Build the production frontend:
 
 ```powershell
-corepack pnpm typecheck
-corepack pnpm test
-corepack pnpm build
+esimu build --root . --theme zju-simplified
 ```

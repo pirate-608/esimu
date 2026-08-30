@@ -106,7 +106,7 @@ ESIMU_STARTER_DATA_DIR=data/starter-sessions
 ```
 
 The file store writes one JSON file per hashed token and remains only for the
-0.3 Beta compatibility window. Distributed deployments should implement the
+0.4 Beta compatibility window. Distributed deployments should implement the
 asynchronous `SessionStore` protocol in the downstream application.
 
 ## Runtime Behavior

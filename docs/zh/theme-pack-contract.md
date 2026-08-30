@@ -107,7 +107,8 @@ Starter 的公开 action 始终使用中性的 `forum`、`messenger` ID。
 
 ## 新主题清单
 
-1. 用 `new_project.py` 生成项目，或复制 `themes/demo-campus/`。
+1. 用 `esimu new` 生成项目；默认复制 `themes/zju-simplified/`，需要中性内容时
+   使用 `--source-theme demo-campus`。
 2. 修改 `theme.json`，尤其是 `theme_id` 和 `storage.prefix`。
 3. 修改 `story.json` 和图片资源。
 4. 修改 `prompts.json`。

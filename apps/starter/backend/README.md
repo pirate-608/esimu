@@ -1,15 +1,21 @@
 # esimu Starter Backend
 
 This is the Beta FastAPI/WebSocket adapter. SQLite is the default persistence,
-`demo-campus` is the default theme, and reusable rules come from `esimu-core`.
+`zju-simplified` is the default theme, and reusable rules come from
+`esimu-core`. Public action IDs remain neutral `forum` and `messenger`.
 The v2 runtime persists cooldowns, achievements, content mode, ending state,
 and messenger rounds while loading v1 state automatically.
 
-Run locally:
+Run the complete local development stack from the project root:
 
 ```powershell
-cd esimu\apps\starter\backend
-python -m uvicorn app.main:app --reload --port 18001
+esimu dev --root . --theme zju-simplified
+```
+
+From a second terminal, synchronize theme metadata and restart both services:
+
+```powershell
+esimu reload --root . --theme zju-simplified
 ```
 
 Smoke checks:

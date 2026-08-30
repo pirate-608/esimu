@@ -28,6 +28,9 @@ python scripts\validate_world_data.py
 Remove-Item Env:ESIMU_THEME
 ```
 
+默认校验现在使用 `zju-simplified`；第二次显式运行继续覆盖中性的
+`demo-campus` 模板。
+
 生成项目不需要保留 esimu 路径，安装 core 后直接运行：
 
 ```powershell
@@ -37,31 +40,25 @@ esimu inspect --root <项目根目录> --theme <主题 ID>
 esimu sync --root <项目根目录> --theme <主题 ID>
 ```
 
-## 运行 Starter
-
-后端：
+## 运行 Starter 开发栈
 
 ```powershell
-cd apps\starter\backend
-python -m pytest tests
-python -m ruff check app tests
-python -m uvicorn app.main:app --reload --port 18001
+cd <esimu 仓库根目录>
+esimu dev --root . --theme zju-simplified
 ```
 
 健康检查位于 `http://127.0.0.1:18001/healthz`。默认持久化是
-`data/esimu.sqlite3`，测试显式使用内存 adapter。
+`data/esimu.sqlite3`，默认主题是 `zju-simplified`；Vite 位于
+`http://127.0.0.1:15175` 并代理 HTTP/WebSocket。
 
-前端在第二个终端运行：
+在第二个终端请求同步完整重启或生产构建：
 
 ```powershell
-cd apps\starter\frontend
-corepack pnpm install --frozen-lockfile
-corepack pnpm typecheck
-corepack pnpm dev
+esimu reload --root . --theme zju-simplified
+esimu build --root . --theme zju-simplified
 ```
 
-打开 `http://127.0.0.1:15175`。开发服务器会把 `/api`、`/config`、
-`/healthz` 和 `/ws` 代理到后端，因此 HTTP 与 WebSocket 保持同源。
+在 `dev` 终端按 Ctrl+C 会同时停止两个服务。
 
 前后端分域部署时，在前端 `.env` 设置：
 
@@ -75,19 +72,18 @@ VITE_ESIMU_WS_BASE=wss://api.example.com
 
 ## 生成独立项目
 
-先从 PyPI 安装精确 Beta：
-
-```powershell
-python -m pip install "esimu-core[ai]==0.3.0b2"
-```
-
-然后生成项目：
+上面的 editable 安装提供 `0.4.0b1` 候选。在该版本发布前，将同一个 editable
+依赖写入生成项目：
 
 ```powershell
 esimu new D:\projects\my-simulator `
   --project-name "My Simulator" `
-  --theme-id my-simulator
+  --theme-id my-simulator `
+  --core-dependency "-e D:\projects\esimu\packages\esimu-core[ai]"
 ```
+
+默认 source theme 是浙大精简适配 `zju-simplified`；需要中性模板时增加
+`--source-theme demo-campus`。
 
 生成项目拥有自己的 Starter、主题、资源、兼容 helper、README、环境模板和
 AGENTS.md，可完全离开 esimu 源码安装运行：
@@ -99,8 +95,7 @@ python -m venv .venv
 python -m pip install -r apps\starter\backend\requirements.txt
 esimu validate --root . --theme my-simulator
 esimu doctor --root . --theme my-simulator
-cd apps\starter\backend
-python -m uvicorn app.main:app --reload --port 18001
+esimu dev --root . --theme my-simulator
 ```
 
 框架贡献者测试未发布 core 时，可给 `esimu new` 传入 `--core-dependency`，

@@ -1,0 +1,27 @@
+[
+  {
+    "id": "roommate_qiushi",
+    "name": "林晓",
+    "role": "roommate",
+    "description": "热心的紫金港室友，常提醒你别错过早八。",
+    "personality": "温和、务实",
+    "relationship": "室友"
+  },
+  {
+    "id": "classmate_qiushi",
+    "name": "周屿",
+    "role": "classmate",
+    "description": "同专业同学，会在课程和社团活动之间找平衡。",
+    "personality": "开朗、可靠",
+    "relationship": "同班同学"
+  },
+  {
+    "id": "teacher_qiushi",
+    "name": "陈老师",
+    "role": "teacher",
+    "description": "专业课程教师，关注你的学习节奏。",
+    "personality": "耐心、直接",
+    "relationship": "任课教师"
+  }
+]
+
