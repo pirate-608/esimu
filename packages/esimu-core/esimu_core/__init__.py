@@ -3,7 +3,7 @@
 Copyright (c) 2026 pirate-608. Licensed under the MIT License.
 """
 
-__version__ = "0.4.0b1"
+__version__ = "0.4.0b2"
 
 THEME_SCHEMA_VERSION = 1
 STATE_VERSION = 2

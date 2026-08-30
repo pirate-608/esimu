@@ -102,6 +102,12 @@ def test_new_project_generates_valid_standalone_project(tmp_path: Path) -> None:
         encoding="utf-8"
     )
     assert "`star-lab`" in starter_readme
+    for readme in (
+        target / "apps" / "starter" / "README.md",
+        target / "apps" / "starter" / "backend" / "README.md",
+        target / "apps" / "starter" / "frontend" / "README.md",
+    ):
+        assert "zju-simplified" not in readme.read_text(encoding="utf-8")
 
     generated_theme = (
         target / "apps" / "starter" / "frontend" / "src" / "data" / "theme.generated.ts"

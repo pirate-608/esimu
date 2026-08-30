@@ -241,11 +241,12 @@ def _patch_starter_files(target: Path, theme_id: str, core_dependency: str) -> N
     for readme_path in (
         target / "apps" / "starter" / "README.md",
         target / "apps" / "starter" / "backend" / "README.md",
+        target / "apps" / "starter" / "frontend" / "README.md",
     ):
         readme_path.write_text(
             readme_path.read_text(encoding="utf-8").replace(
-                f"`{DEFAULT_THEME_ID}`",
-                f"`{theme_id}`",
+                DEFAULT_THEME_ID,
+                theme_id,
             ),
             encoding="utf-8",
         )

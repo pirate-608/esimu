@@ -81,7 +81,7 @@ empty and route `/api`, `/config`, `/healthz`, and `/ws` to the backend.
 
 ## 4. Generate A Standalone Simulator
 
-The editable source installation above provides the `0.4.0b1` candidate. Pass
+The editable source installation above provides the `0.4.0b2` candidate. Pass
 the same editable dependency into the generated project until that version is
 published:
 

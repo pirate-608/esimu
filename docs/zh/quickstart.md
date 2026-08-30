@@ -72,7 +72,7 @@ VITE_ESIMU_WS_BASE=wss://api.example.com
 
 ## 生成独立项目
 
-上面的 editable 安装提供 `0.4.0b1` 候选。在该版本发布前，将同一个 editable
+上面的 editable 安装提供 `0.4.0b2` 候选。在该版本发布前，将同一个 editable
 依赖写入生成项目：
 
 ```powershell

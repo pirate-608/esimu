@@ -3,7 +3,7 @@
 The installed `esimu` command owns project generation, validation, diagnostics,
 metadata synchronization, and conservative world-data authoring.
 
-`dev`, `reload`, and `build` are available on `main` in the `0.4.0b1` source
+`dev`, `reload`, and `build` are available on `main` in the `0.4.0b2` source
 candidate. The latest public PyPI release is `0.3.0b2`.
 
 ## Project Commands

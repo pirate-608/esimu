@@ -11,7 +11,7 @@ dependencies. The historical extraction is preserved by `esimu-lab-final`.
 ## Current Beta State
 
 - Package: `packages/esimu-core`, distribution `esimu-core`, import
-  `esimu_core`, current source candidate `0.4.0b1`; latest released Beta
+  `esimu_core`, current source candidate `0.4.0b2`; latest released Beta
   `0.3.0b2`.
 - Starter: `apps/starter`, FastAPI/WebSocket backend plus Vue 3/Pinia frontend.
 - Default theme: `themes/zju-simplified`; `themes/demo-campus` remains the

@@ -10,9 +10,9 @@ esimu-core + generated Starter app + one theme pack
 ```
 
 The latest public PyPI release remains `0.3.0b2`; `dev`, `reload`, `build`, and
-the new default template are being prepared on `main` for `0.4.0b1`.
+the new default template are being prepared on `main` for `0.4.0b2`.
 
-The current source candidate `esimu-core 0.4.0b1` provides typed world loaders,
+The current source candidate `esimu-core 0.4.0b2` provides typed world loaders,
 theme validation, gameplay
 rules, runtime payload helpers, optional AI generation, and a self-contained
 project CLI. The generated Starter includes a Vue 3/Pinia console, FastAPI and
