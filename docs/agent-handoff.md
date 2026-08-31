@@ -12,8 +12,8 @@ Documentation dependencies are pinned in `docs/requirements.txt`; the current
 toolchain is Zensical 0.0.57. Keep `mkdocs.yml` navigation free of missing or
 archived pages and run the strict build after every docs change.
 
-Current source candidate is `0.4.0b2`; latest release is `0.3.0b2`. Theme schema
-v1 and state/protocol v2 remain unchanged. `zju-simplified` is the default
+Current release is `0.4.0b2`. Theme schema v1 and state/protocol v2 remain
+unchanged. `zju-simplified` is the default
 source theme and `demo-campus` the neutral alternative. Prefer installed
 `esimu doctor/inspect/sync/add/dev/reload/build` commands; source scripts are
 compatibility wrappers. Slow event/forum/messenger AI work must stay outside

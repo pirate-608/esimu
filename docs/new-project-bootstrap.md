@@ -10,7 +10,7 @@ adaptation with neutral `forum` and `messenger` protocol IDs. Add
 
 ## Generate The Project
 
-With the candidate installed:
+With `esimu-core==0.4.0b2` installed:
 
 ```powershell
 esimu new D:\projects\my-simulator `

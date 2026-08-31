@@ -1,6 +1,6 @@
 # Beta Support Policy
 
-`esimu-core 0.3.0b2` is the current public Beta for single-theme narrative
+`esimu-core 0.4.0b2` is the current public Beta for single-theme narrative
 simulator prototypes, published through PyPI and GitHub Releases.
 
 Supported in this Beta:
@@ -12,7 +12,8 @@ Supported in this Beta:
 - the generated Vue/Pinia Starter;
 - SQLite for single-node persistence;
 - optional OpenAI-compatible content generation with local fallback;
-- installed `new/validate/doctor/inspect/sync/add/version` commands.
+- installed `new/validate/doctor/inspect/sync/add/dev/reload/build/version`
+  commands.
 
 Not promised by this Beta:
 

@@ -9,11 +9,8 @@ Its Beta shape is:
 esimu-core + generated Starter app + one theme pack
 ```
 
-The latest public PyPI release remains `0.3.0b2`; `dev`, `reload`, `build`, and
-the new default template are being prepared on `main` for `0.4.0b2`.
-
-The current source candidate `esimu-core 0.4.0b2` provides typed world loaders,
-theme validation, gameplay
+The current public PyPI release `esimu-core 0.4.0b2` provides typed world
+loaders, theme validation, gameplay
 rules, runtime payload helpers, optional AI generation, and a self-contained
 project CLI. The generated Starter includes a Vue 3/Pinia console, FastAPI and
 WebSocket adapter, real-time ticks, events, forum and messenger flows, items,
@@ -22,12 +19,10 @@ distinct endings, and SQLite persistence.
 
 ## Quick Start
 
-Clone the source candidate to use the new lifecycle commands:
+Install the exact Beta from PyPI:
 
 ```powershell
-git clone https://github.com/pirate-608/esimu.git
-cd esimu
-python -m pip install -e ".\packages\esimu-core[ai]"
+python -m pip install "esimu-core[ai]==0.4.0b2"
 esimu new D:\projects\zju-lite `
   --project-name "ZJUers Simulator Lite" `
   --theme-id zju-lite `

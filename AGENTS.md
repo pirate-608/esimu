@@ -11,8 +11,7 @@ dependencies. The historical extraction is preserved by `esimu-lab-final`.
 ## Current Beta State
 
 - Package: `packages/esimu-core`, distribution `esimu-core`, import
-  `esimu_core`, current source candidate `0.4.0b2`; latest released Beta
-  `0.3.0b2`.
+  `esimu_core`, current released Beta `0.4.0b2`.
 - Starter: `apps/starter`, FastAPI/WebSocket backend plus Vue 3/Pinia frontend.
 - Default theme: `themes/zju-simplified`; `themes/demo-campus` remains the
   neutral scaffold alternative.
@@ -109,7 +108,8 @@ both demo semesters without an esimu source checkout.
 - PyPI and GitHub prerelease use `.github/workflows/release.yml` with trusted
   publishing; never add a long-lived PyPI token.
 - Run an external generated-project trial before every release; `0.3.0b2` was
-  validated in `pirate-608/esimu-beta-example` before publication.
+  validated in `pirate-608/esimu-beta-example` before publication, as was
+  `0.4.0b2`.
 
 Preserve unrelated dirty files. Do not reset or delete work that you did not
 create. Update this file and relevant bilingual docs when contracts, layout,

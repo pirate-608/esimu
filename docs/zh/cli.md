@@ -3,8 +3,7 @@
 安装后的 `esimu` 命令负责项目生成、校验、诊断、metadata 同步和保守的世界数据
 编辑。
 
-`dev/reload/build` 已进入 `main` 上的 `0.4.0b2` 源码候选。最新公开 PyPI
-版本仍是 `0.3.0b2`。
+`dev/reload/build` 已包含在公开 PyPI 版本 `0.4.0b2` 中。
 
 ## 项目命令
 

@@ -48,15 +48,16 @@ Completed: an external project can install the package, generate a simulator,
 edit and sync a theme, persist/recover state, and complete the configured game
 without an esimu source checkout.
 
-## 0.4 Developer Experience Candidate
+## Public Beta 0.4
 
-- Add installed `dev`, `reload`, and `build` commands for one-command local
+- Added installed `dev`, `reload`, and `build` commands for one-command local
   startup, synchronized full restarts, and validated production bundles.
-- Make the compact, self-contained `zju-simplified` adaptation the default
+- Made the compact, self-contained `zju-simplified` adaptation the default
   source while retaining `demo-campus` as a neutral opt-in template.
-- Keep reusable core and Starter logic theme-neutral; visible CC98/DingTalk/ZJU
+- Kept reusable core and Starter logic theme-neutral; visible CC98/DingTalk/ZJU
   copy is allowed only in theme data and generated metadata.
-- Repeat wheel-only and external-project validation before publishing 0.4.
+- Published `0.4.0b2` after clean-checkout, wheel-only, TestPyPI, independent
+  Starbridge, and Docker Compose validation.
 
 ## Phase 17: Adapter Ecosystem
 

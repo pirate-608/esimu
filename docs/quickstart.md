@@ -81,15 +81,13 @@ empty and route `/api`, `/config`, `/healthz`, and `/ws` to the backend.
 
 ## 4. Generate A Standalone Simulator
 
-The editable source installation above provides the `0.4.0b2` candidate. Pass
-the same editable dependency into the generated project until that version is
-published:
+Install the exact public Beta, then generate the project:
 
 ```powershell
+python -m pip install "esimu-core[ai]==0.4.0b2"
 esimu new D:\projects\my-simulator `
   --project-name "My Simulator" `
-  --theme-id my-simulator `
-  --core-dependency "-e D:\projects\esimu\packages\esimu-core[ai]"
+  --theme-id my-simulator
 ```
 
 The default source is the compact `zju-simplified` adaptation. Add

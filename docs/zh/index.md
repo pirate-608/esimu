@@ -35,9 +35,8 @@ hide:
 <pre><code>esimu-core + starter app + theme pack</code></pre>
 
 <p>
-  下游项目应固定精确 Beta。<code>0.3.0b2</code> 是当前公开包，已补齐运行时
-  闭环与安装后作者命令。<code>0.4.0b2</code> 是加入生命周期命令与浙大精简
-  默认模板的源码候选。
+  下游项目应固定精确 Beta。<code>0.4.0b2</code> 是当前公开包，包含完整运行时、
+  安装后生命周期/作者命令与浙大精简默认模板。
 </p>
 
 <h2>你会得到什么</h2>

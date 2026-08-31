@@ -1,6 +1,6 @@
 # Beta Readiness Review
 
-esimu `0.3.0b2` is the current public Beta. It passed the clean-checkout matrix,
+esimu `0.4.0b2` is the current public Beta. It passed the clean-checkout matrix,
 TestPyPI installation, and the independent `esimu-beta-example` Docker trial
 before its PyPI and GitHub prerelease.
 
@@ -10,7 +10,7 @@ Vue/Pinia Starter, non-blocking content tasks, automatic events/messenger,
 cooldowns, declarative achievements, Game Over, ordered save/exit, SQLite
 restart persistence, release smoke, and bilingual Zensical 0.0.57 docs.
 
-The 0.3 release gate is complete. Future releases must repeat the same
+The 0.4 release gate is complete. Future releases must repeat the same
 candidate, external-install, artifact, and clean-environment checks.
 
 Deliberately deferred: runtime multi-theme, production identity, distributed

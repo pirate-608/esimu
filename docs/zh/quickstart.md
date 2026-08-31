@@ -72,14 +72,13 @@ VITE_ESIMU_WS_BASE=wss://api.example.com
 
 ## 生成独立项目
 
-上面的 editable 安装提供 `0.4.0b2` 候选。在该版本发布前，将同一个 editable
-依赖写入生成项目：
+先安装精确公开 Beta，再生成项目：
 
 ```powershell
+python -m pip install "esimu-core[ai]==0.4.0b2"
 esimu new D:\projects\my-simulator `
   --project-name "My Simulator" `
-  --theme-id my-simulator `
-  --core-dependency "-e D:\projects\esimu\packages\esimu-core[ai]"
+  --theme-id my-simulator
 ```
 
 默认 source theme 是浙大精简适配 `zju-simplified`；需要中性模板时增加

@@ -43,15 +43,16 @@ esimu 是面向单主题叙事模拟器的独立主题驱动框架。本页记�
 已达到：外部项目无需 esimu 源码 checkout，即可安装、生成模拟器、编辑和同步
 主题、保存恢复状态并完成主题配置的游戏流程。
 
-## 0.4 开发体验候选
+## 公开 Beta 0.4
 
-- 增加安装后的 `dev/reload/build`，用于一条命令启动本地服务、同步完整重启和
+- 已增加安装后的 `dev/reload/build`，用于一条命令启动本地服务、同步完整重启和
   经过校验的生产构建。
-- 将独立、精简的 `zju-simplified` 适配设为默认 source，同时保留中性的
+- 已将独立、精简的 `zju-simplified` 适配设为默认 source，同时保留中性的
   `demo-campus` 可选模板。
-- Core 与 Starter 可复用逻辑继续主题中立；CC98、钉钉和浙大可见文案只能存在于
+- Core 与 Starter 可复用逻辑保持主题中立；CC98、钉钉和浙大可见文案只能存在于
   主题数据和生成 metadata 中。
-- 发布 0.4 前重新完成 wheel-only 与外部项目验证。
+- `0.4.0b2` 已通过 clean-checkout、wheel-only、TestPyPI、独立 Starbridge 和
+  Docker Compose 验收后发布。
 
 ## Phase 17：Adapter 生态
 

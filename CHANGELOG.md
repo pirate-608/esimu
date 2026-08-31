@@ -10,7 +10,7 @@ This project follows a lightweight Semantic Versioning policy for `esimu-core`:
 - `PATCH`: bug fixes, documentation clarifications, and validation improvements
   that do not break existing valid themes.
 
-## 0.4.0b2 - Unreleased
+## 0.4.0b2 - 2026-08-31
 
 - Superseded the TestPyPI-only `0.4.0b1` candidate after external generation
   showed that Starter README lifecycle examples retained the source theme ID;
@@ -25,6 +25,8 @@ This project follows a lightweight Semantic Versioning policy for `esimu-core`:
   scaffold source while retaining `demo-campus` as the neutral alternative.
 - Kept public runtime action IDs neutral (`forum` and `messenger`) and avoided
   any runtime dependency on the ZJUers Simulator repository.
+- Passed the clean-checkout matrix, TestPyPI installation, independent
+  Starbridge backend/frontend checks, and Docker Compose acceptance.
 
 ## 0.4.0b1 - 2026-08-30 (TestPyPI only)
 

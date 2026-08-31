@@ -37,10 +37,9 @@ hide:
 <pre><code>esimu-core + starter app + theme pack</code></pre>
 
 <p>
-  Published projects should pin an exact Beta. <code>0.3.0b2</code> is the
-  current public package, with the closed runtime loop and installed authoring
-  commands. <code>0.4.0b2</code> is the source candidate adding lifecycle
-  commands and the ZJU simplified default template.
+  Published projects should pin an exact Beta. <code>0.4.0b2</code> is the
+  current public package, with the closed runtime loop, installed lifecycle and
+  authoring commands, and the ZJU simplified default template.
 </p>
 
 <h2>What You Get</h2>

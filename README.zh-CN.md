@@ -8,22 +8,17 @@ esimu 是面向校园、职业和人生叙事模拟器的主题驱动框架。Be
 esimu-core + 生成的 Starter 应用 + 单一主题包
 ```
 
-最新公开 PyPI 版本仍是 `0.3.0b2`；`dev/reload/build` 与新的默认模板正在
-`main` 上作为 `0.4.0b2` 候选准备。
-
-当前源码候选 `esimu-core 0.4.0b2` 提供强类型世界数据加载、主题校验、游戏规则、运行时
+当前公开 PyPI 版本 `esimu-core 0.4.0b2` 提供强类型世界数据加载、主题校验、游戏规则、运行时
 payload、可选 AI 生成和自包含项目 CLI。生成的 Starter 包含 Vue 3/Pinia
 控制台、FastAPI/WebSocket、实时 Tick、事件、论坛、私聊、道具、学期结算、
 冷却、声明式成就、自动内容、区分失败/毕业的结局和 SQLite 持久化。
 
 ## 快速开始
 
-克隆源码候选以使用新的生命周期命令：
+从 PyPI 安装精确 Beta：
 
 ```powershell
-git clone https://github.com/pirate-608/esimu.git
-cd esimu
-python -m pip install -e ".\packages\esimu-core[ai]"
+python -m pip install "esimu-core[ai]==0.4.0b2"
 esimu new D:\projects\zju-lite `
   --project-name "ZJUers Simulator Lite" `
   --theme-id zju-lite `
